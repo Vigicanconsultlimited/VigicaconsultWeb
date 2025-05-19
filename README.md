@@ -1,2 +1,2 @@
 # VigicaconsultWeb
-International Student adversory service 
+International Student adversory service web application.
