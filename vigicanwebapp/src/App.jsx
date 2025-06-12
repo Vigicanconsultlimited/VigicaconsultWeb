@@ -1,13 +1,16 @@
 import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import UnderConstructionPage from "./pages/underconstruction";
+
 import Login from "./pages/Login";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/*" element={<UnderConstructionPage />} />
+        <Route path="/*" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
 
         {/* 
