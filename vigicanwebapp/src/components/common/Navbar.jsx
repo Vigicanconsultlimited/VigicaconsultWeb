@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../../styles/Navbar.css";
-import logo from "../../assets/images/VIGICAlogo.png";
+import logo from "../../assets/images/vigica.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
