@@ -36,7 +36,7 @@ const ContactBar = () => {
               </a>
 
               <a
-                href="mailto:info@vigiosconsult.com"
+                href="mailto:info@vigicaconsult.com"
                 className="text-white text-decoration-none d-inline-flex align-items-center contact-item"
               >
                 <FaEnvelope className="me-2" />
