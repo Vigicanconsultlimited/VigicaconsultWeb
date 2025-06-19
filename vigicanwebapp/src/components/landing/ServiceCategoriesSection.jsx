@@ -114,10 +114,9 @@ const ServiceCategoriesSection = () => (
           lineHeight: 1.6,
         }}
       >
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus
-        diam ante, et lobortis nulla laoreet quis. Nunc tortor ex, volutpat eget
-        ligula ac, placerat fringilla enim. Morbi vehicula tincidunt nisi ac
-        eleifend.
+        Empowering individuals and institutions globally by providing
+        comprehensive educational consultancy, streamlined visa and travel
+        solutions, and exceptional accommodation and partnership services.
       </p>
     </div>
   </section>

@@ -24,8 +24,9 @@ const HeroSection = () => (
         </h2>
         <br />
         <p className="hero-paragraph text-white mb-2">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis porta ex
-          et nisl condimentum posuere. Vivamus sodales pellentesque velit.
+          A multidimensional consultancy firm offering specialized services in
+          international education recruitment, advisory, programme coordination,
+          travel logistics, and accommodation solutions.
         </p>
         <button className="btn hero-button text-white py-2 px-4 py-md-3 px-md-3 border-0 d-inline-flex align-items-center mb-5">
           <span
@@ -169,7 +170,7 @@ const HeroSection = () => (
         {/* Stat Item 2 */}
         <div className="col-md-2">
           <div className="stat-item h-100">
-            <div className="stat-number">95%</div>
+            <div className="stat-number">96%</div>
             <div className="stat-label">Successful Visa Process Rate</div>
           </div>
         </div>
@@ -185,8 +186,10 @@ const HeroSection = () => (
           <div className="description-section h-100 mx-auto p-4">
             <h2 className="service-title">Admission & Immigration Services</h2>
             <p className="service-description">
-              Lorem ipsumroin porta ex et nisl condorm postere. Vivamus sodales
-              pellentesque ullamcorper mollis velit porta ex et nisl condorm.
+              A dependable partner in education, travel, and hospitality. Our
+              tailored services, unwavering commitment to quality, and excellent
+              client relations make us a preferred consultancy in Nigeria and
+              beyond.
             </p>
           </div>
         </div>

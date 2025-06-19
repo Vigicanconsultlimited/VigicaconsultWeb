@@ -12,6 +12,8 @@
 .card-img-left {
   max-width: 100%;
   height: 90%;
+  width: 40%;
+  object-fit: cover;
 }
 
 .wide-card {
@@ -157,6 +159,16 @@
 @media (max-width: 768px) {
   .study-abroad-section {
     padding: 1.3rem 0 0.7rem 0;
+  }
+
+  .card-img-left {
+    padding-top: 40px !important;
+    height: 250px;
+    max-height: 250px;
+    width: 40%;
+    max-width: 40%;
+    object-fit: fill;
+    display: block;
   }
 
   .study-abroad-header {
