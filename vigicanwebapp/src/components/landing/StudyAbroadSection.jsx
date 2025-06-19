@@ -2,7 +2,7 @@ import React from "react";
 import admissionImage from "../../assets/images/studyabroad1.jpg";
 import visaImage from "../../assets/images/studyabroad2.jpg";
 import resourcesImage from "../../assets/images/studyabroad3.jpg";
-import "./StudyAbroadSection.css"; // Import the CSS file
+import "./StudyAbroadSection.css";
 
 const features = [
   {
@@ -39,14 +39,13 @@ const StudyAbroadSection = () => (
               <div className="study-abroad-header">
                 <div className="study-abroad-subtitle">— Study Abroad</div>
                 <h2 className="study-abroad-title">
-                  Lorem Ipsum Dolor Sit Amet,
-                  <br />
-                  Consectetur Adipisc Dolor Sit Amet,
+                  Visa advisory, Scholarship support, & Pre-departure
+                  orientation
                 </h2>
                 <p className="study-abroad-description">
-                  Lorem ipsum porta ex et nisl condorm posuere. Vivamussodales
-                  pellentesque ullamcorper mollis velit porta ex et nisl condorm
-                  ullamcorper.
+                  Personalized visa application guidance and documentation
+                  support, comprehensive orientation, airport pickup, and
+                  arrival guidance.
                 </p>
                 <button
                   style={{
@@ -135,10 +134,7 @@ const StudyAbroadSection = () => (
                         src={f.img}
                         className="card-img-left img-fluid m-2 pt-2"
                         alt={f.title}
-                        style={{
-                          width: "40%",
-                          objectFit: "cover",
-                        }}
+                        style={{}}
                       />
                       <div className="card-body">
                         <h5 className="card-title">{f.title}</h5>

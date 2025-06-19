@@ -78,7 +78,10 @@ const FlightBookingSection = () => (
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary flight-search-btn">
+          <button
+            type="submit"
+            className="btn btn-primary flight-search-btn d-none d-md-inline-block"
+          >
             Click to Continue
           </button>
         </div>
@@ -97,8 +100,8 @@ const FlightBookingSection = () => (
           <div className="swap-button d-flex justify-content-center">
             <button
               type="button"
-              className="btn-swap d-flex justify-content-center align-items-center p-2"
-              style={{ width: "50px", height: "50px" }} // optional fixed size
+              className="btn-swap d-flex justify-content-center align-items-center align-self-center p-2"
+              style={{ width: "50px", height: "50px" }}
             >
               {/* Desktop Icon */}
               <i className="bi bi-arrow-left-right d-none d-lg-inline thick-icon"></i>
@@ -182,6 +185,13 @@ const FlightBookingSection = () => (
             </label>
           </div>
         </div>
+
+        <button
+          type="submit"
+          className="btn btn-primary flight-search-btn d-block d-md-none"
+        >
+          Click to Continue
+        </button>
       </div>
     </div>
   </section>

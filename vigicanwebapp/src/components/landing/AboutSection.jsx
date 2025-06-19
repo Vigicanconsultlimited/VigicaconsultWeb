@@ -82,7 +82,7 @@ const AboutSection = () => (
           margin: "0 0 0.8rem 0",
         }}
       >
-        A Multi-dimensional Consultancy Firm
+        A Multi-dimensional Consultancy Firm,
       </h2>
       <p
         style={{
@@ -91,15 +91,17 @@ const AboutSection = () => (
           color: "#2c2c2c",
           lineHeight: "1.7",
           marginBottom: 14,
+          textAlign: "justify",
         }}
       >
-        Lorem ipsum dolor sit amet, Nunc faucibus diam ante, et lobortis nulla
-        laoreet quis. Nunc tortor ex, volutpat eget ligula ac, placerat
-        fringilla enim. consectetur adipiscing elit. Nunc faucibus diam ante, et
-        lobortis nulla laoreet quis. Nunc tortor ex, volutpat eget ligula ac,
-        placerat fringilla enim. Morbi vehicula tincidunt nisi ac eleifend.
-        Suspendisse bibendum sapien faucibus mauris euismod, non consequat diam
-        posuere.
+        specialized services in international education recruitment, advisory,
+        programme coordination, travel logistics, and accommodation solutions.
+        <br />
+        We also facilitate transnational partnership and collaboration between
+        institutions. Strategically headquartered in Abuja, Nigeria, we pride
+        ourselves on delivering tailored, high-impact services that meet the
+        dynamic needs of students, institutions, travelers, and corporate
+        partners.
       </p>
 
       <button

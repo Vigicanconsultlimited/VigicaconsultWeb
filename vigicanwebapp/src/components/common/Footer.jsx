@@ -1,4 +1,5 @@
 import React from "react";
+import footerLogo from "../../assets/images/logo-footer.png";
 import "../../styles/Footer.css";
 
 const Footer = () => (
@@ -8,7 +9,7 @@ const Footer = () => (
         <div className="footer-logo mb-3">
           <div className="logo-icon-variant2 d-flex align-items-center justify-content-center">
             <img
-              src="../../assets/images/VIGICAlogo.png"
+              src={footerLogo}
               alt="Vigica Consult Ltd"
               className="me-2"
               style={{ width: "60px", height: "auto" }}
