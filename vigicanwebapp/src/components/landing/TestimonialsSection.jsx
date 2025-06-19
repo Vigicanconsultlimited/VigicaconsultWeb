@@ -8,7 +8,7 @@ import "./TestimonialsSection.css";
 const TestimonialsSection = () => (
   <div className="testimonials-section py-5">
     <div className="container">
-      <h2 className="testimonials-title mb-5">
+      <h2 className="testimonials-title mb-2">
         Trusted by Hundreds of Students
       </h2>
       <div className="position-relative testimonials-row bg-blue rounded-4 px-4 py-5">
@@ -26,7 +26,7 @@ const TestimonialsSection = () => (
           {/* Testimonial Content */}
           <div className="testimonial-content-main flex-grow-1 me-4 ms-4">
             <h4 className="testimonial-uni mb-2">Lorem Ipsum University</h4>
-            <p className="testimonial-text mb-2">
+            <p className="testimonial-text">
               Lorem ipsumroin porta ex et nisl condorm posuere.
               Vivamussodalerders pellentesque ullamcorper mollis velit porta ex
               et nisl condorm posuere. Lorem ipsumroin porta ex et nisl condorm

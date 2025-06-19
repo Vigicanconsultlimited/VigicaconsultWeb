@@ -28,6 +28,8 @@
 .testimonial-content-main {
   min-width: 250px;
   max-width: 480px;
+  margin: 0px !important;
+  padding: 0 !important;
 }
 
 .testimonial-uni {
@@ -38,7 +40,7 @@
 
 .testimonial-text {
   font-size: 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem !important;
 }
 
 .testimonial-author {
@@ -46,9 +48,19 @@
   font-size: 1.02rem;
 }
 
-.testimonial-img-list img {
+.testimonial-img-list {
   border-radius: 14px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.07);
+  display: flex;
+  gap: 1rem; /* Same as Bootstrap's gap-3 */
+  margin-left: 1.5rem; /* Same as Bootstrap's ms-4 */
+}
+
+.testimonial-img-list img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 0.375rem; /* Same as Bootstrap's rounded-3 */
 }
 
 .testimonial-plane {
@@ -108,11 +120,16 @@
   }
   .testimonial-img-list {
     justify-content: center;
-    margin-top: 1.5rem;
+    flex-direction: row !important;
   }
   .testimonial-carousel-controls {
-    right: 20px;
-    top: 20px;
+    margin: auto;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    right: 0;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -120,15 +137,18 @@
   .testimonials-title {
     font-size: 1.3rem;
   }
-  .testimonial-img-main img,
+  .testimonial-img-main img {
+    width: 200px !important;
+    height: 150px !important;
+    margin-bottom: 0%;
+  }
+
   .testimonial-img-list img {
     width: 80px !important;
     height: 80px !important;
   }
-  .testimonial-plane {
-    display: none;
-  }
   .testimonial-content-main {
     font-size: 0.96rem;
+    margin-top: auto;
   }
 }
