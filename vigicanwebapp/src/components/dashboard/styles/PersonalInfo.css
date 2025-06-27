@@ -1,0 +1,120 @@
+.form-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.form-title {
+  color: #1b2ebf;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+  color: #5c6fb2;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #3b4ea1;
+}
+
+.form-input {
+  width: 100%;
+  border: 2px solid #d1d9f9;
+  background: #f3f6ff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  color: #1b2ebf;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: #1b2ebf;
+  outline: none;
+  background-color: #ebf0ff;
+}
+
+.form-input-error {
+  border-color: #e84343;
+}
+
+.form-hint {
+  font-size: 0.8rem;
+  color: #6d7db9;
+  margin-top: 4px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e4e9fb;
+  margin-top: 2rem;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #1b2ebf;
+  color: #fff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #14239d;
+}
+
+.btn-secondary {
+  background-color: #e4e9fb;
+  color: #1b2ebf;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #d3daf3;
+}
+
+.btn-outline-primary {
+  background: transparent;
+  border: 2px solid #1b2ebf;
+  color: #1b2ebf;
+}
+
+.btn-outline-primary:hover {
+  background-color: #f0f3ff;
+}
+
+@media (max-width: 768px) {
+  .form-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
