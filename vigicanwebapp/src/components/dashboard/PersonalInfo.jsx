@@ -68,6 +68,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+
     // Simple check: Ensure the main fields are filled
     const requiredFields = [
       "FirstName",
@@ -91,6 +92,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
     }
 
     // Form is complete, proceed with submission
+
     const payload = new FormData();
     payload.append("FirstName", formData.FirstName);
     payload.append("MiddleName", formData.MiddleName);
@@ -120,6 +122,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
           },
         }
       );
+
       console.log("Response from server:", response);
       const result = response.data;
       console.log("Form submitted:", result);
