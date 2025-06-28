@@ -68,6 +68,31 @@ export default function PersonalInfo({ onContinue, onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+
+    // Simple check: Ensure the main fields are filled
+    const requiredFields = [
+      "FirstName",
+      "LastName",
+      "Phone",
+      "DOB",
+      "Address",
+      "PostCode",
+      "FirstLanguage",
+      "PreferredPronoun",
+    ];
+
+    const isFormComplete = requiredFields.every(
+      (field) => formData[field] && formData[field].trim() !== ""
+    );
+
+    if (!isFormComplete) {
+      console.warn("Form not completely filled. Skipping submission.");
+      if (onContinue) onContinue(); // Just go to the next step
+      return;
+    }
+
+    // Form is complete, proceed with submission
+
     const payload = new FormData();
     payload.append("FirstName", formData.FirstName);
     payload.append("MiddleName", formData.MiddleName);
@@ -98,7 +123,8 @@ export default function PersonalInfo({ onContinue, onBack }) {
         }
       );
 
-      const result = await response.json();
+      console.log("Response from server:", response);
+      const result = response.data;
       console.log("Form submitted:", result);
       if (onContinue) onContinue();
     } catch (error) {
