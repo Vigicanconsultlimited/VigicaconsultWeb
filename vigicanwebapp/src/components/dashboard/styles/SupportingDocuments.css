@@ -1,0 +1,126 @@
+.supporting-docs {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 750px;
+  margin: auto;
+  box-shadow: 0 2px 8px #dde3f9;
+  font-family: "Inter", sans-serif;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1f3fd6;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #5b5e68;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.divider {
+  height: 2px;
+  background: #1f3fd6;
+  margin-bottom: 1rem;
+}
+
+.accordion-item {
+  margin-bottom: 12px;
+}
+
+.accordion-header {
+  background: #d6e3ff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #1f3fd6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.accordion-header:hover {
+  background: #bfd6ff;
+}
+
+.accordion-body {
+  background: #f4f8ff;
+  border: 2px dashed #c4d3f6;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.upload-box {
+  cursor: pointer;
+}
+
+.upload-placeholder {
+  color: #1f3fd6;
+  font-weight: 500;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.uploaded-file {
+  margin-top: 14px;
+  background: #edf3ff;
+  border: 1px solid #c1d2fa;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1f3fd6;
+  font-weight: 500;
+}
+
+.remove-file {
+  color: #d42785;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 0;
+  margin-top: 30px;
+  border-top: 1px solid #e3e8fd;
+  background: #e3e8fd;
+  border-radius: 0 0 16px 16px;
+}
+
+.footer .btn {
+  padding: 10px 20px;
+  font-weight: 600;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back-btn {
+  background: #f0f4ff;
+  border: 1px solid #c5d4f6;
+  color: #1f3fd6;
+}
+
+.draft-btn {
+  background: #c6d7f9;
+  border: none;
+  color: #1f3fd6;
+}
+
+.continue-btn {
+  background: #1f3fd6;
+  border: none;
+  color: white;
+}

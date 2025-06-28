@@ -1,120 +1,181 @@
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "../store/auth";
 import axios from "./axios";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import Swal from "sweetalert2";
 
-export const login = async (email, password) => {
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top",
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+});
+
+// Helper function to check token expiration
+const isTokenExpired = (token) => {
   try {
-    const { response, status } = await axios.post("auth/token", {
-      email,
-      password,
-    });
-
-    if (status === 200) {
-      setAuthUser(response.access, response.refresh);
-
-      //Alert on successful login
-    }
-    return { response, error: null };
-  } catch (error) {
-    return {
-      response: null,
-      error: error.response.data?.detail || "Something went wrong",
-    };
+    const { exp } = jwtDecode(token);
+    return Date.now() >= exp * 1000;
+  } catch {
+    return true;
   }
 };
 
-export const register = async (
-  first_name,
-  last_name,
-  other_name,
-  email,
-  password,
-  password2
-) => {
+export const login = async (email, password) => {
   try {
-    const { response, status } = await axios.post("auth/register", {
-      first_name,
-      last_name,
-      other_name,
+    const { data } = await axios.post("user/login/", { email, password });
+
+    if (data?.token) {
+      setAuthUser({
+        token: data.token,
+        refreshToken: data.refreshertoken, // Note lowercase 'refreshertoken'
+        user: data.userRsponse,
+      });
+      console.log("Login successful:", data);
+
+      Toast.fire({
+        icon: "success",
+        title: "Login Successful",
+      });
+      return { data, error: null };
+    }
+
+    throw new Error("No token received");
+  } catch (error) {
+    const errorMsg =
+      error.response?.data?.errorDetails ||
+      error.response?.data?.message ||
+      error.message ||
+      "Login failed";
+    return { data: null, error: errorMsg };
+  }
+};
+
+export const setAuthUser = ({ token, refreshToken, user }) => {
+  if (!token) return;
+
+  // Set cookies with proper attributes
+  Cookies.set("access_token", token, {
+    expires: new Date(jwtDecode(token).exp * 1000),
+    secure: false, // True in production
+    //secure: process.env.NODE_ENV === "production",
+    //sameSite: "Strict",
+  });
+
+  if (refreshToken) {
+    Cookies.set("refresh_token", refreshToken, {
+      expires: 7, // 7 days
+      secure: false,
+      //secure: process.env.NODE_ENV === "production",
+      //sameSite: "Strict",
+    });
+  }
+
+  // Set user in store
+  useAuthStore.getState().setUser(user || jwtDecode(token));
+};
+
+export const refreshAuthToken = async () => {
+  try {
+    const refreshToken = Cookies.get("refresh_token");
+    if (!refreshToken) throw new Error("No refresh token");
+
+    const response = await axios.post("User/refreshtoken/", {
+      refresh: refreshToken,
+    });
+
+    return {
+      token: response.data.token,
+      refreshToken: response.data.refreshertoken,
+      user: response.data.userRsponse,
+    };
+  } catch (error) {
+    console.error("Token refresh failed:", error);
+    return null;
+  }
+};
+
+export const setUser = async () => {
+  const accessToken = Cookies.get("access_token");
+  const refreshToken = Cookies.get("refresh_token");
+
+  const store = useAuthStore.getState();
+  store.setLoading(true);
+
+  if (!accessToken || !refreshToken) {
+    store.setLoading(false);
+    return;
+  }
+
+  try {
+    if (isTokenExpired(accessToken)) {
+      const newTokens = await refreshAuthToken();
+      if (newTokens) {
+        setAuthUser(newTokens);
+      } else {
+        logout();
+      }
+    } else {
+      setAuthUser({
+        token: accessToken,
+        refreshToken,
+        user: jwtDecode(accessToken),
+      });
+    }
+  } catch (error) {
+    console.error("Auth error:", error);
+    logout();
+  } finally {
+    store.setLoading(false);
+  }
+};
+
+export const logout = () => {
+  Cookies.remove("access_token");
+  Cookies.remove("refresh_token");
+  localStorage.removeItem("auth-storage");
+  useAuthStore.getState().setUser(null);
+  Toast.fire({
+    icon: "success",
+    title: "Signed Out Successfully",
+  });
+};
+
+export const register = async (email, password, password2) => {
+  try {
+    const { data } = await axios.post("user/create/", {
       email,
-      phone,
       password,
       password2,
     });
 
-    if (status === 201) {
-      await login(email, password);
-      //Alert on successful registration
-    }
-    return { response, error: null };
-  } catch (error) {
-    return {
-      response: null,
-      error: error.response.data?.detail || "Something went wrong",
-    };
-  }
-};
+    await login(email, password);
 
-export const logout = async () => {
-  Cookies.remove("access_token");
-  Cookies.remove("refresh_token");
-  useAuthStore.getState().clearUser();
+    //Alert - Signup up successfully
 
-  //Alert on successful logout
-};
-
-export const setUser = async () => {
-  const access_token = Cookies.get("access_token");
-  const refresh_token = Cookies.get("refresh_token");
-
-  if (access_token || refresh_token) {
-    return;
-  }
-  if (isAccessTokenExpired(access_token)) {
-    const { response, error } = await refreshAccessToken(refresh_token);
-    if (error) {
-      return;
-    }
-    setAuthUser(response.access, response.refresh);
-  } else {
-    setAuthUser(access_token, refresh_token);
-  }
-};
-
-export const setAuthUser = (access_token, refresh_token) => {
-  useAuthStore.getState().setUser(user);
-  Cookies.set("access_token", access_token, { expires: 1, secure: true });
-  Cookies.set("refresh_token", refresh_token, { expires: 7, secure: true });
-
-  const user = jwt_decode(access_token) ?? null;
-  if (user) {
-    useAuthStore.getState().setUser(user);
-  }
-  useAuthStore.getState().setLoading(false);
-};
-
-export const refreshAccessToken = async (refresh_token) => {
-  const refresh_token = Cookies.get("refresh_token");
-  try {
-    const response = await axios.post("user/token/refresh", {
-      refresh: refresh_token,
+    Toast.fire({
+      icon: "success",
+      title: "Account Created Successfully",
     });
 
-    return response.data;
+    return { data, error: null };
   } catch (error) {
+    let errorMsg = "Something went wrong";
+
+    if (error.response?.data?.errorDetails) {
+      errorMsg = error.response.data.errorDetails;
+    } else if (error.response?.data?.detail) {
+      errorMsg = error.response.data.detail;
+    } else if (error.response?.data?.message) {
+      errorMsg = error.response.data.message;
+    } else if (error.message) {
+      errorMsg = error.message;
+    }
+
     return {
-      response: null,
-      error: error.response.data?.detail || "Something went wrong",
+      data: null,
+      error: errorMsg,
     };
   }
-};
-
-export const isAccessTokenExpired = (access_token) => {
-  if (!access_token) {
-    return true;
-  }
-  const decoded = jwt_decode(access_token);
-  const current_time = Date.now() / 1000;
-  return decoded.exp < current_time;
 };
