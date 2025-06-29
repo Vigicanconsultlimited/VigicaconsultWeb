@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import apiInstance from "../utils/axios";
-import "../styles/OtpverifyPage.css";
+import "../styles/OtpVerifyPage.css";
 import OtpVerifyImage from "../assets/images/visa-apply.jpg";
 
 const Toast = Swal.mixin({
