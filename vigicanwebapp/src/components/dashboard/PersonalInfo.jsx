@@ -37,6 +37,10 @@ export default function PersonalInfo({ onContinue, onBack }) {
     return index !== -1 ? index + 1 : 0;
   };
 
+  const getLabelFromMappedValue = (value, options) => {
+    return options[value - 1] || "";
+  };
+
   const [formData, setFormData] = useState({
     FirstName: "",
     MiddleName: "",
@@ -51,24 +55,72 @@ export default function PersonalInfo({ onContinue, onBack }) {
     FirstLanguage: "",
   });
 
-  useEffect(() => {
-    if (authData) {
-      const email =
-        authData["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-      const userId = authData["uid"];
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-      setFormData((prev) => ({
-        ...prev,
-        Email: email || "",
-        UserId: userId || "",
-      }));
-    }
+  useEffect(() => {
+    const fetchExistingData = async () => {
+      if (authData) {
+        const userId = authData["uid"];
+        const email =
+          authData[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+          ];
+
+        setFormData((prev) => ({
+          ...prev,
+          Email: email || "",
+          UserId: userId || "",
+        }));
+
+        try {
+          const response = await apiInstance.get(
+            `StudentPersonalInfo/user/${userId}`
+          );
+          if (response?.data) {
+            const savedData = response.data;
+
+            setFormData({
+              FirstName: savedData.firstName || "",
+              MiddleName: savedData.middleName || "",
+              LastName: savedData.lastName || "",
+              Phone: savedData.phone || "",
+              Email: savedData.email || email,
+              Address: savedData.address || "",
+              PostCode: savedData.postCode || "",
+              DOB: savedData.dob ? savedData.dob.split("T")[0] : "",
+              UserId: savedData.userId || userId,
+              PreferredPronoun: getLabelFromMappedValue(
+                savedData.preferredPronoun,
+                pronounOptions
+              ),
+              FirstLanguage: getLabelFromMappedValue(
+                savedData.firstLanguage,
+                languageOptions
+              ),
+            });
+
+            setIsFormSubmitted(true);
+          }
+        } catch (error) {
+          console.warn("No existing personal info found or error:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchExistingData();
   }, [authData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simple check: Ensure the main fields are filled
+    if (isFormSubmitted) {
+      window.location.href = "/dashboard/applications";
+      return;
+    }
+
     const requiredFields = [
       "FirstName",
       "LastName",
@@ -86,11 +138,10 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
     if (!isFormComplete) {
       console.warn("Form not completely filled. Skipping submission.");
-      if (onContinue) onContinue(); // Just go to the next step
+      if (onContinue) onContinue(); // go to next step anyway
       return;
     }
 
-    // Form is complete, proceed with submission
     const payload = new FormData();
     payload.append("FirstName", formData.FirstName);
     payload.append("MiddleName", formData.MiddleName);
@@ -120,14 +171,14 @@ export default function PersonalInfo({ onContinue, onBack }) {
           },
         }
       );
-      console.log("Response from server:", response);
-      const result = response.data;
-      console.log("Form submitted:", result);
+      console.log("Form submitted:", response.data);
       if (onContinue) onContinue();
     } catch (error) {
       console.error("Submission failed:", error);
     }
   };
+
+  if (loading) return <div className="loading">Loading...</div>;
 
   return (
     <form className="form-container" onSubmit={handleSubmit}>
@@ -137,18 +188,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
         your application.
       </p>
 
-      {/* Title and Full Name */}
       <div className="row">
-        {/* <div className="col-md-2 col-6">
-          <label className="form-label">Title</label>
-          <select className="form-input">
-            <option value="">Mr.</option>
-            <option>Mrs.</option>
-            <option>Miss</option>
-            <option>Dr.</option>
-            <option>Prof.</option>
-          </select>
-        </div> */}
         <div className="col-md-3 col-12">
           <label className="form-label">First Name</label>
           <input
@@ -156,6 +196,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
             className="form-input"
             placeholder="Enter your first name"
             value={formData.FirstName}
+            disabled={isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, FirstName: e.target.value })
             }
@@ -168,6 +209,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
             className="form-input"
             placeholder="Enter your middle name"
             value={formData.MiddleName}
+            disabled={isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, MiddleName: e.target.value })
             }
@@ -180,6 +222,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
             className="form-input"
             placeholder="Enter your last name"
             value={formData.LastName}
+            disabled={isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, LastName: e.target.value })
             }
@@ -187,62 +230,48 @@ export default function PersonalInfo({ onContinue, onBack }) {
         </div>
         <div className="col-12">
           <small className="form-hint">
-            Enter your full name exactly as it appears on your passport. Note
-            that any discrepancies may cause issues with your application.
+            Enter your full name exactly as it appears on your passport.
           </small>
         </div>
       </div>
 
-      {/* Phone & Date of Birth */}
       <div className="row">
-        {/* Phone */}
         <div className="col-md-6 col-12">
           <label className="form-label">Phone Number</label>
           <input
             type="tel"
-            className="form-input form-input-error"
+            className="form-input"
             placeholder="+234 80..."
             value={formData.Phone}
+            disabled={isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, Phone: e.target.value })
             }
           />
-          <small className="form-hint">
-            Enter an active phone number where you can receive an SMS from us
-          </small>
         </div>
 
-        {/* Date of Birth */}
         <div className="col-md-6 col-12">
           <label className="form-label">Date of Birth</label>
           <input
             type="date"
             className="form-input"
             value={formData.DOB}
+            disabled={isFormSubmitted}
             onChange={(e) => setFormData({ ...formData, DOB: e.target.value })}
           />
-          <small className="form-hint">
-            Select your date of birth (e.g., 1990-05-20)
-          </small>
         </div>
       </div>
 
-      {/* Email */}
       <div className="form-group">
         <label className="form-label">Email</label>
         <input
           type="email"
           className="form-input"
-          placeholder="Enter your email"
           value={formData.Email}
           disabled
         />
-        <small className="form-hint">
-          Enter an active email address where you can receive messages from us
-        </small>
       </div>
 
-      {/* Address */}
       <div className="form-group">
         <label className="form-label">Permanent Address</label>
         <input
@@ -250,14 +279,13 @@ export default function PersonalInfo({ onContinue, onBack }) {
           className="form-input"
           placeholder="Enter address"
           value={formData.Address}
+          disabled={isFormSubmitted}
           onChange={(e) =>
             setFormData({ ...formData, Address: e.target.value })
           }
         />
-        <small className="form-hint">Provide your permanent home address</small>
       </div>
 
-      {/* Postcode & Course */}
       <div className="row">
         <div className="col-md-6 col-12">
           <label className="form-label">Post Code</label>
@@ -266,19 +294,19 @@ export default function PersonalInfo({ onContinue, onBack }) {
             className="form-input"
             placeholder="Enter postcode"
             value={formData.PostCode}
+            disabled={isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, PostCode: e.target.value })
             }
           />
-          <small className="form-hint">What is your postal code?</small>
         </div>
 
         <div className="col-md-6 col-12">
           <label className="form-label">Preferred Language</label>
           <select
-            id="language"
             className="form-select personal-info-input"
             value={formData.FirstLanguage}
+            disabled={isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, FirstLanguage: e.target.value })
             }
@@ -290,45 +318,28 @@ export default function PersonalInfo({ onContinue, onBack }) {
               </option>
             ))}
           </select>
-          <small className="form-hint">Which language do you prefer?</small>
         </div>
-        {/* Pronoun */}
-        <div className="mb-3">
-          <label className="form-label personal-info-label" htmlFor="pronoun">
-            Preferred Pronoun
-          </label>
-          <select
-            id="pronoun"
-            className="form-select personal-info-input"
-            value={formData.PreferredPronoun}
-            onChange={(e) =>
-              setFormData({ ...formData, PreferredPronoun: e.target.value })
-            }
-          >
-            <option value="">Select pronoun</option>
-            {pronounOptions.map((p, i) => (
-              <option key={i} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-          <div className="form-hint">How would you like to be addressed?</div>
-        </div>
-        {/* <div className="col-md-6 col-12">
-          <label className="form-label">Preferred Course</label>
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Enter preferred course"
-          />
-          <small className="form-hint">
-            Which course are you interested in applying for?
-          </small>
-        </div>
-        */}
       </div>
 
-      {/* Footer */}
+      <div className="mb-3">
+        <label className="form-label">Preferred Pronoun</label>
+        <select
+          className="form-select personal-info-input"
+          value={formData.PreferredPronoun}
+          disabled={isFormSubmitted}
+          onChange={(e) =>
+            setFormData({ ...formData, PreferredPronoun: e.target.value })
+          }
+        >
+          <option value="">Select pronoun</option>
+          {pronounOptions.map((p, i) => (
+            <option key={i} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="form-footer">
         <button
           type="button"
@@ -340,10 +351,29 @@ export default function PersonalInfo({ onContinue, onBack }) {
         <button type="button" className="btn btn-secondary">
           💾 Save as Draft
         </button>
-        <button type="submit" className="btn btn-primary">
-          Continue →
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={isFormSubmitted}
+        >
+          {isFormSubmitted ? "Already Submitted" : "Continue →"}
         </button>
       </div>
+
+      {isFormSubmitted && (
+        <div className="alert alert-info mt-3">
+          <strong>You've already submitted this form.</strong>
+          <br />
+          You can edit it from your application dashboard.
+          <br />
+          <button
+            className="btn btn-link mt-2"
+            onClick={() => (window.location.href = "/dashboard/applications")}
+          >
+            ➡ Go to My Applications
+          </button>
+        </div>
+      )}
     </form>
   );
 }
