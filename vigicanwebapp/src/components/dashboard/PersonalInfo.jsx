@@ -121,6 +121,8 @@ export default function PersonalInfo({ onContinue, onBack }) {
       return;
     }
 
+
+    // Simple check: Ensure the main fields are filled
     const requiredFields = [
       "FirstName",
       "LastName",
@@ -141,6 +143,10 @@ export default function PersonalInfo({ onContinue, onBack }) {
       if (onContinue) onContinue(); // go to next step anyway
       return;
     }
+
+
+    // Form is complete, proceed with submission
+
 
     const payload = new FormData();
     payload.append("FirstName", formData.FirstName);
@@ -171,7 +177,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
           },
         }
       );
-      console.log("Form submitted:", response.data);
+
       if (onContinue) onContinue();
     } catch (error) {
       console.error("Submission failed:", error);
