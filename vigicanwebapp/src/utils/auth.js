@@ -29,7 +29,7 @@ export const login = async (email, password) => {
     if (data?.token) {
       setAuthUser({
         token: data.token,
-        refreshToken: data.refreshertoken, // Note lowercase 'refreshertoken'
+        refreshToken: data.refreshertoken,
         user: data.userRsponse,
       });
       console.log("Login successful:", data);
@@ -74,6 +74,7 @@ export const setAuthUser = ({ token, refreshToken, user }) => {
 
   // Set user in store
   useAuthStore.getState().setUser(user || jwtDecode(token));
+  useAuthStore.getState().setLoading(false);
 };
 
 export const refreshAuthToken = async () => {
