@@ -1,16 +1,25 @@
 import React from "react";
+import logo from "../../assets/images/vigica.png";
+
 import "./styles/DashboardNavbar.css";
+import { useAuthStore } from "../../store/auth";
 
 export default function DashboardNavbar() {
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const user = useAuthStore((state) => state.allUserData);
+  console.log("User Data:", user);
+
+  const email =
+    user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+  const role =
+    user?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+  const userId = user?.uid;
+
   return (
-    <nav className="dashboard-navbar d-flex align-items-center px-3 px-md-4">
+    <nav className="dashboard-navbar d-flex align-items-center px-3 px-md-4 mb-3">
       {/* Logo Section */}
       <div className="d-flex align-items-center me-4">
-        <img
-          src="/assets/images/logo.png" // Replace with your logo path
-          alt="Vigica Logo"
-          className="dashboard-navbar-logo"
-        />
+        <img src={logo} alt="Vigica Logo" className="dashboard-navbar-logo" />
         <div className="d-none d-md-block ms-2">
           <span className="dashboard-navbar-brand fw-bold">VIGICA</span>
           <div
@@ -47,7 +56,7 @@ export default function DashboardNavbar() {
       {/* User Section */}
       <div className="d-flex align-items-center ms-auto">
         <img
-          src="/assets/images/user-profile.jpg" // Replace with the user's profile image path
+          src="/assets/images/user-profile.jpg"
           alt="User"
           className="dashboard-navbar-avatar me-2"
         />
@@ -56,13 +65,20 @@ export default function DashboardNavbar() {
             className="dashboard-navbar-user fw-medium text-white"
             style={{ fontSize: 15 }}
           >
-            Charles Sopuruchi
+            {isLoggedIn() ? user?.name || "Guest" : "Guest User"}
           </span>
           <div
             className="dashboard-navbar-email text-white-50"
             style={{ fontSize: 12 }}
           >
-            charles_sopuruchukwu26@gmail.com
+            {email || "Guest"}
+          </div>
+
+          <div
+            className="dashboard-navbar-email text-white-50"
+            style={{ fontSize: 8 }}
+          >
+            User ID: {userId || "N/A"}
           </div>
         </div>
       </div>
