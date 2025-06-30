@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { login } from "../utils/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
+
+import "../styles/Login.css";
 import registerImage from "../assets/images/visa-apply.jpg";
 import vigicaLogo from "../assets/images/vigica.png";
 
@@ -11,6 +13,7 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -111,7 +114,7 @@ function Login() {
                   className="mt-4"
                   autoComplete="off"
                 >
-                  <div className="mb-3">
+                  <div className="mb-3 position-relative">
                     <input
                       type="email"
                       className="form-control py-2"
@@ -126,39 +129,36 @@ function Login() {
                   </div>
                   <div className="mb-3 position-relative">
                     <input
-                      type="password"
-                      className="form-control py-2"
+                      //type="password"
+                      type={showPassword ? "text" : "password"}
+                      className="form-control py-2 pe-5"
                       placeholder="Password"
                       required
                       id="password"
                       name="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      style={{ fontWeight: 400, fontSize: 16 }}
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-link p-0 position-absolute"
                       style={{
-                        right: 12,
+                        fontWeight: 400,
+                        fontSize: 16,
+                      }}
+                    />
+                    <span
+                      className="position-absolute"
+                      style={{
+                        right: 10,
                         top: "50%",
                         transform: "translateY(-50%)",
+                        cursor: "pointer",
                       }}
-                      tabIndex={-1}
-                      aria-label="Show password"
+                      onClick={() => setShowPassword(!showPassword)}
                     >
-                      <svg
-                        width="22"
-                        height="22"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
-                          fill="#bbb"
-                        />
-                      </svg>
-                    </button>
+                      {showPassword ? (
+                        <i className="fas fa-eye-slash" />
+                      ) : (
+                        <i className="fas fa-eye" />
+                      )}
+                    </span>
                   </div>
 
                   {isLoading === true ? (
