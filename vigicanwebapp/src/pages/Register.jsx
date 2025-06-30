@@ -16,6 +16,8 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -226,60 +228,60 @@ function Register() {
                 </div>
                 <div className="mb-3 position-relative">
                   <input
-                    type="password"
+                    //type="password"
+                    type={showPassword ? "text" : "password"}
                     className="form-control py-2"
                     placeholder="Password"
                     required
                     onChange={(e) => setPassword(e.target.value)}
                     style={{ fontWeight: 400, fontSize: 16 }}
                   />
-                  <button
-                    type="button"
-                    className="btn btn-link p-0 position-absolute"
+                  {/* Show Password */}
+                  <span
+                    className="position-absolute"
                     style={{
-                      right: 12,
+                      right: 10,
                       top: "50%",
                       transform: "translateY(-50%)",
+                      cursor: "pointer",
                     }}
-                    tabIndex={-1}
-                    aria-label="Show password"
+                    onClick={() => setShowPassword(!showPassword)}
                   >
-                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                      <path
-                        d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
-                        fill="#bbb"
-                      />
-                    </svg>
-                  </button>
+                    {showPassword ? (
+                      <i className="fas fa-eye-slash" />
+                    ) : (
+                      <i className="fas fa-eye" />
+                    )}
+                  </span>
                 </div>
 
                 <div className="mb-3 position-relative">
                   <input
-                    type="password"
+                    //type="password"
+                    type={showPassword2 ? "text" : "password"}
                     className="form-control py-2"
                     placeholder="Confirm Password"
                     required
                     onChange={(e) => setPassword2(e.target.value)}
                     style={{ fontWeight: 400, fontSize: 16 }}
                   />
-                  <button
-                    type="button"
-                    className="btn btn-link p-0 position-absolute"
+                  {/* Show Password */}
+                  <span
+                    className="position-absolute"
                     style={{
-                      right: 12,
+                      right: 10,
                       top: "50%",
                       transform: "translateY(-50%)",
+                      cursor: "pointer",
                     }}
-                    tabIndex={-1}
-                    aria-label="Show password"
+                    onClick={() => setShowPassword2(!showPassword2)}
                   >
-                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
-                      <path
-                        d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z"
-                        fill="#bbb"
-                      />
-                    </svg>
-                  </button>
+                    {showPassword2 ? (
+                      <i className="fas fa-eye-slash" />
+                    ) : (
+                      <i className="fas fa-eye" />
+                    )}
+                  </span>
                 </div>
 
                 {/* {isLoading === true ? (
