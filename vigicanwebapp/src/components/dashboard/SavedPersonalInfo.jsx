@@ -2,13 +2,17 @@ import React, { useState, useEffect } from "react";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import "./styles/PersonalInfo.css";
+import { useNavigate } from "react-router-dom";
 
 export default function SavedPersonalInfo({ onBack }) {
+  const [appId, setAppId] = useState(null);
+
   const authData = useAuthStore((state) => state.allUserData);
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const navigate = useNavigate();
 
   const languageOptions = [
     "English",
@@ -43,40 +47,58 @@ export default function SavedPersonalInfo({ onBack }) {
   useEffect(() => {
     const fetchData = async () => {
       if (!authData) return;
+
+      setLoading(true);
       const userId = authData["uid"];
       const email =
         authData["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
 
       try {
-        const res = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
-        if (res?.data) {
-          const data = res.data;
-          setFormData({
-            FirstName: data.firstName || "",
-            MiddleName: data.middleName || "",
-            LastName: data.lastName || "",
-            Email: data.email || email,
-            Phone: data.phone || "",
-            Address: data.address || "",
-            PostCode: data.postCode || "",
-            DOB: data.dob ? data.dob.split("T")[0] : "",
-            FirstLanguage: getLabelFromMappedValue(
-              data.firstLanguage,
-              languageOptions
-            ),
-            PreferredPronoun: getLabelFromMappedValue(
-              data.preferredPronoun,
-              pronounOptions
-            ),
-            UserId: data.userId || userId,
-          });
+        // STEP 1: Get basic info + application ID
+        const res1 = await apiInstance.get(
+          `StudentPersonalInfo/user/${userId}`
+        );
+        const data1 = res1.data;
+        //console.log("Basic info response:", data1);
+
+        if (!data1?.result.id) {
+          throw new Error("No application ID found.");
         }
+
+        // STEP 2: Use application ID to get full application
+        const appId = data1.result.id;
+        setAppId(appId);
+        const res2 = await apiInstance.get(`StudentPersonalInfo/${appId}`);
+        const data = res2.data.result;
+        console.log("Full application response:", data.result);
+
+        setFormData({
+          Id: data.id,
+          FirstName: data.firstName || "",
+          MiddleName: data.middleName || "",
+          LastName: data.lastName || "",
+          Email: data.email || email,
+          Phone: data.phone || "",
+          Address: data.address || "",
+          PostCode: data.postCode || "",
+          DOB: data.dob ? data.dob.split("T")[0] : "",
+          FirstLanguage: getLabelFromMappedValue(
+            data.firstLanguage,
+            languageOptions
+          ),
+          PreferredPronoun: getLabelFromMappedValue(
+            data.preferredPronoun,
+            pronounOptions
+          ),
+          UserId: data.userId || userId,
+        });
       } catch (err) {
         console.error("Error loading saved personal info:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, [authData]);
 
@@ -88,11 +110,12 @@ export default function SavedPersonalInfo({ onBack }) {
   };
 
   const handleSave = async () => {
-    if (!formData) return;
+    if (!formData || !appId) return;
     setIsSaving(true);
     setSuccessMsg("");
 
     const payload = new FormData();
+    payload.append("Id", appId);
     payload.append("FirstName", formData.FirstName);
     payload.append("MiddleName", formData.MiddleName);
     payload.append("LastName", formData.LastName);
@@ -110,12 +133,22 @@ export default function SavedPersonalInfo({ onBack }) {
       "PreferredPronoun",
       getMappedValue(formData.PreferredPronoun, pronounOptions)
     );
+    console.log("Payload to save:", Object.fromEntries(payload.entries()));
 
     try {
-      await apiInstance.put("StudentPersonalInfo/update", payload);
+      const res = await apiInstance.put("StudentPersonalInfo/update", payload);
       setSuccessMsg("Changes saved successfully ✅");
+
+      // Optional: check response status
+      console.log("Save response:", res.data);
+
+      // Redirect after 1.5 seconds
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
     } catch (err) {
       console.error("Update failed:", err);
+      setSuccessMsg("❌ Failed to save changes. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -126,7 +159,15 @@ export default function SavedPersonalInfo({ onBack }) {
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Edit Saved Personal Information</h2>
+      <div>
+        <span className="text-muted ">
+          <p className="mb-0 fw-bold">
+            Application ID:
+            <span className="mb-0 text-danger fs-6 fst-italic">{appId} </span>
+          </p>
+        </span>
+        <h2 className="form-title mb-4">Edit Saved Personal Information</h2>
+      </div>
 
       <div className="row">
         <div className="col-md-4 col-12">
@@ -240,7 +281,14 @@ export default function SavedPersonalInfo({ onBack }) {
           onClick={handleSave}
           disabled={isSaving}
         >
-          {isSaving ? "Saving..." : "Save Changes"}
+          {isSaving ? (
+            <>
+              <span className="spinner-border spinner-border-sm me-2"></span>
+              Saving...
+            </>
+          ) : (
+            "Save Changes"
+          )}
         </button>
       </div>
 
