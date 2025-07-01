@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import "./styles/PersonalInfo.css";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
+import { useNavigate } from "react-router-dom";
 
-export default function PersonalInfo({ onContinue, onBack }) {
+export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
   const authData = useAuthStore((state) => state.allUserData);
 
   const languageOptions = [
@@ -77,8 +78,9 @@ export default function PersonalInfo({ onContinue, onBack }) {
           const response = await apiInstance.get(
             `StudentPersonalInfo/user/${userId}`
           );
-          if (response?.data) {
-            const savedData = response.data;
+          if (response?.data?.result) {
+            const savedData = response.data.result;
+            console.log("Fetched personal info:", savedData);
 
             setFormData({
               FirstName: savedData.firstName || "",
@@ -117,12 +119,10 @@ export default function PersonalInfo({ onContinue, onBack }) {
     e.preventDefault();
 
     if (isFormSubmitted) {
-      window.location.href = "/dashboard/applications";
+      window.location.href = "/dashboard/saved-applications";
       return;
     }
 
-
-    // Simple check: Ensure the main fields are filled
     const requiredFields = [
       "FirstName",
       "LastName",
@@ -140,13 +140,9 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
     if (!isFormComplete) {
       console.warn("Form not completely filled. Skipping submission.");
-      if (onContinue) onContinue(); // go to next step anyway
+      if (onContinue) onContinue();
       return;
     }
-
-
-    // Form is complete, proceed with submission
-
 
     const payload = new FormData();
     payload.append("FirstName", formData.FirstName);
@@ -168,15 +164,9 @@ export default function PersonalInfo({ onContinue, onBack }) {
     );
 
     try {
-      const response = await apiInstance.post(
-        "StudentPersonalInfo/create",
-        payload,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await apiInstance.post("StudentPersonalInfo/create", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (onContinue) onContinue();
     } catch (error) {
@@ -189,6 +179,21 @@ export default function PersonalInfo({ onContinue, onBack }) {
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Personal Information</h2>
+      {isFormSubmitted && (
+        <div className="alert alert-info mt-3">
+          <strong>You've already saved/submitted this form.</strong>
+          <br />
+          You can edit it from your saved applications.
+          <br />
+          <button
+            className="btn btn-link mt-2"
+            onClick={() => setCurrentStep("saved-personal-info")}
+          >
+            ➡ Go to Saved Applications
+          </button>
+        </div>
+      )}
+
       <p className="form-subtitle">
         Please provide accurate information. Inaccuracies may delay or reject
         your application.
@@ -200,7 +205,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
           <input
             type="text"
             className="form-input"
-            placeholder="Enter your first name"
             value={formData.FirstName}
             disabled={isFormSubmitted}
             onChange={(e) =>
@@ -213,7 +217,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
           <input
             type="text"
             className="form-input"
-            placeholder="Enter your middle name"
             value={formData.MiddleName}
             disabled={isFormSubmitted}
             onChange={(e) =>
@@ -226,18 +229,12 @@ export default function PersonalInfo({ onContinue, onBack }) {
           <input
             type="text"
             className="form-input"
-            placeholder="Enter your last name"
             value={formData.LastName}
             disabled={isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, LastName: e.target.value })
             }
           />
-        </div>
-        <div className="col-12">
-          <small className="form-hint">
-            Enter your full name exactly as it appears on your passport.
-          </small>
         </div>
       </div>
 
@@ -247,7 +244,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
           <input
             type="tel"
             className="form-input"
-            placeholder="+234 80..."
             value={formData.Phone}
             disabled={isFormSubmitted}
             onChange={(e) =>
@@ -283,7 +279,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
         <input
           type="text"
           className="form-input"
-          placeholder="Enter address"
           value={formData.Address}
           disabled={isFormSubmitted}
           onChange={(e) =>
@@ -298,7 +293,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
           <input
             type="text"
             className="form-input"
-            placeholder="Enter postcode"
             value={formData.PostCode}
             disabled={isFormSubmitted}
             onChange={(e) =>
@@ -310,7 +304,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
         <div className="col-md-6 col-12">
           <label className="form-label">Preferred Language</label>
           <select
-            className="form-select personal-info-input"
+            className="form-select"
             value={formData.FirstLanguage}
             disabled={isFormSubmitted}
             onChange={(e) =>
@@ -330,7 +324,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
       <div className="mb-3">
         <label className="form-label">Preferred Pronoun</label>
         <select
-          className="form-select personal-info-input"
+          className="form-select"
           value={formData.PreferredPronoun}
           disabled={isFormSubmitted}
           onChange={(e) =>
@@ -354,9 +348,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
         >
           ⬅ Back
         </button>
-        <button type="button" className="btn btn-secondary">
-          💾 Save as Draft
-        </button>
         <button
           type="submit"
           className="btn btn-primary"
@@ -365,21 +356,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
           {isFormSubmitted ? "Already Submitted" : "Continue →"}
         </button>
       </div>
-
-      {isFormSubmitted && (
-        <div className="alert alert-info mt-3">
-          <strong>You've already submitted this form.</strong>
-          <br />
-          You can edit it from your application dashboard.
-          <br />
-          <button
-            className="btn btn-link mt-2"
-            onClick={() => (window.location.href = "/dashboard/applications")}
-          >
-            ➡ Go to My Applications
-          </button>
-        </div>
-      )}
     </form>
   );
 }

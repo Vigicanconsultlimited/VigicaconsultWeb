@@ -13,7 +13,7 @@ export default function SavedApplications({ userId, setCurrentStep }) {
     const fetchSaved = async () => {
       try {
         const response = await apiInstance.get(
-          `/StudentPersonalInfo/get/${userId}`
+          `/StudentPersonalInfo/user/${userId}`
         );
         setSavedData(response.data);
       } catch (error) {

@@ -7,8 +7,8 @@ import { useAuthStore } from "../../store/auth";
 export default function DashboardNavbar() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const user = useAuthStore((state) => state.allUserData);
-  console.log("User Data:", user);
 
+  //console.log("User Data:", user);
   const email =
     user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
   const role =
