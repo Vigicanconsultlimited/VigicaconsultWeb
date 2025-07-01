@@ -32,6 +32,7 @@ function Dashboard() {
         try {
           const res = await apiInstance.get("/Auth/user");
           setUser(res.data);
+          console.log("User data fetched after login:", res.data);
         } catch (err) {
           console.error("Failed to fetch user data after login:", err);
         }
@@ -46,7 +47,7 @@ function Dashboard() {
 
   const steps = {
     "dashboard-home": {
-      component: <StudentDashboard />,
+      component: <StudentDashboard setCurrentStep={setCurrentStep} />,
     },
     "personal-info": {
       component: (
@@ -55,6 +56,7 @@ function Dashboard() {
           userId={user?.UserId}
           onContinue={() => setCurrentStep("academic-documents")}
           onBack={() => setCurrentStep("dashboard-home")}
+          setCurrentStep={setCurrentStep}
         />
       ),
     },
@@ -93,7 +95,7 @@ function Dashboard() {
       component: <ApplicationStatus />,
     },
     "saved-application": {
-      component: <SavedApplication />,
+      component: <SavedApplication userId={user?.uid} />,
     },
 
     "saved-personal-info": {

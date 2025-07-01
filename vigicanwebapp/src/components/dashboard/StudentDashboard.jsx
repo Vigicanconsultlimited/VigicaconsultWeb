@@ -4,9 +4,10 @@ import { useAuthStore } from "../../store/auth";
 import { useNavigate } from "react-router-dom";
 import "./styles/StudentDashboard.css";
 
-export default function StudentDashboard() {
+export default function StudentDashboard(setCurrentStep) {
   const authData = useAuthStore((state) => state.allUserData);
   const [application, setApplication] = useState(null);
+  const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -15,24 +16,35 @@ export default function StudentDashboard() {
     authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
 
   useEffect(() => {
-    const fetchApplication = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await apiInstance.get(`StudentPersonalInfo/${userId}`);
-        setApplication(response.data);
+        const personalRes = await apiInstance.get(
+          `StudentPersonalInfo/user/${userId}`
+        );
+        const applicationId = personalRes?.data?.result?.id;
+        const applicationDetails = await apiInstance.get(
+          `StudentPersonalInfo/${applicationId}`
+        );
+        setApplication(applicationDetails?.data?.result);
+
+        const documentsRes = await apiInstance.get(
+          `UploadFile/list-by-user/${userId}`
+        );
+        setDocuments(documentsRes?.data?.result || []);
       } catch (err) {
-        console.warn("No application found or error fetching:", err);
+        console.warn("Error fetching dashboard data:", err);
       } finally {
         setLoading(false);
       }
     };
 
     if (userId) {
-      fetchApplication();
+      fetchDashboardData();
     }
   }, [userId]);
 
   const handleEdit = () => {
-    navigate("/edit/personal-info"); // adjust this route as needed
+    navigate("/dashboard", { state: { step: "saved-personal-info" } });
   };
 
   const handleStartNew = () => {
@@ -66,9 +78,37 @@ export default function StudentDashboard() {
             <li>
               <strong>Address:</strong> {application.address}
             </li>
+            {/* <li>
+              <strong>Type of Application:</strong>{" "}
+              {application.applicationType || "N/A"}
+            </li>
+            <li>
+              <strong>Submitted At:</strong>{" "}
+              {new Date(application.createdAt).toLocaleString()}
+            </li>*/}
           </ul>
-          <button className="btn btn-primary mt-2" onClick={handleEdit}>
-            ✏️ Edit Application
+
+          {/* <div className="mt-4">
+            <h4>Uploaded Documents</h4>
+            {documents.length > 0 ? (
+              <ul className="dashboard-doc-list">
+                {documents.map((doc, index) => (
+                  <li key={index}>
+                    <strong>{doc.fileName}</strong> ({doc.fileType}) - Uploaded
+                    on {new Date(doc.uploadedAt).toLocaleDateString()}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No documents uploaded yet.</p>
+            )}
+          </div> */}
+
+          <button
+            className="btn btn-primary mt-3"
+            onClick={() => setCurrentStep("saved-personal-info")}
+          >
+            ✏️ Go to Saved Application to Edit
           </button>
         </div>
       ) : (
