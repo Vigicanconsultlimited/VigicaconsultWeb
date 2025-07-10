@@ -2,9 +2,18 @@ import React, { useState, useEffect } from "react";
 import "./styles/PersonalInfo.css";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
-import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
-export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
+// SweetAlert Toast
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top",
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+});
+
+export default function PersonalInfo({ onContinue, onBack }) {
   const authData = useAuthStore((state) => state.allUserData);
 
   const languageOptions = [
@@ -57,6 +66,7 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
   });
 
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -67,7 +77,6 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
           authData[
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
           ];
-
         setFormData((prev) => ({
           ...prev,
           Email: email || "",
@@ -80,8 +89,6 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
           );
           if (response?.data?.result) {
             const savedData = response.data.result;
-            console.log("Fetched personal info:", savedData);
-
             setFormData({
               FirstName: savedData.firstName || "",
               MiddleName: savedData.middleName || "",
@@ -91,7 +98,7 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
               Address: savedData.address || "",
               PostCode: savedData.postCode || "",
               DOB: savedData.dob ? savedData.dob.split("T")[0] : "",
-              UserId: savedData.userId || userId,
+              Id: savedData.id || "",
               PreferredPronoun: getLabelFromMappedValue(
                 savedData.preferredPronoun,
                 pronounOptions
@@ -101,7 +108,6 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
                 languageOptions
               ),
             });
-
             setIsFormSubmitted(true);
           }
         } catch (error) {
@@ -115,13 +121,19 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
     fetchExistingData();
   }, [authData]);
 
+  const showLoadingOverlay = () => {
+    Swal.fire({
+      title: "Please wait...",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (isFormSubmitted) {
-      window.location.href = "/dashboard/saved-applications";
-      return;
-    }
 
     const requiredFields = [
       "FirstName",
@@ -133,64 +145,92 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
       "FirstLanguage",
       "PreferredPronoun",
     ];
-
     const isFormComplete = requiredFields.every(
       (field) => formData[field] && formData[field].trim() !== ""
     );
 
     if (!isFormComplete) {
-      console.warn("Form not completely filled. Skipping submission.");
-      if (onContinue) onContinue();
+      Toast.fire({
+        icon: "warning",
+        title: "Please complete all required fields.",
+      });
       return;
     }
 
     const payload = new FormData();
-    payload.append("FirstName", formData.FirstName);
-    payload.append("MiddleName", formData.MiddleName);
-    payload.append("LastName", formData.LastName);
-    payload.append("Phone", formData.Phone);
-    payload.append("Email", formData.Email);
-    payload.append("Address", formData.Address);
-    payload.append("PostCode", formData.PostCode);
-    payload.append("DOB", formData.DOB);
-    payload.append("UserId", formData.UserId);
-    payload.append(
-      "FirstLanguage",
-      getMappedValue(formData.FirstLanguage, languageOptions)
-    );
-    payload.append(
-      "PreferredPronoun",
-      getMappedValue(formData.PreferredPronoun, pronounOptions)
-    );
+    Object.entries({
+      ...formData,
+      FirstLanguage: getMappedValue(formData.FirstLanguage, languageOptions),
+      PreferredPronoun: getMappedValue(
+        formData.PreferredPronoun,
+        pronounOptions
+      ),
+    }).forEach(([key, value]) => payload.append(key, value));
 
     try {
+      showLoadingOverlay();
       await apiInstance.post("StudentPersonalInfo/create", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
+      Swal.close();
+      setIsFormSubmitted(true);
+      Toast.fire({ icon: "success", title: "Submitted successfully" });
       if (onContinue) onContinue();
     } catch (error) {
+      Swal.close();
       console.error("Submission failed:", error);
+      Toast.fire({ icon: "error", title: "Submission failed" });
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  const handleEditSubmit = async () => {
+    const payload = new FormData();
+    Object.entries({
+      ...formData,
+      FirstLanguage: getMappedValue(formData.FirstLanguage, languageOptions),
+      PreferredPronoun: getMappedValue(
+        formData.PreferredPronoun,
+        pronounOptions
+      ),
+    }).forEach(([key, value]) => payload.append(key, value));
+
+    try {
+      showLoadingOverlay();
+      await apiInstance.put("StudentPersonalInfo/update", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      Swal.close();
+      Toast.fire({ icon: "success", title: "Updated successfully" });
+      setIsEditing(false);
+    } catch (error) {
+      Swal.close();
+      console.error("Update failed:", error);
+      Toast.fire({ icon: "error", title: "Update failed" });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "300px" }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Personal Information</h2>
-      {isFormSubmitted && (
+
+      {isFormSubmitted && !isEditing && (
         <div className="alert alert-info mt-3">
-          <strong>You've already saved/submitted this form.</strong>
+          <strong>You’ve already submitted this form.</strong>
           <br />
-          You can edit it from your saved applications.
-          <br />
-          <button
-            className="btn btn-link mt-2"
-            onClick={() => setCurrentStep("saved-personal-info")}
-          >
-            ➡ Go to Saved Applications
-          </button>
+          Click edit to update your information.
         </div>
       )}
 
@@ -199,114 +239,97 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
         your application.
       </p>
 
-      <div className="row">
-        <div className="col-md-3 col-12">
-          <label className="form-label">First Name</label>
+      {/* Name Fields */}
+      <div className="row g-3 pb-3">
+        {["FirstName", "MiddleName", "LastName"].map((field, i) => (
+          <div className="col-md-4 col-12" key={i}>
+            <label className="form-label">
+              {field.replace("Name", " Name")}
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData[field]}
+              disabled={!isEditing && isFormSubmitted}
+              onChange={(e) =>
+                setFormData({ ...formData, [field]: e.target.value })
+              }
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Contact Info */}
+      <div className="row g-3 pb-3">
+        <div className="col-md-4 col-12">
+          <label className="form-label">Email</label>
           <input
-            type="text"
+            type="email"
             className="form-input"
-            value={formData.FirstName}
-            disabled={isFormSubmitted}
-            onChange={(e) =>
-              setFormData({ ...formData, FirstName: e.target.value })
-            }
-          />
-        </div>
-        <div className="col-md-3 col-12">
-          <label className="form-label">Middle Name</label>
-          <input
-            type="text"
-            className="form-input"
-            value={formData.MiddleName}
-            disabled={isFormSubmitted}
-            onChange={(e) =>
-              setFormData({ ...formData, MiddleName: e.target.value })
-            }
+            value={formData.Email}
+            disabled
           />
         </div>
         <div className="col-md-4 col-12">
-          <label className="form-label">Last Name</label>
-          <input
-            type="text"
-            className="form-input"
-            value={formData.LastName}
-            disabled={isFormSubmitted}
-            onChange={(e) =>
-              setFormData({ ...formData, LastName: e.target.value })
-            }
-          />
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="col-md-6 col-12">
           <label className="form-label">Phone Number</label>
           <input
             type="tel"
             className="form-input"
             value={formData.Phone}
-            disabled={isFormSubmitted}
+            disabled={!isEditing && isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, Phone: e.target.value })
             }
           />
         </div>
-
-        <div className="col-md-6 col-12">
+        <div className="col-md-4 col-12">
           <label className="form-label">Date of Birth</label>
           <input
             type="date"
             className="form-input"
             value={formData.DOB}
-            disabled={isFormSubmitted}
+            disabled={!isEditing && isFormSubmitted}
             onChange={(e) => setFormData({ ...formData, DOB: e.target.value })}
           />
         </div>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Email</label>
-        <input
-          type="email"
-          className="form-input"
-          value={formData.Email}
-          disabled
-        />
+      {/* Address */}
+      <div className="row g-3 pb-3">
+        <div className="col-12">
+          <label className="form-label">Permanent Address</label>
+          <input
+            type="text"
+            className="form-input"
+            value={formData.Address}
+            disabled={!isEditing && isFormSubmitted}
+            onChange={(e) =>
+              setFormData({ ...formData, Address: e.target.value })
+            }
+          />
+        </div>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Permanent Address</label>
-        <input
-          type="text"
-          className="form-input"
-          value={formData.Address}
-          disabled={isFormSubmitted}
-          onChange={(e) =>
-            setFormData({ ...formData, Address: e.target.value })
-          }
-        />
-      </div>
-
-      <div className="row">
-        <div className="col-md-6 col-12">
+      {/* Post Code & Preferences */}
+      <div className="row g-3 pb-3">
+        <div className="col-md-4 col-12">
           <label className="form-label">Post Code</label>
           <input
             type="text"
             className="form-input"
             value={formData.PostCode}
-            disabled={isFormSubmitted}
+            disabled={!isEditing && isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, PostCode: e.target.value })
             }
           />
         </div>
-
-        <div className="col-md-6 col-12">
+        <div className="col-md-4 col-12">
           <label className="form-label">Preferred Language</label>
           <select
             className="form-select"
             value={formData.FirstLanguage}
-            disabled={isFormSubmitted}
+            disabled={!isEditing && isFormSubmitted}
             onChange={(e) =>
               setFormData({ ...formData, FirstLanguage: e.target.value })
             }
@@ -319,42 +342,77 @@ export default function PersonalInfo({ onContinue, onBack, setCurrentStep }) {
             ))}
           </select>
         </div>
+        <div className="col-md-4 col-12">
+          <label className="form-label">Preferred Pronoun</label>
+          <select
+            className="form-select"
+            value={formData.PreferredPronoun}
+            disabled={!isEditing && isFormSubmitted}
+            onChange={(e) =>
+              setFormData({ ...formData, PreferredPronoun: e.target.value })
+            }
+          >
+            <option value="">Select pronoun</option>
+            {pronounOptions.map((p, i) => (
+              <option key={i} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className="mb-3">
-        <label className="form-label">Preferred Pronoun</label>
-        <select
-          className="form-select"
-          value={formData.PreferredPronoun}
-          disabled={isFormSubmitted}
-          onChange={(e) =>
-            setFormData({ ...formData, PreferredPronoun: e.target.value })
-          }
-        >
-          <option value="">Select pronoun</option>
-          {pronounOptions.map((p, i) => (
-            <option key={i} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-footer">
+      {/* Footer Buttons */}
+      <div className="form-footer d-flex justify-content-between">
         <button
           type="button"
-          className="btn btn-outline-primary"
+          className="btn btn-outline-secondary"
           onClick={onBack}
         >
-          ⬅ Back
+          ⬅ Back to Dashboard
         </button>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={isFormSubmitted}
-        >
-          {isFormSubmitted ? "Already Submitted" : "Continue →"}
-        </button>
+
+        <div>
+          {!isFormSubmitted ? (
+            <button type="submit" className="btn btn-primary">
+              Continue →
+            </button>
+          ) : isEditing ? (
+            <>
+              <button
+                type="button"
+                className="btn btn-success me-2"
+                onClick={handleEditSubmit}
+              >
+                ✅ Finish Editing
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onContinue}
+              >
+                ➡ Next
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn btn-secondary me-2"
+                onClick={() => setIsEditing(true)}
+              >
+                ✏️ Edit
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onContinue}
+              >
+                ➡ Next
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </form>
   );

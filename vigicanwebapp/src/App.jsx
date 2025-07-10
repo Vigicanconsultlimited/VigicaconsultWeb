@@ -42,7 +42,9 @@ function App() {
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard />
+              <Dashboard
+                key={window.location.pathname + window.location.search}
+              />
             </PrivateRoute>
           }
         />

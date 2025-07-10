@@ -90,3 +90,41 @@
   font-size: 1rem;
   color: #2135b0;
 }
+.progress-bar {
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: #007bff;
+  transition: width 0.3s ease;
+}
+.progress-text {
+  font-size: 12px;
+  margin-top: 2px;
+  text-align: right;
+  color: #444;
+}
+.remove-file {
+  cursor: pointer;
+  color: red;
+  margin-left: 10px;
+}
+.spinner-border {
+  margin-left: 10px;
+}
+
+.loading-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.loading-spinner {
+  text-align: center;
+}
