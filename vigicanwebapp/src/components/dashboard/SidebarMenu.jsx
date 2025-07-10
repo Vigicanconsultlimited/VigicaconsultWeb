@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./styles/SidebarMenu.css";
+import { FileText } from "lucide-react";
 
 export default function SidebarMenu({ setCurrentStep }) {
   const [docsOpen, setDocsOpen] = useState(true);
   const [savedOpen, setSavedOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false); // for mobile toggle
+  const navigate = useNavigate();
 
   return (
     <>
@@ -25,16 +27,46 @@ export default function SidebarMenu({ setCurrentStep }) {
         <nav>
           <div className="sidebar-section-title mb-4">MENU</div>
           <ul className="sidebar-list list-unstyled mb-0">
-            {/* My Application */}
+            {/* Dashboard */}
+            <li className="sidebar-item mb-2">
+              <span
+                className="sidebar-link d-flex align-items-center"
+                onClick={() => {
+                  window.location.href = "/dashboard";
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <span className="sidebar-icon me-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="feather feather-layout"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="9" y1="21" x2="9" y2="9" />
+                  </svg>
+                </span>
+                <span className="sidebar-link-text">Dashboard</span>
+              </span>
+            </li>
+
+            {/* My Applications */}
             <li className="sidebar-item mb-2">
               <span
                 className="sidebar-link d-flex align-items-center"
                 onClick={() => setDocsOpen((v) => !v)}
               >
-                <span className="sidebar-icon me-2">📄</span>
-                <span className="sidebar-link-text fw-bold">
-                  My Application
+                <span className="sidebar-icon me-2">
+                  <FileText size={24} color="#fff" />
                 </span>
+                <span className="sidebar-link-text fw-bold">Application</span>
                 <span
                   className="ms-auto"
                   style={{
@@ -76,6 +108,7 @@ export default function SidebarMenu({ setCurrentStep }) {
             </li>
 
             {/* Saved Application */}
+            {/*}
             <li className="sidebar-item mb-2">
               <span
                 className="sidebar-link d-flex align-items-center"
@@ -125,7 +158,8 @@ export default function SidebarMenu({ setCurrentStep }) {
                   </li>
                 </ul>
               )}
-            </li>
+            </li> 
+            */}
 
             {/* Application Status */}
             <li className="sidebar-item mb-2">
@@ -133,7 +167,9 @@ export default function SidebarMenu({ setCurrentStep }) {
                 className="sidebar-link d-flex align-items-center"
                 onClick={() => setCurrentStep("application-status")}
               >
-                <span className="sidebar-icon me-2">📊</span>
+                <span className="sidebar-icon me-2">
+                  <i className="fas fa-tasks"></i>
+                </span>
                 <span className="sidebar-link-text">Application Status</span>
               </span>
             </li>
@@ -144,7 +180,9 @@ export default function SidebarMenu({ setCurrentStep }) {
                 className="sidebar-link d-flex align-items-center"
                 onClick={() => setCurrentStep("inbox")}
               >
-                <span className="sidebar-icon me-2">📥</span>
+                <span className="sidebar-icon me-2">
+                  <i className="fas fa-inbox"></i>
+                </span>
                 <span className="sidebar-link-text">Inbox</span>
               </span>
             </li>
@@ -156,7 +194,9 @@ export default function SidebarMenu({ setCurrentStep }) {
           <ul className="sidebar-list list-unstyled mb-0">
             <li className="sidebar-item mb-2">
               <span className="sidebar-link d-flex align-items-center">
-                <span className="sidebar-icon me-2">🚪</span>
+                <span className="sidebar-icon me-2">
+                  <i className="fas fa-sign-out-alt"></i>
+                </span>
                 <span className="sidebar-link-text">
                   <Link
                     to="/logout"

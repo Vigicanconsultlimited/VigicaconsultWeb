@@ -1,236 +1,282 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/auth";
-
-import "./styles/SupportingDocuments.css";
 import apiInstance from "../../utils/axios";
+import Swal from "sweetalert2";
+import "./styles/SupportingDocuments.css";
 
-const documentAPIMap = {
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top",
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+});
+
+const LoadingSpinner = () => (
+  <div className="loading-spinner-container">
+    <div className="loading-spinner">
+      <div className="spinner"></div>
+      <p className="loading-text">Loading your documents...</p>
+    </div>
+  </div>
+);
+
+const DOCUMENTS = {
   "Personal Statement (PS) or SOP": {
     uploadUrl: "PersonalStatement",
     statusUrl: "PersonalStatement/document",
     deleteUrl: "PersonalStatement",
+    viewKey: "personalStatementurlDocumentgoogledocviewurl",
+    downloadKey: "personalStatementDocumentdownloadurl",
   },
   "CV/Resume": {
     uploadUrl: "CvOrResume",
     statusUrl: "CvOrResume/document",
     deleteUrl: "CvOrResume",
+    viewKey: "cvOrResumeDocumentgoogledocviewurl",
+    downloadKey: "cvOrResumeDocumentdownloadurl",
   },
   "Academic References": {
     uploadUrl: "AcademicReferenceDoc",
     statusUrl: "AcademicReferenceDoc/document",
     deleteUrl: "AcademicReferenceDoc",
+    viewKey: "academicReferenceDocumentgoogledocviewurl",
+    downloadKey: "academicReferenceDocumentdownloadurl",
   },
   "Professional References": {
     uploadUrl: "ProfessionalReference",
     statusUrl: "ProfessionalReference/document",
     deleteUrl: "ProfessionalReference",
+    viewKey: "professionalReferenceDocumentgoogledocviewurl",
+    downloadKey: "professionalReferenceDocumentdownloadurl",
+  },
+  "Proof of English Proficiency": {
+    uploadUrl: "EnglishProof",
+    statusUrl: "EnglishProof/document",
+    deleteUrl: "EnglishProof",
+    viewKey: "englishProficiencyProofDocumentgoogledocviewurl",
+    downloadKey: "englishProficiencyProofDocumentdownloadurl",
   },
   "Work Experience": {
     uploadUrl: "WorkExperience",
     statusUrl: "WorkExperience/document",
     deleteUrl: "WorkExperience",
+    viewKey: "workExperienceDocumentgoogledocviewurl",
+    downloadKey: "workExperienceDocumentdownloadurl",
   },
-
   "International Passport": {
-    uploadUrl: "InternationalPssport",
-    statusUrl: "InternationalPssport/document",
-    deleteUrl: "InternationalPssport",
+    uploadUrl: "InternationalPassport",
+    statusUrl: "InternationalPassport/document",
+    deleteUrl: "InternationalPassport",
+    viewKey: "internationalPassportDocumentgoogledocviewurl",
+    downloadKey: "internationalPassportDocumentdownloadurl",
   },
 };
 
 export default function SupportingDocuments({ onContinue, onBack }) {
   const authData = useAuthStore((state) => state.allUserData);
-  const [appId, setAppId] = useState(null);
-
-  const [expanded, setExpanded] = useState("Academic References");
-  const [uploadedFiles, setUploadedFiles] = useState({});
-  const [uploadProgress, setUploadProgress] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [studentId, setStudentId] = useState(null);
+  const [documents, setDocuments] = useState({});
+  const [expanded, setExpanded] = useState(null);
+  const [progress, setProgress] = useState({});
   const [errors, setErrors] = useState({});
-  const dropRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const init = async () => {
       if (!authData) return;
-      setLoading(true);
-
-      const userId = authData["uid"];
-
       try {
-        const res = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
-        const appData = res.data;
-        const fetchedAppId = appData?.result?.id;
+        const { data } = await apiInstance.get(
+          `StudentPersonalInfo/user/${authData.uid}`
+        );
+        const sid = data.result?.id;
+        if (!sid) throw new Error("StudentPersonalInformationId missing");
+        setStudentId(sid);
 
-        if (!fetchedAppId) throw new Error("No application ID found");
+        for (const [label, cfg] of Object.entries(DOCUMENTS)) {
+          try {
+            const fileIdRes = await apiInstance.get(`${cfg.uploadUrl}/${sid}`);
+            const fileId = fileIdRes.data.result?.id;
+            if (!fileId) continue;
 
-        setAppId(fetchedAppId);
-        // You can fetch document statuses here if you have DocIds stored or retrievable
-      } catch (error) {
-        console.error("Error fetching application ID:", error);
+            const det = await apiInstance.get(
+              `${cfg.statusUrl}?DocId=${fileId}`
+            );
+            const obj = det.data.result;
+            setDocuments((prev) => ({
+              ...prev,
+              [label]: {
+                name: obj[cfg.downloadKey]?.split("/").pop(),
+                url: obj[cfg.downloadKey],
+                viewUrl: obj[cfg.viewKey],
+                docId: obj.id,
+              },
+            }));
+          } catch {
+            // No existing file — ignore
+          }
+        }
+      } catch (err) {
+        console.error("Initialization error:", err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchData();
+    init();
   }, [authData]);
 
-  const handleToggle = (section) => {
-    setExpanded((prev) => (prev === section ? null : section));
-  };
-
-  const uploadFile = async (section, file) => {
-    const { uploadUrl } = documentAPIMap[section];
-    const formData = new FormData();
-    formData.append("Document", file);
-    formData.append("studentInfoId", appId); // ✅ Add studentInfoId
+  const uploadHandler = async (label, file) => {
+    const cfg = DOCUMENTS[label];
+    const fd = new FormData();
+    fd.append("Document", file);
+    fd.append("StudentPersonalInformationId", studentId);
 
     try {
-      setErrors((prev) => ({ ...prev, [section]: null }));
-
-      const response = await apiInstance.post(uploadUrl, formData, {
+      setErrors((prev) => ({ ...prev, [label]: null }));
+      const r = await apiInstance.post(cfg.uploadUrl, fd, {
         headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadProgress((prev) => ({ ...prev, [section]: percent }));
+        onUploadProgress: (e) => {
+          const pct = Math.round((e.loaded * 100) / e.total);
+          setProgress((prev) => ({ ...prev, [label]: pct }));
         },
       });
 
-      const result = response.data.result;
-
-      setUploadedFiles((prev) => ({
+      const res = r.data.result;
+      setDocuments((prev) => ({
         ...prev,
-        [section]: {
+        [label]: {
           name: file.name,
-          url: result?.url || "#",
-          docId: result?.id,
-          locked: false,
+          url: res[cfg.downloadKey],
+          viewUrl: res[cfg.viewKey],
+          docId: res.id,
         },
       }));
-    } catch (err) {
-      const message =
-        err?.response?.data?.message || "Upload failed. Please try again.";
-      setErrors((prev) => ({ ...prev, [section]: message }));
+
+      Toast.fire({ icon: "success", title: `${label} uploaded` });
+    } catch (e) {
+      const msg = e.response?.data?.message || "Upload failed";
+      setErrors((prev) => ({ ...prev, [label]: msg }));
+      Toast.fire({ icon: "error", title: msg });
     } finally {
-      setUploadProgress((prev) => ({ ...prev, [section]: null }));
+      setProgress((prev) => ({ ...prev, [label]: null }));
     }
   };
 
-  const handleFileChange = (section, file) => {
-    if (
-      file &&
-      [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      ].includes(file.type)
-    ) {
-      uploadFile(section, file);
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        [section]: "Only PDF or DOC/DOCX files are allowed.",
-      }));
-    }
-  };
+  const deleteHandler = async (label) => {
+    const cfg = DOCUMENTS[label];
+    const id = documents[label]?.docId;
+    if (!id) return;
 
-  const handleRemoveFile = async (section) => {
-    const { deleteUrl } = documentAPIMap[section];
-    const docId = uploadedFiles[section]?.docId;
+    const confirm = await Swal.fire({
+      title: `Delete "${label}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+    });
+    if (!confirm.isConfirmed) return;
 
     try {
-      await apiInstance.delete(`${deleteUrl}/${docId}`);
-      setUploadedFiles((prev) => {
-        const updated = { ...prev };
-        delete updated[section];
-        return updated;
+      await apiInstance.delete(`${cfg.deleteUrl}/${id}`);
+      setDocuments((prev) => {
+        const c = { ...prev };
+        delete c[label];
+        return c;
       });
-    } catch (err) {
-      const msg = err?.response?.data?.message || "Error deleting file.";
-      setErrors((prev) => ({ ...prev, [section]: msg }));
+      Toast.fire({ icon: "success", title: `${label} deleted` });
+    } catch (e) {
+      const msg = e.response?.data?.message || "Deletion failed";
+      setErrors((prev) => ({ ...prev, [label]: msg }));
+      Toast.fire({ icon: "error", title: msg });
     }
   };
 
-  const handleDrop = (e, section) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    handleFileChange(section, file);
+  const fileChange = (label, file) => {
+    if (!file) return;
+    const types = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+    if (!types.includes(file.type)) {
+      const m = "Only PDF or DOCX allowed";
+      setErrors((prev) => ({ ...prev, [label]: m }));
+      return Toast.fire({ icon: "warning", title: m });
+    }
+    uploadHandler(label, file);
   };
 
-  const handleDragOver = (e) => e.preventDefault();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onContinue && onContinue();
-  };
+  if (loading) return <LoadingSpinner />;
 
   return (
-    <form className="supporting-docs p-3 p-md-4" onSubmit={handleSubmit}>
+    <form
+      className="supporting-docs p-3 p-md-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onContinue();
+      }}
+    >
       <h2 className="title">Supporting Documents</h2>
-      <p className="subtitle">Click drop-down to upload file.</p>
-      <div className="divider"></div>
+      <p className="subtitle">Click each section to upload or view the file.</p>
+      <div className="divider" />
 
-      {Object.keys(documentAPIMap).map((section) => (
-        <div key={section} className="accordion-item mb-2">
+      {Object.keys(DOCUMENTS).map((label) => (
+        <div key={label} className="accordion-item mb-2">
           <div
-            className={`accordion-header ${expanded === section ? "open" : ""}`}
-            onClick={() => handleToggle(section)}
+            className={`accordion-header ${
+              expanded === label ? "expanded" : ""
+            }`}
+            onClick={() => setExpanded(expanded === label ? null : label)}
           >
-            <span>{section}</span>
-            <span className="chevron">{expanded === section ? "▲" : "▼"}</span>
+            {label}
+            <span className="chevron">{expanded === label ? "▲" : "▼"}</span>
           </div>
 
-          {expanded === section && (
+          {expanded === label && (
             <div
               className="accordion-body"
-              onDrop={(e) => handleDrop(e, section)}
-              onDragOver={handleDragOver}
-              ref={dropRef}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                fileChange(label, e.dataTransfer.files[0]);
+              }}
             >
               <label className="upload-box">
                 <input
                   type="file"
                   className="d-none"
-                  accept=".pdf,.doc,.docx"
-                  onChange={(e) => handleFileChange(section, e.target.files[0])}
+                  accept=".pdf,.docx"
+                  onChange={(e) => fileChange(label, e.target.files[0])}
                 />
-                <div className="upload-placeholder">
-                  📎 Attach file <br /> Drag & drop file
-                </div>
+                <div className="upload-placeholder">📎 Attach or drop file</div>
               </label>
 
-              {uploadProgress[section] && (
+              {progress[label] != null && (
                 <div className="progress-bar mt-2">
                   <div
                     className="progress-bar-fill"
-                    style={{ width: `${uploadProgress[section]}%` }}
-                  ></div>
+                    style={{ width: `${progress[label]}%` }}
+                  />
                 </div>
               )}
 
-              {errors[section] && (
-                <div className="error-text mt-2">{errors[section]}</div>
+              {errors[label] && (
+                <div className="error-text mt-2">{errors[label]}</div>
               )}
 
-              {uploadedFiles[section] && (
+              {documents[label] && (
                 <div className="uploaded-file mt-2">
                   <a
-                    href={uploadedFiles[section].url}
+                    href={documents[label].viewUrl || documents[label].url}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {uploadedFiles[section].name || "View File"}
+                    {documents[label].name}
                   </a>
-                  {!uploadedFiles[section].locked && (
-                    <span
-                      className="remove-file"
-                      onClick={() => handleRemoveFile(section)}
-                    >
-                      ✖
-                    </span>
-                  )}
+                  <span
+                    className="remove-file"
+                    onClick={() => deleteHandler(label)}
+                  >
+                    ✖
+                  </span>
                 </div>
               )}
             </div>
@@ -243,9 +289,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
           ← Back
         </button>
         <div>
-          <button type="button" className="btn draft-btn me-2">
-            💾 Save as Draft
-          </button>
           <button type="submit" className="btn continue-btn">
             Continue →
           </button>
