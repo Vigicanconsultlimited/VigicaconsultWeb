@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
-import "./styles/AcademicDocuments.css";
-import { useAuthStore } from "../../store/auth";
 import apiInstance from "../../utils/axios";
+import { useAuthStore } from "../../store/auth";
+import "./styles/AcademicDocuments.css";
+import Swal from "sweetalert2";
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top",
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+});
 
 const documentTypes = [
   "Degree Certificate",
@@ -15,34 +23,53 @@ const documentTypes = [
 const documentAPIMap = {
   "Degree Certificate": {
     uploadUrl: "DegreeCert",
-    statusUrl: "DegreeCertificate/document",
-    deleteUrl: "DegreeCertificate",
+    statusUrl: "DegreeCert/document",
+    deleteUrl: "DegreeCert",
+    viewKey: "degreeCertificategoogledocviewurl",
+    downloadKey: "degreeCertificatedownloadurl",
   },
   "WAEC Certificate": {
     uploadUrl: "WaecOrNeco",
-    statusUrl: "WAECCertificate/document",
-    deleteUrl: "WAECCertificate",
+    statusUrl: "WaecOrNeco/document",
+    deleteUrl: "WaecOrNeco",
+    viewKey: "waecOrNecoCertificateDucumentgoogledocviewurl",
+    downloadKey: "waecOrNecoCertificateDucumentdownloadurl",
   },
   "Personal Statement": {
     uploadUrl: "PersonalStatement",
     statusUrl: "PersonalStatement/document",
     deleteUrl: "PersonalStatement",
+    viewKey: "personalStatementurlDocumentgoogledocviewurl",
+    downloadKey: "personalStatementDocumentdownloadurl",
   },
   "Official Transcript": {
     uploadUrl: "OfficialTranscript",
     statusUrl: "OfficialTranscript/document",
     deleteUrl: "OfficialTranscript",
+    viewKey: "officialTranscriptDocumentgoogledocviewurl",
+    downloadKey: "officialTranscriptDocumentdownloadurl",
   },
   "Proof of English Proficiency": {
     uploadUrl: "EnglishProof",
     statusUrl: "EnglishProof/document",
     deleteUrl: "EnglishProof",
+    viewKey: "englishProficiencyProofDocumentgoogledocviewurl",
+    downloadKey: "englishProficiencyProofDocumentdownloadurl",
   },
 };
 
+// Loading Spinner Component
+const LoadingSpinner = () => (
+  <div className="loading-spinner-container">
+    <div className="loading-spinner">
+      <div className="spinner"></div>
+      <p className="loading-text">Loading your documents...</p>
+    </div>
+  </div>
+);
+
 export default function AcademicDocuments({ onContinue, onBack }) {
   const authData = useAuthStore((state) => state.allUserData);
-
   const [appId, setAppId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState("Degree Certificate");
@@ -52,38 +79,74 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   const dropRef = useRef(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStudentInfo = async () => {
       if (!authData) return;
-      setLoading(true);
-
-      const userId = authData["uid"];
-
       try {
+        const userId = authData["uid"];
         const res = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
-        const appData = res.data;
-        const fetchedAppId = appData?.result?.id;
+        const studentId = res.data?.result?.id;
+        if (!studentId) throw new Error("Student ID not found");
+        setAppId(studentId);
 
-        if (!fetchedAppId) throw new Error("No application ID found");
+        // Create an array of promises for all document fetches
+        const documentPromises = documentTypes.map(async (type) => {
+          const { uploadUrl, statusUrl, viewKey, downloadKey } =
+            documentAPIMap[type];
+          try {
+            const fileRes = await apiInstance.get(`${uploadUrl}/${studentId}`);
+            const docId = fileRes.data?.result?.id;
+            if (!docId) return null;
 
-        setAppId(fetchedAppId);
-        // You can fetch document statuses here if you have DocIds stored or retrievable
-      } catch (error) {
-        console.error("Error fetching application ID:", error);
+            const docDetailsRes = await apiInstance.get(
+              `${statusUrl}?DocId=${docId}`
+            );
+            const data = docDetailsRes.data?.result;
+            if (!data) return null;
+
+            return {
+              type,
+              fileData: {
+                name: data[downloadKey]?.split("/").pop(),
+                url: data[downloadKey],
+                viewUrl: data[viewKey],
+                docId: data.id,
+                locked: false,
+              },
+            };
+          } catch (err) {
+            console.warn(`Error fetching document for ${type}:`, err);
+            return null;
+          }
+        });
+
+        // Wait for all document fetches to complete
+        const results = await Promise.all(documentPromises);
+
+        // Update uploaded files state with all results
+        const newUploadedFiles = {};
+        results.forEach((result) => {
+          if (result) {
+            newUploadedFiles[result.type] = result.fileData;
+          }
+        });
+
+        setUploadedFiles(newUploadedFiles);
+      } catch (err) {
+        console.error("Error fetching student data:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchStudentInfo();
   }, [authData]);
 
   const handleToggle = (type) => {
     setExpanded((prev) => (prev === type ? null : type));
   };
 
-  // Function to upload a file for a specific document type
   const uploadFile = async (type, file) => {
-    const { uploadUrl } = documentAPIMap[type];
+    const { uploadUrl, downloadKey, viewKey } = documentAPIMap[type];
     const formData = new FormData();
     formData.append("Document", file);
     formData.append("StudentPersonalInformationId", appId);
@@ -91,36 +154,31 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     try {
       setErrors((prev) => ({ ...prev, [type]: null }));
 
-      const response = await apiInstance.post(uploadUrl, formData, {
+      const res = await apiInstance.post(uploadUrl, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
+        onUploadProgress: (e) => {
+          const percent = Math.round((e.loaded * 100) / e.total);
           setUploadProgress((prev) => ({ ...prev, [type]: percent }));
         },
       });
 
-      console.log(`Upload response for ${type}:`, response.data);
-
-      const result = response.data.result;
-
+      const result = res.data.result;
       setUploadedFiles((prev) => ({
         ...prev,
         [type]: {
           name: file.name,
-          url:
-            result.englishProficiencyProofDocumentdownloadurl ||
-            result.url ||
-            "#",
+          url: result[downloadKey],
+          viewUrl: result[viewKey],
           docId: result.id,
           locked: false,
         },
       }));
+
+      Toast.fire({ icon: "success", title: `${type} uploaded successfully` });
     } catch (err) {
-      const message =
-        err?.response?.data?.message || "Upload failed. Please try again.";
-      setErrors((prev) => ({ ...prev, [type]: message }));
+      const msg = err?.response?.data?.message || "Upload failed.";
+      setErrors((prev) => ({ ...prev, [type]: msg }));
+      Toast.fire({ icon: "error", title: msg });
     } finally {
       setUploadProgress((prev) => ({ ...prev, [type]: null }));
     }
@@ -147,6 +205,19 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     const { deleteUrl } = documentAPIMap[type];
     const docId = uploadedFiles[type]?.docId;
 
+    if (!docId) return;
+
+    const confirm = await Swal.fire({
+      title: `Delete ${type}?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!confirm.isConfirmed) return;
+
     try {
       await apiInstance.delete(`${deleteUrl}/${docId}`);
       setUploadedFiles((prev) => {
@@ -154,9 +225,11 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         delete updated[type];
         return updated;
       });
+      Toast.fire({ icon: "success", title: `${type} deleted` });
     } catch (err) {
       const msg = err?.response?.data?.message || "Error deleting file.";
       setErrors((prev) => ({ ...prev, [type]: msg }));
+      Toast.fire({ icon: "error", title: msg });
     }
   };
 
@@ -172,6 +245,11 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     e.preventDefault();
     onContinue && onContinue();
   };
+
+  // Show loading spinner while fetching data
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <form className="academic-docs-form p-3 p-md-4" onSubmit={handleSubmit}>
@@ -225,7 +303,9 @@ export default function AcademicDocuments({ onContinue, onBack }) {
               {uploadedFiles[type] && (
                 <div className="uploaded-file mt-2">
                   <a
-                    href={uploadedFiles[type].url}
+                    href={
+                      uploadedFiles[type].viewUrl || uploadedFiles[type].url
+                    }
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -255,9 +335,9 @@ export default function AcademicDocuments({ onContinue, onBack }) {
           ← Back
         </button>
         <div>
-          <button type="button" className="btn btn-outline-secondary px-4 me-2">
+          {/* <button type="button" className="btn btn-outline-secondary px-4 me-2">
             Save as Draft
-          </button>
+          </button> */}
           <button type="submit" className="btn btn-primary px-4">
             Continue →
           </button>

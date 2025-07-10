@@ -1,19 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/images/vigica.png";
-
+import profile from "../../assets/images/default-profile.jpg";
 import "./styles/DashboardNavbar.css";
 import { useAuthStore } from "../../store/auth";
+import apiInstance from "../../utils/axios";
 
 export default function DashboardNavbar() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const user = useAuthStore((state) => state.allUserData);
 
-  //console.log("User Data:", user);
   const email =
     user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-  const role =
-    user?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
   const userId = user?.uid;
+
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    const fetchName = async () => {
+      try {
+        const personalRes = await apiInstance.get(
+          `StudentPersonalInfo/user/${userId}`
+        );
+        const personalInfoId = personalRes?.data?.result?.id;
+
+        if (personalInfoId) {
+          const submittedAppRes = await apiInstance.get(
+            `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+          );
+          const personalData =
+            submittedAppRes?.data?.result?.personalInformation;
+
+          if (personalData?.firstName) {
+            setDisplayName(`${personalData.firstName}`);
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to fetch display name:", error);
+      }
+    };
+
+    if (userId) fetchName();
+  }, [userId]);
 
   return (
     <nav className="dashboard-navbar d-flex align-items-center px-3 px-md-4 mb-3">
@@ -30,6 +57,7 @@ export default function DashboardNavbar() {
           </div>
         </div>
       </div>
+
       {/* Search Bar */}
       <form className="dashboard-navbar-search flex-grow-1 mx-2 mx-md-4">
         <div className="input-group">
@@ -53,10 +81,11 @@ export default function DashboardNavbar() {
           />
         </div>
       </form>
+
       {/* User Section */}
       <div className="d-flex align-items-center ms-auto">
         <img
-          src="/assets/images/user-profile.jpg"
+          src={profile}
           alt="User"
           className="dashboard-navbar-avatar me-2"
         />
@@ -65,20 +94,15 @@ export default function DashboardNavbar() {
             className="dashboard-navbar-user fw-medium text-white"
             style={{ fontSize: 15 }}
           >
-            {isLoggedIn() ? user?.name || "Guest" : "Guest User"}
+            {isLoggedIn()
+              ? displayName || user?.fullName || email || "Hi"
+              : "Guest User"}
           </span>
           <div
-            className="dashboard-navbar-email text-white-50"
+            className="dashboard-navbar-email text-white"
             style={{ fontSize: 12 }}
           >
-            {email || "Guest"}
-          </div>
-
-          <div
-            className="dashboard-navbar-email text-white-50"
-            style={{ fontSize: 8 }}
-          >
-            User ID: {userId || "N/A"}
+            {email || "guest@example.com"}
           </div>
         </div>
       </div>
