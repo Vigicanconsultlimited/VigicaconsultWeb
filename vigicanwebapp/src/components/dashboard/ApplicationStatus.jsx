@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 
 const documentTypes = [
   "Degree Certificate",
