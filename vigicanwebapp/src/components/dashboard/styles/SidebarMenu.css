@@ -12,9 +12,9 @@
 
 /* Sidebar base */
 .sidebar-menu {
-  width: 260px; /* Increased width */
+  width: 260px;
   background-color: #1b2ebf;
-  height: 100vh;
+  height: auto !important;
   overflow-y: auto;
   position: fixed;
   color: #fff;
@@ -23,6 +23,10 @@
   padding: 1rem;
   transition: transform 0.3s ease-in-out;
   z-index: 1050;
+}
+
+.sidebar-item {
+  margin-bottom: 1rem !important;
 }
 
 .sidebar-link,

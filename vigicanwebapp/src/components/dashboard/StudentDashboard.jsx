@@ -103,10 +103,12 @@ export default function StudentDashboard({ setCurrentStep }) {
   return (
     <div className="student-dashboard">
       <div className="welcome-card">
-        <h2>Welcome, {displayName || authData?.fullName || userEmail}</h2>
+        <h2 className="fs-4">
+          Welcome, {displayName || authData?.fullName || userEmail}
+        </h2>
         <p className="subtitle">This is your application dashboard</p>
 
-        {applications.length > 0 && (
+        {applications.length > 0 ? (
           <>
             <h3>{applications.length} Applications Found</h3>
             <p>You have submitted these applications. Continue to edit.</p>
@@ -117,27 +119,36 @@ export default function StudentDashboard({ setCurrentStep }) {
               Continue
             </button>
           </>
-        )}
-
-        {availableApplications.length > 0 ? (
-          <>
-            <h3>{availableApplications.length} Available Program(s)</h3>
-            <p>New programs are available. You can start a new application.</p>
-            <button
-              className="btn btn-primary"
-              onClick={() => navigate("/application/start")}
-            >
-              ➕ Start New Application
-            </button>
-          </>
         ) : (
-          <div className="info-banner">
-            📢 No new programs available right now. You'll be able to apply once
-            new programs are added.
-          </div>
+          <>
+            {availableApplications.length > 0 && (
+              <>
+                <h3>{availableApplications.length} Available Program(s)</h3>
+                <p>You can start a new application here:</p>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setCurrentStep("personal-info")}
+                >
+                  ➕ Start New Application
+                </button>
+              </>
+            )}
+
+            <div className="mt-4 text-center">
+              <p className="text-muted">
+                Can’t find a program of interest yet? Start your application
+                anyway:
+              </p>
+              <button
+                className="btn btn-outline-primary"
+                onClick={() => setCurrentStep("personal-info")}
+              >
+                📝 Start Application
+              </button>
+            </div>
+          </>
         )}
       </div>
-
       <div className="dashboard-section">
         {/* Your Applications */}
         <h3 className="section-title">📂 Your Applications</h3>
@@ -162,13 +173,19 @@ export default function StudentDashboard({ setCurrentStep }) {
               <tbody>
                 {applications.map((app) => (
                   <tr key={app.id}>
-                    <td>
+                    <td data-label="Select">
                       <input type="checkbox" />
                     </td>
-                    <td>{app.schoolName || "—"}</td>
-                    <td>{app.course || "—"}</td>
-                    <td className="actions">
-                      <button className="icon-btn">📧</button>
+                    <td data-label="School Name">
+                      {app.schoolName || "University of Greater Manchester"}
+                    </td>
+                    <td data-label="Course">
+                      {app.course || "Industrial Chemistry"}
+                    </td>
+                    <td data-label="Action" className="actions">
+                      <button className="icon-btn">
+                        <i className="fas fa-envelope"></i>
+                      </button>
                       <button
                         className="icon-btn"
                         onClick={() => setCurrentStep("personal-info")}
@@ -179,7 +196,7 @@ export default function StudentDashboard({ setCurrentStep }) {
                         className="icon-btn"
                         onClick={() => handleDelete(app.id)}
                       >
-                        🗑️
+                        <i className="fas fa-trash-alt"></i>
                       </button>
                     </td>
                   </tr>

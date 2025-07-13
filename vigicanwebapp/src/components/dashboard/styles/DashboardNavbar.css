@@ -1,94 +1,105 @@
 .dashboard-navbar {
-  height: 62px;
   background: #2135b0;
+  padding: 8px 16px;
+  width: 100%;
+  position: relative;
+}
+
+.dashboard-navbar-container {
   display: flex;
   align-items: center;
   width: 100%;
-  min-width: 0;
+}
+
+.dashboard-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .dashboard-navbar-logo {
-  width: 48px;
   height: 48px;
+  width: auto;
 }
 
 .dashboard-navbar-brand {
   color: #fff;
-  font-size: 18px;
-  letter-spacing: 1px;
-  line-height: 1.2;
+  font-weight: 700;
 }
 
 .dashboard-navbar-sub {
-  color: #e9e9e9;
-  font-weight: 400;
-  letter-spacing: 0.5px;
+  font-size: 10px;
+  color: #e5e7eb;
 }
 
 .dashboard-navbar-search {
-  max-width: 600px;
   width: 100%;
 }
 
-.dashboard-navbar-search .input-group {
+.dashboard-navbar form .input-group,
+.dashboard-navbar form .form-control {
   background: #2640c6;
   border-radius: 25px;
+  border: 1px solid #4a5ac2;
   overflow: hidden;
-  border: 1px solid #fff;
 }
 
-.dashboard-navbar-search input.form-control {
+.dashboard-navbar form input.form-control {
   border: none !important;
   outline: none !important;
+  box-shadow: none !important;
   background: transparent !important;
   color: #fff !important;
   font-size: 16px;
   font-weight: 500;
+  padding-left: 0.5rem;
 }
 
-.dashboard-navbar-search .input-group-text {
+.dashboard-navbar form input.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.8) !important;
+  opacity: 1;
+}
+
+.dashboard-navbar .input-group-text {
   background: transparent;
   border: none;
   color: #fff;
 }
 
 .dashboard-navbar-avatar {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   object-fit: cover;
   border-radius: 50%;
-  background: #fff;
   border: 2px solid #fff;
 }
 
 .dashboard-navbar-user {
-  color: #fff;
   display: block;
-  font-weight: 600;
+  font-size: 15px;
 }
 
 .dashboard-navbar-email {
   font-size: 12px;
-  color: #e5e7eb;
 }
 
-@media (max-width: 768px) {
-  .dashboard-navbar {
-    flex-direction: column;
-    height: auto;
-    padding: 0.5rem 0.7rem;
-    align-items: stretch;
+.dashboard-navbar-right {
+  gap: 1rem;
+}
+
+/* Hide search bar on mobile (already handled with d-none d-lg-flex in JSX) */
+
+@media (max-width: 991.98px) {
+  .dashboard-navbar-left {
+    justify-content: center;
+    width: 100%;
   }
+
   .dashboard-navbar-logo {
-    width: 38px;
-    height: 38px;
+    height: 40px;
   }
-  .dashboard-navbar-search {
-    margin: 10px 0;
-    max-width: 100%;
-  }
-  .dashboard-navbar-avatar {
-    width: 34px;
-    height: 34px;
+
+  .dashboard-navbar-center {
+    display: none !important;
   }
 }

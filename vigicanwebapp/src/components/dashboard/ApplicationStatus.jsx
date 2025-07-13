@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import "./styles/ApplicationStatus.css";
 
 const documentTypes = [
   "Degree Certificate",
@@ -49,14 +48,14 @@ const documentAPIMap = {
     nameKey: "englishProficiencyProofDocumentdownloadurl",
   },
   "CV/Resume": {
-    statusUrl: "CV/document",
-    getUrl: "CV",
-    viewKey: "cvDocumentgoogledocviewurl",
-    nameKey: "cvDocumentdownloadurl",
+    statusUrl: "CvOrResume/document",
+    getUrl: "CvOrResume",
+    viewKey: "cvOrResumeDocumentgoogledocviewurl",
+    nameKey: "cvOrResumeDocumentdownloadurl",
   },
   "Academic References": {
-    statusUrl: "AcademicReference/document",
-    getUrl: "AcademicReference",
+    statusUrl: "AcademicReferenceDoc/document",
+    getUrl: "AcademicReferenceDoc",
     viewKey: "academicReferenceDocumentgoogledocviewurl",
     nameKey: "academicReferenceDocumentdownloadurl",
   },
@@ -80,6 +79,12 @@ const documentAPIMap = {
   },
 };
 
+const statusColorMap = {
+  Uploaded: "#198754",
+  Pending: "#ffc107",
+  Rejected: "#dc3545",
+  "Under Review": "#0d6efd",
+};
 const ApplicationStatus = () => {
   const authData = useAuthStore((state) => state.allUserData);
   const [uploadedDocs, setUploadedDocs] = useState([]);
@@ -97,6 +102,8 @@ const ApplicationStatus = () => {
 
           try {
             const docRes = await apiInstance.get(`${getUrl}/${studentId}`);
+            console.log(`Fetching document for ${type}:`, docRes.data);
+
             const docId = docRes?.data?.result?.id;
             if (!docId) return { type, status: "Pending" };
 
@@ -130,53 +137,59 @@ const ApplicationStatus = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-gray-500 text-sm">
-          Loading document statuses...
+      <div className="loading-overlay">
+        <div className="spinner-container">
+          <div className="loading-spinner"></div>
+          <p>Loading Application Status</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-      {uploadedDocs.map((doc, index) => (
-        <Card
-          key={index}
-          className="p-5 border border-gray-200 rounded-2xl shadow-md transition hover:shadow-lg"
-        >
-          <div className="flex flex-col gap-3">
-            <div className="text-lg font-semibold text-gray-800">
-              {doc.type}
-            </div>
-
-            <div className="text-sm text-blue-600 truncate">
-              {doc.url ? (
-                <a
-                  href={doc.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  {doc.name}
-                </a>
-              ) : (
-                <span className="italic text-gray-400">No file uploaded</span>
-              )}
-            </div>
-
-            <Badge
-              className={`w-fit px-3 py-1 text-sm rounded-full ${
-                doc.status === "Uploaded"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-yellow-100 text-yellow-700"
-              }`}
+    <div className="container">
+      <div className="row g-3">
+        {uploadedDocs.map((doc, index) => (
+          <div key={index} className="col-12 col-sm-6 col-lg-4">
+            <div
+              className="p-3 h-100 bg-white doc-card-hover"
+              style={{
+                borderLeftColor: statusColorMap[doc.status] || "#6c757d", // fallback: gray
+              }}
             >
-              {doc.status}
-            </Badge>
+              <div className="fs-6 doc-title mb-0">{doc.type}</div>
+
+              <div
+                className="text-truncate mb-1"
+                style={{ fontSize: ".99rem" }}
+              >
+                {doc.url ? (
+                  <a
+                    href={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="doc-link"
+                  >
+                    View {doc.type}
+                  </a>
+                ) : (
+                  <span className="fst-italic text-muted">
+                    No file uploaded
+                  </span>
+                )}
+              </div>
+
+              <span
+                className={`doc-status ${
+                  doc.status === "Uploaded" ? "uploaded" : "pending"
+                }`}
+              >
+                {doc.status}
+              </span>
+            </div>
           </div>
-        </Card>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
