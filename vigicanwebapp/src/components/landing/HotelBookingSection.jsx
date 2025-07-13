@@ -20,13 +20,11 @@ const HotelBookingSection = () => (
 
     <div className="hotel-cta-section">
       <div className="container">
-        <h2>
-          Lorem Ipsum Dolor Si Elium Vigica Consult Ipsum onsectecnct conit
-        </h2>
+        <h2>Discover the perfect place to stay for your next adventure</h2>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-          sodales pellentesque ullamcorper mollis velit porta ex et nisl condorm
-          ullamcorper.
+          Whether you're traveling for business or leisure, we have a wide range
+          of hotels to suit your needs. From budget-friendly options to
+          luxurious resorts, we make booking easy and convenient.
         </p>
         <button className="btn btn-outline-light hotel-cta-btn">
           <i className="fas fa-search"></i> Find a Hotel
@@ -55,7 +53,9 @@ const HotelBookingSection = () => (
                   alt="Hotel"
                   className="img-fluid onboard-image"
                 />
-                <div className="hotel-overlay-text">Lorem Ipsum keive</div>
+                <div className="hotel-overlay-text">
+                  SENTIDO Reef Oasis Senses Resort{" "}
+                </div>
               </div>
             </div>
           </div>
@@ -64,11 +64,11 @@ const HotelBookingSection = () => (
             <div className="row align-items-center">
               <div className="col-md-6 text-section">
                 <h2 className="where-title">WHERE TO?</h2>
-                <p className="where-subtitle">Lorem Ipsum keive</p>
+                <p className="where-subtitle">Exclusive Lodge</p>
                 <p className="where-desc">
-                  Lorem Ipsum keive <br />
-                  confrentVivamussdes sgue <br />
-                  ullamcorper mollis velit
+                  Europe <br />
+                  Asia <br />
+                  United States
                 </p>
               </div>
 
@@ -78,7 +78,7 @@ const HotelBookingSection = () => (
                   alt="Resort"
                   className="img-fluid where-image"
                 />
-                <div className="image-overlay-text">Lorem Ipsum keive</div>
+                <div className="image-overlay-text">Cheeca Lodge</div>
               </div>
             </div>
           </div>
@@ -93,7 +93,7 @@ const HotelBookingSection = () => (
                     alt="Hotel Main"
                   />
                   <div className="hotel-img-title position-absolute top-0 start-0 w-100 px-4 py-3">
-                    Lorem Ipsum keive
+                    Kipriotis Hotel Rhodes
                   </div>
                 </div>
               </div>
@@ -105,7 +105,7 @@ const HotelBookingSection = () => (
                     alt="Hotel Pool"
                   />
                   <div className="hotel-img-title position-absolute top-0 start-0 w-100 px-4 py-3">
-                    Lorem Ipsum keive
+                    Macau
                   </div>
                 </div>
                 <div className="hotel-img-card position-relative flex-grow-1">
@@ -115,7 +115,7 @@ const HotelBookingSection = () => (
                     alt="Hotel Poolside"
                   />
                   <div className="hotel-img-title position-absolute top-0 start-0 w-100 px-4 py-3">
-                    Lorem Ipsum keive
+                    Macau Resort
                   </div>
                 </div>
               </div>
