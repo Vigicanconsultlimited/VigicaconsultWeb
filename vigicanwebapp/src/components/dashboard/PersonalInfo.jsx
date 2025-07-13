@@ -211,12 +211,10 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: "300px" }}
-      >
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <div className="loading-overlay">
+        <div className="spinner-container">
+          <div className="loading-spinner"></div>
+          <p>Loading Personal Info...</p>
         </div>
       </div>
     );

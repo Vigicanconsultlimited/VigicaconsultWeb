@@ -25,9 +25,13 @@ export default function SidebarMenu({ setCurrentStep }) {
         }`}
       >
         <nav>
-          <div className="sidebar-section-title mb-4">MENU</div>
+          <div className="sidebar-section-title mb-4"></div>
+          <br />
+          <span className="sidebar-link-text mb-4">Menu</span>
+
           <ul className="sidebar-list list-unstyled mb-0">
             {/* Dashboard */}
+
             <li className="sidebar-item mb-2">
               <span
                 className="sidebar-link d-flex align-items-center"
@@ -53,11 +57,26 @@ export default function SidebarMenu({ setCurrentStep }) {
                     <line x1="9" y1="21" x2="9" y2="9" />
                   </svg>
                 </span>
+
                 <span className="sidebar-link-text">Dashboard</span>
+              </span>
+            </li>
+            <li className="sidebar-item mb-2">
+              <span
+                className="sidebar-link d-flex align-items-center"
+                onClick={() => setCurrentStep("personal-info")}
+              >
+                <span className="sidebar-icon me-2">
+                  <FileText size={24} color="#fff" />
+                </span>
+                <span className="sidebar-link-text fw-bold">
+                  My Application
+                </span>
               </span>
             </li>
 
             {/* My Applications */}
+            {/*}
             <li className="sidebar-item mb-2">
               <span
                 className="sidebar-link d-flex align-items-center"
@@ -106,6 +125,7 @@ export default function SidebarMenu({ setCurrentStep }) {
                 </ul>
               )}
             </li>
+            */}
 
             {/* Saved Application */}
             {/*}

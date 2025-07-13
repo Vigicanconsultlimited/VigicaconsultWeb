@@ -204,7 +204,15 @@ export default function SupportingDocuments({ onContinue, onBack }) {
     uploadHandler(label, file);
   };
 
-  if (loading) return <LoadingSpinner />;
+  if (loading)
+    return (
+      <div className="loading-overlay">
+        <div className="spinner-container">
+          <div className="loading-spinner"></div>
+          <p>Loading your Documents...</p>
+        </div>
+      </div>
+    );
 
   return (
     <form
@@ -269,7 +277,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {documents[label].name}
+                    View {label}
                   </a>
                   <span
                     className="remove-file"

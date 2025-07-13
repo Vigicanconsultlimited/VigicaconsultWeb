@@ -248,7 +248,14 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
   // Show loading spinner while fetching data
   if (loading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="loading-overlay">
+        <div className="spinner-container">
+          <div className="loading-spinner"></div>
+          <p>Loading your Documents...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -309,7 +316,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {uploadedFiles[type].name || "View File"}
+                    View {type}
                   </a>
                   {!uploadedFiles[type].locked && (
                     <span
