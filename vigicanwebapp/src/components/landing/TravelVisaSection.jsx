@@ -16,25 +16,26 @@ const countries = [
     name: "AUSTRALIA",
     flag: australiaFlag,
     image: australiaCityImage,
-    description: "Student Immigration Lorem ipsum dolor sit amet, Lorem ips",
+    description: "Subclass 500 - Student Visa",
   },
   {
     name: "UNITED STATES",
     flag: usaFlag,
     image: usaCityImage,
-    description: "Student Immigration Lorem ipsum dolor sit amet, Lorem ips",
+    description: "F-1 & M-1 United States Student Visas",
   },
   {
     name: "EUROPE",
     flag: europeFlag,
     image: europeCityImage,
-    description: "Student Immigration Lorem ipsum dolor sit amet, Lorem ips",
+    description:
+      "National Visa (Type D), MVV Visa, Type D National Visa and Schengen Visa",
   },
   {
     name: "UNITED KINGDOM",
     flag: ukFlag,
     image: ukCityImage,
-    description: "Student Immigration Lorem ipsum dolor sit amet, Lorem ips",
+    description: "Student Visa (Tier 4) and Short-term Study Visa",
   },
 ];
 
@@ -44,9 +45,7 @@ const TravelVisaSection = () => (
       {/* Main Title Section */}
       <div className="visa-header">
         <span className="visa-subtitle">— Visa Guide</span>
-        <h2 className="visa-title">
-          Travel Visa Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit
-        </h2>
+        <h2 className="visa-title">Travel Visa for multiple countries</h2>
         <div className="airplane-icons">
           <i className="fas fa-plane airplane-left"></i>
           <i className="fas fa-plane airplane-right"></i>
@@ -94,7 +93,8 @@ const TravelVisaSection = () => (
                 Get Free Online Visa Assessment Today!
               </span>
               <h3 className="cta-title">
-                Lorem Ipsum Dolor Si Elium Vigica Consult Ipsum Consect
+                Find out your eligibility for student visas with our quick and
+                personalized assessment
               </h3>
               <button
                 style={{

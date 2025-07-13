@@ -25,17 +25,17 @@ const TestimonialsSection = () => (
           </div>
           {/* Testimonial Content */}
           <div className="testimonial-content-main flex-grow-1 me-4 ms-4">
-            <h4 className="testimonial-uni mb-2">Lorem Ipsum University</h4>
+            <h4 className="testimonial-uni mb-2">
+              {" "}
+              University of Greater Manchester{" "}
+            </h4>
             <p className="testimonial-text">
-              Lorem ipsumroin porta ex et nisl condorm posuere.
-              Vivamussodalerders pellentesque ullamcorper mollis velit porta ex
-              et nisl condorm posuere. Lorem ipsumroin porta ex et nisl condorm
-              posuere. Vivamussodalerders pellentesque ullamcorper mollis velit
-              porta ex et nislr.
+              "Vigica Consult made my study abroad journey seamless. From visa
+              application to accommodation, their support was invaluable. I
+              highly recommend their services to anyone looking to study
+              abroad."
             </p>
-            <strong className="testimonial-author">
-              Opeyemi David Olajumoke
-            </strong>
+            <strong className="testimonial-author">Mercy Oji Ojii</strong>
           </div>
           {/* Other Testimonial Images */}
           <div className="testimonial-img-list d-flex gap-3 ms-4">

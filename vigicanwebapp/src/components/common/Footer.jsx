@@ -42,12 +42,11 @@ const Footer = () => (
           <div className="footer-column">
             <h4 className="footer-title-variant2">About Us</h4>
             <p className="footer-description-variant2">
-              Lorem ipsumroin porta ex et nisl condorm posuere.
-              Vivamussodalerders pellentesque ullamcorper mollis velit porta ex
-              et nisl condorm nisl ullamcorper condorm posuere. Lorem ipsumroin
-              porta ex et nisl condorm posuere. Vivamussodalerders pellentesque
-              ullamcorper mollis velit porta ex et nisl condorm nisl ullamcorper
-              condorm posuere. corper mollis velit porta ex et nisl condorm nisl
+              Vigica Consult is your trusted partner for study abroad, travel,
+              and hotel bookings. We provide personalized visa application
+              guidance, scholarship support, and pre-departure orientation. Our
+              team is dedicated to making your study abroad journey smooth and
+              successful.
             </p>
           </div>
         </div>
@@ -80,8 +79,8 @@ const Footer = () => (
           <div className="footer-column">
             <h4 className="footer-title-variant2">Subscribe Our Newsletter</h4>
             <p className="footer-description-variant2">
-              Lorem ipsumroin porta ex et nisl condorm posuere.
-              Vivamussodalerders pellentesque ullamcorper mollis.
+              Stay updated with the latest news and offers from Vigica Consult.
+              Subscribe to our newsletter for exclusive content and updates.
             </p>
             <form className="footer-newsletter-form-variant2 d-flex align-items-center">
               <input
