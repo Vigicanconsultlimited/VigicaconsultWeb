@@ -15,7 +15,6 @@ const Toast = Swal.mixin({
 const documentTypes = [
   "Degree Certificate",
   "WAEC Certificate",
-  "Personal Statement",
   "Official Transcript",
   "Proof of English Proficiency",
 ];
@@ -34,13 +33,6 @@ const documentAPIMap = {
     deleteUrl: "WaecOrNeco",
     viewKey: "waecOrNecoCertificateDucumentgoogledocviewurl",
     downloadKey: "waecOrNecoCertificateDucumentdownloadurl",
-  },
-  "Personal Statement": {
-    uploadUrl: "PersonalStatement",
-    statusUrl: "PersonalStatement/document",
-    deleteUrl: "PersonalStatement",
-    viewKey: "personalStatementurlDocumentgoogledocviewurl",
-    downloadKey: "personalStatementDocumentdownloadurl",
   },
   "Official Transcript": {
     uploadUrl: "OfficialTranscript",
@@ -259,7 +251,10 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   }
 
   return (
-    <form className="academic-docs-form p-3 p-md-4" onSubmit={handleSubmit}>
+    <form
+      className="academic-docs-form p-3 p-md-4 mb-4"
+      onSubmit={handleSubmit}
+    >
       <h2 className="academic-docs-title">Academic Documents</h2>
       <div className="academic-docs-desc">
         Click a drop-down to upload the relevant document.
@@ -333,10 +328,10 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         </div>
       ))}
 
-      <div className="d-flex justify-content-between align-items-center gap-2 pt-4 pb-1 academic-docs-footer">
+      <div className="d-flex justify-content-between align-items-center gap-2 p-2 pb-1 academic-docs-footer">
         <button
           type="button"
-          className="btn btn-outline-primary px-4"
+          className="btn btn-outline-primary"
           onClick={onBack}
         >
           ← Back

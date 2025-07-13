@@ -190,7 +190,7 @@ export default function SidebarMenu({ setCurrentStep }) {
                 <span className="sidebar-icon me-2">
                   <i className="fas fa-tasks"></i>
                 </span>
-                <span className="sidebar-link-text">Application Status</span>
+                <span className="sidebar-link-text">Document Status</span>
               </span>
             </li>
 
