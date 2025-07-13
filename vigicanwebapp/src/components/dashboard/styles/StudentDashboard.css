@@ -10,7 +10,7 @@
   padding: 2rem;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
   margin-bottom: 2rem;
-  text-align: center;
+  text-align: justify;
 }
 
 .welcome-card h2 {
@@ -220,5 +220,65 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .student-dashboard {
+    padding: 1rem;
+  }
+
+  .welcome-card {
+    padding: 1.5rem;
+  }
+
+  .styled-table {
+    font-size: 0.85rem;
+    min-width: unset;
+  }
+
+  .styled-table thead {
+    display: none;
+  }
+
+  .styled-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+
+  .styled-table td {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border: none;
+  }
+
+  .styled-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: #555;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .apply-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .icon-btn {
+    font-size: 1rem;
+    margin: 4px 2px;
+  }
+
+  .table-container {
+    overflow-x: hidden;
   }
 }

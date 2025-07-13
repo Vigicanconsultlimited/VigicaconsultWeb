@@ -17,6 +17,7 @@ import Inbox from "../components/dashboard/Inbox";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ApplicationStatus from "../components/dashboard/ApplicationStatus";
 import apiInstance from "../utils/axios";
+import ApplicationSummary from "../components/dashboard/ApplicationSummary";
 
 function Dashboard() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
@@ -77,17 +78,7 @@ function Dashboard() {
       ),
     },
     summary: {
-      component: (
-        <div>
-          <h2>All steps completed 🎉</h2>
-          <button
-            onClick={() => setCurrentStep("supporting-documents")}
-            className="btn btn-secondary mt-3"
-          >
-            ⬅ Back
-          </button>
-        </div>
-      ),
+      component: <ApplicationSummary setCurrentStep={setCurrentStep} />,
     },
 
     // ✅ SAVED COMPONENTS
