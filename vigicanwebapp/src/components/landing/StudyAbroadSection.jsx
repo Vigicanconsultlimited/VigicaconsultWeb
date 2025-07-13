@@ -1,8 +1,10 @@
 import React from "react";
-import admissionImage from "../../assets/images/studyabroad1.jpg";
+import admissionImage1 from "../../assets/images/studyabroad1.jpg";
 import visaImage from "../../assets/images/studyabroad2.jpg";
 import resourcesImage from "../../assets/images/studyabroad3.jpg";
+import admissionImage from "../../assets/images//img/vigica-img7.jpg";
 import "./StudyAbroadSection.css";
+import { Link } from "react-router-dom";
 
 const features = [
   {
@@ -22,7 +24,7 @@ const features = [
   },
   {
     title: "Visa Assistance",
-    img: admissionImage, // Replace with actual image
+    img: admissionImage1,
     points: ["F1 student Visa", "Non Academic visa", "Exchange visitor visa"],
   },
 ];
@@ -117,6 +119,7 @@ const StudyAbroadSection = () => (
                       />
                     </svg>
                   </span>
+                  <Link to="/register" className="text-decoration-none"></Link>
                   Start Your Application
                 </button>
               </div>

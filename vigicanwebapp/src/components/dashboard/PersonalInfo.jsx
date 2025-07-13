@@ -361,13 +361,21 @@ export default function PersonalInfo({ onContinue, onBack }) {
       </div>
 
       {/* Footer Buttons */}
-      <div className="form-footer d-flex justify-content-between">
+      <div
+        className="form-footer d-flex justify-content-between"
+        style={{
+          marginTop: "20px",
+          backgroundColor: "#e3e8fd",
+          padding: "15px",
+          borderRadius: "8px",
+        }}
+      >
         <button
           type="button"
-          className="btn btn-outline-secondary"
+          className="btn btn-outline-primary px-4"
           onClick={onBack}
         >
-          ⬅ Back to Dashboard
+          ← Back to Dashboard
         </button>
 
         <div>
@@ -379,7 +387,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
             <>
               <button
                 type="button"
-                className="btn btn-success me-2"
+                className="btn btn-success me-2 "
                 onClick={handleEditSubmit}
               >
                 ✅ Finish Editing
@@ -396,7 +404,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
             <>
               <button
                 type="button"
-                className="btn btn-secondary me-2"
+                className="btn btn-secondary me-2 btn-outline-primary"
                 onClick={() => setIsEditing(true)}
               >
                 ✏️ Edit

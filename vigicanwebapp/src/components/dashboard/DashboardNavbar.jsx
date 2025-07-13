@@ -66,22 +66,28 @@ export default function DashboardNavbar() {
 
           {/* Desktop Left Logo */}
           <div className="d-none d-lg-flex align-items-center">
-            <img
-              src={logo}
-              alt="Vigica Logo"
-              className="dashboard-navbar-logo me-2"
-            />
-            <div className="d-none d-md-block">
-              <span className="dashboard-navbar-brand fw-bold text-white">
-                VIGICA
-              </span>
-              <div
-                className="dashboard-navbar-sub text-white-50"
-                style={{ fontSize: 10 }}
-              >
-                CONSULT LIMITED
+            <a
+              href="/"
+              className="dashboard-navbar-link"
+              style={{ textDecoration: "none" }}
+            >
+              <img
+                src={logo}
+                alt="Vigica Logo"
+                className="dashboard-navbar-logo me-2"
+              />
+              <div className="d-none d-md-block">
+                <span className="dashboard-navbar-brand fw-bold text-white">
+                  VIGICA
+                </span>
+                <div
+                  className="dashboard-navbar-sub text-white-50"
+                  style={{ fontSize: 10 }}
+                >
+                  CONSULT LIMITED
+                </div>
               </div>
-            </div>
+            </a>
           </div>
         </div>
 
