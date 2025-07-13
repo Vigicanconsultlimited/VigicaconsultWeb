@@ -1,6 +1,7 @@
 import React from "react";
 import aboutImage1 from "../../assets/images/about1.jpg";
-import aboutImage2 from "../../assets/images/about2.jpg";
+import aboutImage2 from "../../assets/images/img/vigica-img1.jpg";
+//import aboutImage3 from "../../assets/images/about2.jpg";
 
 const AboutSection = () => (
   <section

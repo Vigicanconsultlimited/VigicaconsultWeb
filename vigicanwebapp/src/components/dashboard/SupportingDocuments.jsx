@@ -50,13 +50,6 @@ const DOCUMENTS = {
     viewKey: "professionalReferenceDocumentgoogledocviewurl",
     downloadKey: "professionalReferenceDocumentdownloadurl",
   },
-  "Proof of English Proficiency": {
-    uploadUrl: "EnglishProof",
-    statusUrl: "EnglishProof/document",
-    deleteUrl: "EnglishProof",
-    viewKey: "englishProficiencyProofDocumentgoogledocviewurl",
-    downloadKey: "englishProficiencyProofDocumentdownloadurl",
-  },
   "Work Experience": {
     uploadUrl: "WorkExperience",
     statusUrl: "WorkExperience/document",
@@ -292,8 +285,12 @@ export default function SupportingDocuments({ onContinue, onBack }) {
         </div>
       ))}
 
-      <div className="footer d-flex justify-content-between align-items-center pt-4">
-        <button type="button" className="btn back-btn" onClick={onBack}>
+      <div className="footer d-flex justify-content-between align-items-center p-2 mb-4">
+        <button
+          type="button"
+          className="btn btn-outline-primary"
+          onClick={onBack}
+        >
           ← Back
         </button>
         <div>
