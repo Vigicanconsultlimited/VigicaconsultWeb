@@ -61,10 +61,8 @@ function Register() {
               />
               <div className="register-img-overlay px-3 py-2 rounded">
                 <p className="mb-0 text-white" style={{ fontWeight: 400 }}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Aliquam consequat ornare feugiat. Nulla diam elit, ornare non
-                  felis vitae, porttitor venenatis nunc. Morbi dictum molestie
-                  dapibus. Vivamus lacinia nunc eu elit volutpat blandit.
+                  Welcome to the VIGICA Consult Limited Portal. Please register
+                  to create a free account and access our services.
                 </p>
               </div>
             </div>
