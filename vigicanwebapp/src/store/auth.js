@@ -6,16 +6,19 @@ export const useAuthStore = create(
   persist(
     (set, get) => ({
       allUserData: null,
+      userRole: null,
       loading: true,
       hydrated: false,
 
       setUser: (user) => set({ allUserData: user }),
+      setUserRole: (role) => set({ userRole: role }),
       setLoading: (loading) => set({ loading }),
-      clearUser: () => set({ allUserData: null }),
+      clearUser: () => set({ allUserData: null, userRole: null }),
       isLoggedIn: () => get().allUserData !== null,
+      getUserRole: () => get().userRole,
     }),
     {
-      name: "auth-storage", // localStorage key
+      name: "auth-storage",
       getStorage: () => localStorage,
       onRehydrateStorage: (set) => () => {
         set({ hydrated: true });

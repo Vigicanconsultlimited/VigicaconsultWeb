@@ -1,17 +1,34 @@
 import React, { useEffect } from "react";
 import { setUser } from "./utils/auth";
-import { useAuthStore } from "./store/auth"; // <-- import store
+import { useAuthStore } from "./store/auth";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import PrivateRoute from "./routes/PrivateRoutes";
+import RequireRole from "./routes/RequireRole";
 
 import Login from "./pages/Login";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Logout from "./pages/Logout";
 import OtpverifyPage from "./pages/OtpVerifyPage";
+
+// Component to redirect to appropriate dashboard based on role
+function DashboardRedirect() {
+  const userRole = useAuthStore((state) => state.getUserRole());
+
+  if (userRole === "Admin") {
+    return <Navigate to="/admin-dashboard" replace />;
+  }
+  return <Navigate to="/dashboard" replace />;
+}
 
 function App() {
   const loading = useAuthStore((state) => state.loading);
@@ -37,14 +54,38 @@ function App() {
         <Route path="/verify-otp" element={<OtpverifyPage />} />
         <Route path="/logout" element={<Logout />} />
 
-        {/* Private Route */}
+        {/* Dashboard redirect route - redirects to appropriate dashboard based on role */}
+        <Route
+          path="/dashboard-redirect"
+          element={
+            <PrivateRoute>
+              <DashboardRedirect />
+            </PrivateRoute>
+          }
+        />
+
+        {/* User Dashboard - Only for Students */}
         <Route
           path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard
-                key={window.location.pathname + window.location.search}
-              />
+              <RequireRole role="User">
+                <Dashboard
+                  key={window.location.pathname + window.location.search}
+                />
+              </RequireRole>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Admin Dashboard - Only for admins */}
+        <Route
+          path="/admin-dashboard"
+          element={
+            <PrivateRoute>
+              <RequireRole role="Admin">
+                <AdminDashboard />
+              </RequireRole>
             </PrivateRoute>
           }
         />
