@@ -17,7 +17,13 @@ function Login() {
 
   useEffect(() => {
     if (isLoggedIn()) {
-      navigate("/dashboard");
+      // Redirect based on role if already logged in
+      const userRole = useAuthStore.getState().getUserRole();
+      if (userRole === "Admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     }
   }, [isLoggedIn, navigate]);
 
@@ -30,16 +36,22 @@ function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    const { error } = await login(email, password);
+    const { error, userRole } = await login(email, password);
     if (error) {
       alert(error);
       setIsLoading(false);
     } else {
-      navigate("/dashboard");
+      // Navigate based on user role
+      if (userRole === "Admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
       resetForm();
       setIsLoading(false);
     }
   };
+
   return (
     <>
       <section>
@@ -59,11 +71,8 @@ function Login() {
                 />
                 <div className="register-img-overlay px-3 py-2 rounded">
                   <p className="mb-0 text-white" style={{ fontWeight: 400 }}>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Aliquam consequat ornare feugiat. Nulla diam elit, ornare
-                    non felis vitae, porttitor venenatis nunc. Morbi dictum
-                    molestie dapibus. Vivamus lacinia nunc eu elit volutpat
-                    blandit.
+                    Welcome to Vigica Consult Limited. Please sign to continue
+                    exploring our services.
                   </p>
                 </div>
               </div>
