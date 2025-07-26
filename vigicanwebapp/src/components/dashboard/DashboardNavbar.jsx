@@ -9,7 +9,7 @@ export default function DashboardNavbar() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const user = useAuthStore((state) => state.allUserData);
   const [displayName, setDisplayName] = useState("");
-  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const email =
     user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
@@ -92,13 +92,14 @@ export default function DashboardNavbar() {
         </div>
 
         {/* Center: Desktop Search */}
-        <div className="dashboard-navbar-center flex-grow-1 d-none d-lg-flex justify-content-center">
+        <div className="dashboard-navbar-center flex-grow-1 d-none d-lg-flex justify-content-center align-items-center">
           <form
-            className="dashboard-navbar-search"
-            style={{ maxWidth: "500px", width: "100%" }}
+            className="dashboard-navbar-search w-100"
+            style={{ maxWidth: "500px" }}
+            autoComplete="off"
           >
-            <div className="input-group">
-              <span className="input-group-text bg-transparent border-0 ps-3">
+            <div className="input-group dashboard-search-group">
+              <span className="input-group-text dashboard-search-icon">
                 <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
                   <circle cx="11" cy="11" r="8" stroke="#fff" strokeWidth="2" />
                   <path
@@ -111,9 +112,20 @@ export default function DashboardNavbar() {
               </span>
               <input
                 type="text"
-                className="form-control dashboard-search-input bg-transparent border-0 text-white"
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "#fff",
+                  width: "100%",
+                  padding: "0 8px",
+                  outline: "none",
+                  fontSize: "15px",
+                  fontWeight: "400",
+                  paddingTop: "4px",
+                }}
                 placeholder="Search"
-                aria-label="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </form>

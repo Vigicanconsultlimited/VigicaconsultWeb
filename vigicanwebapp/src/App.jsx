@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
-import { setUser } from "./utils/auth";
+import { logout, setUser } from "./utils/auth";
+
 import { useAuthStore } from "./store/auth";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import Cookies from "js-cookie";
 import {
   BrowserRouter as Router,
   Routes,
@@ -32,15 +33,16 @@ function DashboardRedirect() {
 
 function App() {
   const loading = useAuthStore((state) => state.loading);
+  const validateAuth = useAuthStore((state) => state.validateAuth);
 
   useEffect(() => {
-    setUser();
-  }, []);
+    validateAuth();
+  }, [validateAuth]);
 
   if (loading) {
     return (
       <div className="d-flex vh-100 justify-content-center align-items-center">
-        <p>Loading...</p> {/* Replace with a spinner if you like */}
+        <p>Loading...</p> {/* spinner */}
       </div>
     );
   }

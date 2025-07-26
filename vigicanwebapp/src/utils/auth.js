@@ -13,7 +13,7 @@ const Toast = Swal.mixin({
 });
 
 // Helper function to check token expiration
-const isTokenExpired = (token) => {
+export const isTokenExpired = (token) => {
   try {
     const { exp } = jwtDecode(token);
     return Date.now() >= exp * 1000;
@@ -125,33 +125,26 @@ export const refreshAuthToken = async () => {
 
 export const setUser = async () => {
   const accessToken = Cookies.get("access_token");
-  const refreshToken = Cookies.get("refresh_token");
-
   const store = useAuthStore.getState();
   store.setLoading(true);
 
-  if (!accessToken || !refreshToken) {
+  if (!accessToken) {
     store.setLoading(false);
     return;
   }
 
   try {
     if (isTokenExpired(accessToken)) {
-      const newTokens = await refreshAuthToken();
-      if (newTokens) {
-        setAuthUser(newTokens);
-      } else {
-        logout();
-      }
-    } else {
-      const userRole = getRoleFromToken(accessToken);
-      setAuthUser({
-        token: accessToken,
-        refreshToken,
-        user: jwtDecode(accessToken),
-        userRole: userRole,
-      });
+      logout();
+      return;
     }
+
+    const userRole = getRoleFromToken(accessToken);
+    setAuthUser({
+      token: accessToken,
+      user: jwtDecode(accessToken),
+      userRole: userRole,
+    });
   } catch (error) {
     console.error("Auth error:", error);
     logout();
@@ -163,12 +156,14 @@ export const setUser = async () => {
 export const logout = () => {
   Cookies.remove("access_token");
   Cookies.remove("refresh_token");
+
+  useAuthStore.getState().clearUser();
+
   localStorage.removeItem("auth-storage");
-  useAuthStore.getState().setUser(null);
-  useAuthStore.getState().setUserRole(null);
+
   Toast.fire({
     icon: "success",
-    title: "Signed Out Successfully",
+    title: "Signed out successfully",
   });
 };
 
