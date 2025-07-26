@@ -1,5 +1,5 @@
 import React from "react";
-import studentImage from "../../assets/images/student.png";
+import studentImage from "../../assets/images//img/vigica-img8.jpg";
 import studentsImage from "../../assets/images/students.png";
 
 import "./AboutUsSection.css";

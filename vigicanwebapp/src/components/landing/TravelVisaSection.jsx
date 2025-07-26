@@ -7,7 +7,7 @@ import australiaFlag from "../../assets/images/australia-flag.png";
 import usaFlag from "../../assets/images/usa-flag.png";
 import europeFlag from "../../assets/images/europe-flag.png";
 import ukFlag from "../../assets/images/uk-flag.png";
-import visaApply from "../../assets/images/visa-apply.jpg";
+import visaApply from "../../assets/images//img/vigica-img6.jpg";
 
 import "./TravelVisaSection.css";
 
