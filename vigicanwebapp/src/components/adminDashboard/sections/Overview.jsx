@@ -1,39 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BarChart2, ChevronDown, MoreHorizontal, Star } from "lucide-react";
+import apiInstance from "../../../utils/axios";
 import "../styles/StatsOverview.css";
 
-// Mocked Data
-const statCards = [
-  {
-    title: "Total Applications",
-    value: "51,341",
-    change: "+14% Inc",
-    changePercent: 74,
-    color: "blue",
-  },
-  {
-    title: "Approved Applications",
-    value: "3,231",
-    change: "+07% Inc",
-    changePercent: 14,
-    color: "green",
-  },
-  {
-    title: "Rejected Applications",
-    value: "1,055",
-    change: "+04% Dec",
-    changePercent: 24,
-    color: "red",
-  },
-  {
-    title: "Pending Applications",
-    value: "1,055",
-    change: "+04% Dec",
-    changePercent: 24,
-    color: "gray",
-  },
-];
-
+// Static (mocked) data for non-API sections
 const breakdownData = [
   { day: "Mon", application: 100, approved: 60, rejected: 30, pending: 10 },
   { day: "Tue", application: 90, approved: 55, rejected: 28, pending: 7 },
@@ -88,6 +58,106 @@ const analytics = [
 const genderData = { male: 2324, female: 1893 };
 
 export default function Overview() {
+  // States for API-driven stats
+  const [statCards, setStatCards] = useState([
+    {
+      title: "Total Applications",
+      value: "--",
+      change: "+0% Inc",
+      changePercent: 0,
+      color: "blue",
+    },
+    {
+      title: "Approved Applications",
+      value: "--",
+      change: "+0% Inc",
+      changePercent: 0,
+      color: "green",
+    },
+    {
+      title: "Rejected Applications",
+      value: "--",
+      change: "+0% Dec",
+      changePercent: 0,
+      color: "red",
+    },
+    {
+      title: "Pending Applications",
+      value: "--",
+      change: "+0% Dec",
+      changePercent: 0,
+      color: "gray",
+    },
+  ]);
+
+  // Fetch applications summary from API
+  useEffect(() => {
+    async function fetchApplicationStats() {
+      try {
+        const response = await apiInstance.get(
+          "StudentApplication/allapplications"
+        );
+        if (response?.data?.statusCode === 200 && response?.data?.result) {
+          const {
+            totalNumOfApplications,
+            approvedApplications,
+            rejectedApplications,
+            pendingApplications,
+          } = response.data.result;
+
+          // Compute change and changePercent
+          // For demo, we use 0% and 0. Use your own logic if you have previous stats or trends.
+          setStatCards([
+            {
+              title: "Total Applications",
+              value:
+                typeof totalNumOfApplications === "number"
+                  ? totalNumOfApplications.toLocaleString()
+                  : "--",
+              change: "+12% Inc",
+              changePercent: 0,
+              color: "blue",
+            },
+            {
+              title: "Approved Applications",
+              value:
+                typeof approvedApplications === "number"
+                  ? approvedApplications.toLocaleString()
+                  : "--",
+              change: "+8% Inc",
+              changePercent: 0,
+              color: "green",
+            },
+            {
+              title: "Rejected Applications",
+              value:
+                typeof rejectedApplications === "number"
+                  ? rejectedApplications.toLocaleString()
+                  : "--",
+              change: "+5% Dec",
+              changePercent: 0,
+              color: "red",
+            },
+            {
+              title: "Pending Applications",
+              value:
+                typeof pendingApplications === "number"
+                  ? pendingApplications.toLocaleString()
+                  : "--",
+              change: "+10% Dec",
+              changePercent: 0,
+              color: "gray",
+            },
+          ]);
+        }
+      } catch (error) {
+        // Optionally show an error, otherwise leave stat cards at defaults
+        // You may set error state here if you want
+      }
+    }
+    fetchApplicationStats();
+  }, []);
+
   return (
     <div className="overview-main">
       {/* Stat Cards */}

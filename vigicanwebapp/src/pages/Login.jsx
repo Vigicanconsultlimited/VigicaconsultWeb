@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
 
 import "../styles/Login.css";
-import registerImage from "../assets/images/visa-apply.jpg";
+import registerImage from "../assets/images/img/vigica-img6.jpg";
 import vigicaLogo from "../assets/images/vigica.png";
 
 function Login() {
