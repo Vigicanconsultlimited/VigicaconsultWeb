@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "../../shared/Button";
 import Modal from "../../shared/Modal";
 import LoadingSpinner from "../../shared/LoadingSpinner";
 import profile from "../../../assets/images/default-profile.jpg";
+import apiInstance from "../../../utils/axios";
 import {
   Search,
   Filter,
@@ -18,64 +19,7 @@ import {
 } from "lucide-react";
 
 export default function UserManagement() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Fizy Edward",
-      email: "fizy.edward@gmail.com",
-      role: "Student",
-      status: "active",
-      lastLogin: "2024-01-15",
-      joinDate: "2023-08-10",
-      avatar: profile,
-      applications: 3,
-    },
-    {
-      id: 2,
-      name: "ANC Charles",
-      email: "anc.charles@gmail.com",
-      role: "Student",
-      status: "active",
-      lastLogin: "2024-01-14",
-      joinDate: "2023-07-22",
-      avatar: profile,
-      applications: 1,
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike.johnson@example.com",
-      role: "Admin",
-      status: "active",
-      lastLogin: "2024-01-16",
-      joinDate: "2023-01-15",
-      avatar: "/api/placeholder/40/40",
-      applications: 0,
-    },
-    {
-      id: 4,
-      name: "Sarah Wilson",
-      email: "sarah.wilson@example.com",
-      role: "Student",
-      status: "inactive",
-      lastLogin: "2024-01-10",
-      joinDate: "2023-09-05",
-      avatar: "/api/placeholder/40/40",
-      applications: 2,
-    },
-    {
-      id: 5,
-      name: "David Brown",
-      email: "david.brown@example.com",
-      role: "Moderator",
-      status: "active",
-      lastLogin: "2024-01-15",
-      joinDate: "2023-05-18",
-      avatar: "/api/placeholder/40/40",
-      applications: 0,
-    },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -90,9 +34,47 @@ export default function UserManagement() {
     role: "Student",
     status: "active",
   });
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   const roles = ["Student", "Admin", "Moderator"];
   const statuses = ["active", "inactive", "suspended"];
+
+  // Fetch users from API
+  useEffect(() => {
+    async function fetchUsers() {
+      setLoadingUsers(true);
+      try {
+        const res = await apiInstance.get("StudentPersonalInfo");
+        if (res?.data?.statusCode === 200 && Array.isArray(res.data.result)) {
+          // Map API data to expected user object
+          const mapped = res.data.result.map((user, idx) => ({
+            id: user.id,
+            name:
+              `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+              user.email ||
+              "Unnamed",
+            email: user.email,
+            role: "Student",
+            status: "active",
+            lastLogin: "",
+            joinDate: user.dob || "",
+            avatar: profile,
+            applications: 0,
+            phone: user.phone,
+            address: user.address,
+            postCode: user.postCode,
+            middleName: user.middleName,
+            dob: user.dob,
+          }));
+          setUsers(mapped);
+        }
+      } catch (e) {
+        setUsers([]);
+      }
+      setLoadingUsers(false);
+    }
+    fetchUsers();
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -135,8 +117,8 @@ export default function UserManagement() {
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = selectedRole === "all" || user.role === selectedRole;
     const matchesStatus =
       selectedStatus === "all" || user.status === selectedStatus;
@@ -147,13 +129,14 @@ export default function UserManagement() {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-      const newId = Math.max(...users.map((u) => u.id)) + 1;
+      const newId =
+        users.length > 0 ? Math.max(...users.map((u) => u.id || 0)) + 1 : 1;
       const createdUser = {
         ...newUser,
         id: newId,
         lastLogin: "Never",
         joinDate: new Date().toISOString().split("T")[0],
-        avatar: "/api/placeholder/40/40",
+        avatar: profile,
         applications: 0,
       };
       setUsers([createdUser, ...users]);
@@ -323,94 +306,104 @@ export default function UserManagement() {
       {/* Users Table */}
       <div className="users-table-container">
         <div className="table-wrapper">
-          <table className="users-table">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Applications</th>
-                <th>Last Login</th>
-                <th>Join Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr key={user.id}>
-                  <td className="user-info">
-                    <div className="user-details">
-                      <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="user-avatar"
-                      />
-                      <div className="user-text">
-                        <div className="user-name">{user.name}</div>
-                        <div className="user-email">{user.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="role-container">
-                      <span className={`role-badge ${getRoleColor(user.role)}`}>
-                        {getRoleIcon(user.role)}
-                        {user.role}
-                      </span>
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      className={`status-badge ${getStatusColor(user.status)}`}
-                    >
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="applications-count">{user.applications}</td>
-                  <td className="last-login">{user.lastLogin}</td>
-                  <td className="join-date">{user.joinDate}</td>
-                  <td className="actions">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewUser(user)}
-                      className="action-btn"
-                    >
-                      <Eye size={16} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openEditModal(user)}
-                      className="action-btn"
-                    >
-                      <Edit size={16} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleToggleStatus(user.id)}
-                      className="action-btn"
-                    >
-                      {user.status === "active" ? (
-                        <UserX size={16} />
-                      ) : (
-                        <UserCheck size={16} />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="action-btn delete-btn"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </td>
+          {loadingUsers ? (
+            <div style={{ textAlign: "center", padding: "2rem" }}>
+              Loading users...
+            </div>
+          ) : (
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Applications</th>
+                  <th>Last Login</th>
+                  <th>Join Date</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td className="user-info">
+                      <div className="user-details">
+                        <img
+                          src={user.avatar}
+                          alt={user.name}
+                          className="user-avatar"
+                        />
+                        <div className="user-text">
+                          <div className="user-name">{user.name}</div>
+                          <div className="user-email">{user.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="role-container">
+                        <span
+                          className={`role-badge ${getRoleColor(user.role)}`}
+                        >
+                          {getRoleIcon(user.role)}
+                          {user.role}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        className={`status-badge ${getStatusColor(
+                          user.status
+                        )}`}
+                      >
+                        {user.status}
+                      </span>
+                    </td>
+                    <td className="applications-count">{user.applications}</td>
+                    <td className="last-login">{user.lastLogin}</td>
+                    <td className="join-date">{user.joinDate}</td>
+                    <td className="actions">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleViewUser(user)}
+                        className="action-btn"
+                      >
+                        <Eye size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEditModal(user)}
+                        className="action-btn"
+                      >
+                        <Edit size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleToggleStatus(user.id)}
+                        className="action-btn"
+                      >
+                        {user.status === "active" ? (
+                          <UserX size={16} />
+                        ) : (
+                          <UserCheck size={16} />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="action-btn delete-btn"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
@@ -652,7 +645,29 @@ export default function UserManagement() {
               </div>
               <div className="stat-item">
                 <label>Join Date</label>
-                <value>{selectedUser.joinDate}</value>
+                <value>
+                  {selectedUser.joinDate}
+                  {selectedUser.dob &&
+                  selectedUser.joinDate === selectedUser.dob
+                    ? ` (${selectedUser.dob})`
+                    : ""}
+                </value>
+              </div>
+              <div className="stat-item">
+                <label>Phone</label>
+                <value>{selectedUser.phone}</value>
+              </div>
+              <div className="stat-item">
+                <label>Address</label>
+                <value>{selectedUser.address}</value>
+              </div>
+              <div className="stat-item">
+                <label>Post Code</label>
+                <value>{selectedUser.postCode}</value>
+              </div>
+              <div className="stat-item">
+                <label>Middle Name</label>
+                <value>{selectedUser.middleName}</value>
               </div>
             </div>
           </div>

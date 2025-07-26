@@ -1,95 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import profile from "../../../assets/images/default-profile.jpg";
 import { Eye, Trash2, CheckCircle, XCircle, MessageSquare } from "lucide-react";
+import apiInstance from "../../../utils/axios";
 import "../styles/DocumentReview.css";
 
-const students = [
-  {
-    id: 1,
-    name: "Fizy Edwards",
-    avatar: profile,
-    documents: [
-      { name: "Degree Cert", status: "approved" },
-      { name: "SOP", status: "pending" },
-      { name: "Resume", status: "rejected" },
-    ],
-    email: "fizy@gmail.com",
-    phone: "+234 801 111 1111",
-    address: "No. 2 Main Street, City, State",
-    postCode: "90021",
-    language: "English",
-    dateOfBirth: "16th May, 2000",
-    joined: "4th March, 2025",
-  },
-  {
-    id: 2,
-    name: "Charles ANC",
-    avatar: profile,
-    documents: [
-      { name: "Degree Cert", status: "approved" },
-      { name: "Transcript", status: "approved" },
-    ],
-    email: "anc@gmail.com",
-    phone: "+234 802 222 2222",
-    address: "No. 3 Main Street, City, State",
-    postCode: "90022",
-    language: "English",
-    dateOfBirth: "1st Jan, 1999",
-    joined: "12th March, 2025",
-  },
-  {
-    id: 3,
-    name: "Mike Johnson",
-    avatar: "/api/placeholder/22/22",
-    documents: [
-      { name: "Recommendation", status: "pending" },
-      { name: "Degree Cert", status: "approved" },
-    ],
-    email: "mike.johnson@email.com",
-    phone: "+234 803 333 3333",
-    address: "No. 4 Main Street, City, State",
-    postCode: "90023",
-    language: "English",
-    dateOfBirth: "23rd Feb, 2001",
-    joined: "22nd March, 2025",
-  },
-  {
-    id: 4,
-    name: "Sarah Wilson",
-    avatar: "/api/placeholder/22/22",
-    documents: [
-      { name: "Personal Statement", status: "pending" },
-      { name: "Degree Cert", status: "rejected" },
-    ],
-    email: "sarah.wilson@email.com",
-    phone: "+234 804 444 4444",
-    address: "No. 5 Main Street, City, State",
-    postCode: "90024",
-    language: "English",
-    dateOfBirth: "10th May, 2002",
-    joined: "1st April, 2025",
-  },
-  {
-    id: 5,
-    name: "Charles Nwosu",
-    avatar: "/api/placeholder/22/22",
-    documents: [
-      { name: "Degree Cert", status: "approved" },
-      { name: "Resume", status: "approved" },
-    ],
-    email: "charles.nwosu@email.com",
-    phone: "+234 805 555 5555",
-    address: "No. 6 Main Street, City, State",
-    postCode: "90025",
-    language: "English",
-    dateOfBirth: "5th Jun, 1998",
-    joined: "2nd April, 2025",
-  },
+// Application status mapping
+const statusMap = {
+  1: "submitted",
+  2: "pending",
+  3: "under review",
+  4: "rejected",
+  5: "approved",
+};
+
+// Document fields and their pretty names
+const docFields = [
+  { key: "degreeCertificateurl", label: "Degree Certificate" },
+  { key: "officialTranscripturl", label: "Official Transcript" },
+  { key: "cvOrResumeurl", label: "CV/Resume" },
+  { key: "academicReferenceurl", label: "Academic Reference" },
+  { key: "professionalReferenceurl", label: "Professional Reference" },
+  { key: "waecOrNecoCertificateurl", label: "WAEC/NECO Certificate" },
+  { key: "personalStatementurl", label: "Personal Statement" },
+  { key: "englishProficiencyProofurl", label: "English Proficiency Proof" },
+  { key: "workExperienceurl", label: "Work Experience" },
+  { key: "internationalPassporturl", label: "International Passport" },
 ];
 
 export default function DocumentReview() {
-  const [studentList, setStudentList] = useState(students);
-  const [selectedStudent, setSelectedStudent] = useState(studentList[0]);
+  const [studentList, setStudentList] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [toggleStates, setToggleStates] = useState({
     approve: false,
@@ -101,6 +41,108 @@ export default function DocumentReview() {
     reject: false,
     comment: false,
   });
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+
+  // Fetch all students on mount
+  useEffect(() => {
+    async function fetchStudents() {
+      setLoadingStudents(true);
+      try {
+        const res = await apiInstance.get("StudentPersonalInfo");
+        if (res?.data?.statusCode === 200 && Array.isArray(res.data.result)) {
+          // Map to UI format, default avatar if missing
+          const students = res.data.result.map((student) => ({
+            id: student.id,
+            name:
+              `${student.firstName || ""} ${student.lastName || ""}`.trim() ||
+              student.email ||
+              "Unnamed",
+            avatar: profile,
+            documents: [],
+            email: student.email,
+            phone: student.phoneNumber,
+            address: student.address,
+            postCode: student.postalCode,
+            language: student.preferredLanguage,
+            dateOfBirth: student.dateOfBirth,
+            joined: student.dateCreated
+              ? new Date(student.dateCreated).toLocaleDateString()
+              : "",
+            applicationStatus: "pending",
+          }));
+          setStudentList(students);
+          setSelectedStudent(students[0] || null);
+        }
+      } catch (e) {
+        setStudentList([]);
+      }
+      setLoadingStudents(false);
+    }
+    fetchStudents();
+  }, []);
+
+  // Fetch selected student's application & docs
+  useEffect(() => {
+    async function fetchStudentApplication() {
+      if (!selectedStudent) return;
+      setLoadingDetails(true);
+      try {
+        const res = await apiInstance.get(
+          `StudentApplication/application?StudentPersonalInformationId=${selectedStudent.id}`
+        );
+        const result = res?.data?.result;
+        if (result) {
+          // Documents: parse all *_url fields that are present
+          const documents = docFields
+            .filter((doc) => result[doc.key])
+            .map((doc) => ({
+              name: doc.label,
+              url: result[doc.key],
+              status: statusMap[result.applicationStatus] || "pending",
+            }));
+
+          // Use nested personalInformation for details if available, otherwise fallback to list
+          const p = result.personalInformation || selectedStudent;
+          setSelectedStudent((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  name:
+                    `${p.firstName || ""} ${p.lastName || ""}`.trim() ||
+                    p.email ||
+                    "Unnamed",
+                  email: p.email || prev.email,
+                  phone: p.phoneNumber || prev.phone,
+                  address: p.address || prev.address,
+                  postCode: p.postalCode || prev.postCode,
+                  language: p.preferredLanguage || prev.language,
+                  dateOfBirth: p.dob || prev.dateOfBirth,
+                  joined: prev.joined,
+                  documents,
+                  applicationStatus:
+                    statusMap[result.applicationStatus] || "pending",
+                }
+              : prev
+          );
+        } else {
+          setSelectedStudent((prev) =>
+            prev
+              ? { ...prev, documents: [], applicationStatus: "pending" }
+              : prev
+          );
+        }
+      } catch (e) {
+        setSelectedStudent((prev) =>
+          prev ? { ...prev, documents: [], applicationStatus: "pending" } : prev
+        );
+      }
+      setSelectedDocument(null);
+      setLoadingDetails(false);
+    }
+    if (selectedStudent) fetchStudentApplication();
+    // eslint-disable-next-line
+  }, [selectedStudent?.id]);
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -110,13 +152,19 @@ export default function DocumentReview() {
         return "status-badge pending";
       case "rejected":
         return "status-badge rejected";
+      case "under review":
+        return "status-badge pending";
+      case "submitted":
+        return "status-badge pending";
       default:
         return "status-badge";
     }
   };
 
-  // Derive main status from documents: approved if any doc approved, rejected if all rejected, else pending
+  // Derive main status using applicationStatus if available
   const deriveStatus = (student) => {
+    if (student && student.applicationStatus) return student.applicationStatus;
+    if (!student.documents || !student.documents.length) return "pending";
     if (student.documents.some((d) => d.status === "approved"))
       return "approved";
     if (student.documents.every((d) => d.status === "rejected"))
@@ -124,12 +172,17 @@ export default function DocumentReview() {
     return "pending";
   };
 
-  const handleDeleteStudent = (id) => {
-    const filtered = studentList.filter((s) => s.id !== id);
-    setStudentList(filtered);
-    if (selectedStudent && selectedStudent.id === id) {
-      setSelectedStudent(filtered[0] || null);
-      setSelectedDocument(null);
+  const handleDeleteStudent = async (id) => {
+    try {
+      await apiInstance.delete(`StudentPersonalInfo/delete/${id}`);
+      const filtered = studentList.filter((s) => s.id !== id);
+      setStudentList(filtered);
+      if (selectedStudent && selectedStudent.id === id) {
+        setSelectedStudent(filtered[0] || null);
+        setSelectedDocument(null);
+      }
+    } catch (e) {
+      // handle error as needed
     }
   };
 
@@ -147,6 +200,7 @@ export default function DocumentReview() {
     }));
   };
 
+  // Remove document from UI only (no API, as per original)
   const handleDeleteDocument = (idx) => {
     if (!selectedStudent) return;
     const updatedDocs = selectedStudent.documents.filter((_, i) => i !== idx);
@@ -179,70 +233,80 @@ export default function DocumentReview() {
         {/* Left: Students List */}
         <div className="documents-table-container">
           <div className="table-wrapper">
-            <table className="documents-table">
-              <thead>
-                <tr>
-                  <th>Full Name</th>
-                  <th>Status</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentList.map((student) => (
-                  <tr
-                    key={student.id}
-                    className={
-                      selectedStudent?.id === student.id ? "selected" : ""
-                    }
-                    onClick={() => {
-                      setSelectedStudent(student);
-                      setSelectedDocument(null);
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <td className="student-name">
-                      <img
-                        src={student.avatar}
-                        className="student-avatar"
-                        alt={student.name}
-                      />
-                      <span>{student.name}</span>
-                    </td>
-                    <td>
-                      <span className={getStatusClass(deriveStatus(student))}>
-                        {deriveStatus(student).charAt(0).toUpperCase() +
-                          deriveStatus(student).slice(1)}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        className="action-btn delete-btn"
-                        title="Delete Student"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteStudent(student.id);
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {studentList.length === 0 && (
+            {loadingStudents ? (
+              <div style={{ textAlign: "center", padding: "2rem" }}>
+                Loading students...
+              </div>
+            ) : (
+              <table className="documents-table">
+                <thead>
                   <tr>
-                    <td colSpan={3} style={{ textAlign: "center" }}>
-                      No students found
-                    </td>
+                    <th>Full Name</th>
+                    <th>Status</th>
+                    <th>Delete</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {studentList.map((student) => (
+                    <tr
+                      key={student.id}
+                      className={
+                        selectedStudent?.id === student.id ? "selected" : ""
+                      }
+                      onClick={() => {
+                        setSelectedStudent(student);
+                        setSelectedDocument(null);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <td className="student-name">
+                        <img
+                          src={student.avatar}
+                          className="student-avatar"
+                          alt={student.name}
+                        />
+                        <span>{student.name}</span>
+                      </td>
+                      <td>
+                        <span className={getStatusClass(deriveStatus(student))}>
+                          {deriveStatus(student).charAt(0).toUpperCase() +
+                            deriveStatus(student).slice(1)}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          className="action-btn delete-btn"
+                          title="Delete Student"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteStudent(student.id);
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {studentList.length === 0 && (
+                    <tr>
+                      <td colSpan={3} style={{ textAlign: "center" }}>
+                        No students found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
         {/* Middle: Student Info & Documents, Review Actions */}
         <div className="review-details-panel">
-          {selectedStudent ? (
+          {loadingDetails ? (
+            <div style={{ textAlign: "center", marginTop: "2rem" }}>
+              Loading student details...
+            </div>
+          ) : selectedStudent ? (
             <>
               <img
                 src={selectedStudent.avatar}
@@ -260,6 +324,20 @@ export default function DocumentReview() {
                 <p>Preferred Language: {selectedStudent.language}</p>
                 <p>Date of Birth: {selectedStudent.dateOfBirth}</p>
                 <p>Joined: {selectedStudent.joined}</p>
+                <p>
+                  Application Status:{" "}
+                  <span
+                    className={getStatusClass(deriveStatus(selectedStudent))}
+                  >
+                    {selectedStudent.applicationStatus
+                      ? selectedStudent.applicationStatus
+                          .charAt(0)
+                          .toUpperCase() +
+                        selectedStudent.applicationStatus.slice(1)
+                      : deriveStatus(selectedStudent).charAt(0).toUpperCase() +
+                        deriveStatus(selectedStudent).slice(1)}
+                  </span>
+                </p>
               </div>
               <div
                 className="document-preview-actions"
@@ -297,7 +375,9 @@ export default function DocumentReview() {
                 <div className="uploaded-documents-header">
                   <span>Uploaded Documents</span>
                   <span className="document-count">
-                    {selectedStudent.documents.length}
+                    {selectedStudent.documents
+                      ? selectedStudent.documents.length
+                      : 0}
                   </span>
                 </div>
                 <table className="uploaded-documents-table">
@@ -309,39 +389,41 @@ export default function DocumentReview() {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedStudent.documents.map((doc, idx) => (
-                      <tr key={idx}>
-                        <td>{doc.name}</td>
-                        <td>
-                          <span className={getStatusClass(doc.status)}>
-                            {doc.status.charAt(0).toUpperCase() +
-                              doc.status.slice(1)}
-                          </span>
-                        </td>
-                        <td>
-                          <button
-                            className="action-btn view-btn"
-                            title="View"
-                            onClick={() => setSelectedDocument(doc)}
-                          >
-                            <Eye size={14} />
-                            <span className="action-label">View</span>
-                          </button>
-                          <button
-                            className="action-btn delete-btn"
-                            title="Delete Document"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteDocument(idx);
-                            }}
-                          >
-                            <Trash2 size={14} />
-                            <span className="action-label">Delete</span>
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                    {selectedStudent.documents.length === 0 && (
+                    {selectedStudent.documents &&
+                    selectedStudent.documents.length > 0 ? (
+                      selectedStudent.documents.map((doc, idx) => (
+                        <tr key={idx}>
+                          <td>{doc.name}</td>
+                          <td>
+                            <span className={getStatusClass(doc.status)}>
+                              {doc.status.charAt(0).toUpperCase() +
+                                doc.status.slice(1)}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className="action-btn view-btn"
+                              title="View"
+                              onClick={() => setSelectedDocument(doc)}
+                            >
+                              <Eye size={14} />
+                              {/* <span className="action-label">View</span> */}
+                            </button>
+                            <button
+                              className="action-btn delete-btn"
+                              title="Delete Document"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteDocument(idx);
+                              }}
+                            >
+                              <Trash2 size={14} />
+                              {/*<span className="action-label">Delete</span> */}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
                       <tr>
                         <td colSpan={3} style={{ textAlign: "center" }}>
                           No documents found
@@ -368,12 +450,16 @@ export default function DocumentReview() {
               </div>
               <div className="document-preview-content">
                 <div className="pdf-preview-image">
-                  <img src="/pdf-preview.png" alt="PDF Preview" />
+                  <iframe
+                    title="Document Preview"
+                    src={selectedDocument.url}
+                    style={{ width: "100%", height: "320px", border: "none" }}
+                  />
                 </div>
                 <div className="document-preview-info">
                   <div className="doc-meta">
                     <div>
-                      <span>File name:</span> {selectedDocument.name}.pdf
+                      <span>File name:</span> {selectedDocument.name}
                     </div>
                     <div>
                       <span>Status:</span>
@@ -383,7 +469,12 @@ export default function DocumentReview() {
                       </span>
                     </div>
                     <div className="download-link">
-                      <a href="#" download>
+                      <a
+                        href={selectedDocument.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                      >
                         Click to download file
                       </a>
                     </div>

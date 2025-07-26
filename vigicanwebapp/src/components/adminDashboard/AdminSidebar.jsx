@@ -14,6 +14,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import "./styles/AdminSidebar.css";
+import { Link } from "react-router-dom";
 
 export default function AdminSidebar({
   currentStep,
@@ -134,7 +135,11 @@ export default function AdminSidebar({
               className="sidebar-menu-item-redesign logout-btn"
             >
               <LogOut size={20} className="menu-icon" />
-              <span className="menu-text">Logout</span>
+              <span className="menu-text">
+                <Link to="/logout" className="text-decoration-none text-reset">
+                  Logout
+                </Link>
+              </span>
             </button>
           </div>
         </div>
