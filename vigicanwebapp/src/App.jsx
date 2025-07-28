@@ -33,16 +33,34 @@ function DashboardRedirect() {
 
 function App() {
   const loading = useAuthStore((state) => state.loading);
+  const hydrated = useAuthStore((state) => state.hydrated);
   const validateAuth = useAuthStore((state) => state.validateAuth);
 
   useEffect(() => {
-    validateAuth();
-  }, [validateAuth]);
+    // Only run validation after store is hydrated
+    if (hydrated) {
+      console.log(
+        "App: Store hydrated, running validation - Time: 2025-07-28 12:36:28 UTC - User: NeduStack"
+      );
+      validateAuth();
+    }
+  }, [hydrated, validateAuth]);
 
-  if (loading) {
+  // Show loading until hydrated and validation is complete
+  if (!hydrated || loading) {
     return (
       <div className="d-flex vh-100 justify-content-center align-items-center">
-        <p>Loading...</p> {/* spinner */}
+        <div className="text-center">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-2">Loading...</p>
+          <small className="text-muted">
+            {!hydrated
+              ? "Initializing store..."
+              : "Validating authentication..."}
+          </small>
+        </div>
       </div>
     );
   }
@@ -91,6 +109,9 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

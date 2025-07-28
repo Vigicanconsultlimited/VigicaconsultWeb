@@ -38,23 +38,36 @@ export const useAuthStore = create(
 
       getUserRole: () => get().userRole,
 
-      // New action to validate token on rehydration
+      // Fixed validateAuth function
       validateAuth: () => {
+        console.log("Auth Store: Starting validateAuth...");
+
         const token = Cookies.get("access_token");
         if (!token) {
+          console.log("Auth Store: No token found, clearing user");
           get().clearUser();
+          set({ loading: false });
           return false;
         }
 
         try {
-          const { exp } = jwtDecode(token);
+          const decoded = jwtDecode(token);
+          const { exp } = decoded;
+
           if (Date.now() >= exp * 1000) {
+            console.log("Auth Store: Token expired, clearing user");
             get().clearUser();
+            set({ loading: false });
             return false;
           }
+
+          console.log("Auth Store: Token valid, setting loading to false");
+          set({ loading: false });
           return true;
-        } catch {
+        } catch (error) {
+          console.error("Auth Store: Error decoding token:", error);
           get().clearUser();
+          set({ loading: false });
           return false;
         }
       },
@@ -62,11 +75,24 @@ export const useAuthStore = create(
     {
       name: "auth-storage",
       getStorage: () => localStorage,
-      onRehydrateStorage: (state) => (persistedState) => {
-        // Validate auth state when rehydrating
-        state.validateAuth();
-        state.setLoading(false);
-        set({ hydrated: true });
+      onRehydrateStorage: () => (state, error) => {
+        console.log("Auth Store: Rehydration started");
+
+        if (error) {
+          console.error("Auth Store: Rehydration error:", error);
+          // Handle rehydration error
+          useAuthStore.getState().setLoading(false);
+          return;
+        }
+
+        // Use setTimeout to ensure the store is fully rehydrated
+        setTimeout(() => {
+          console.log("Auth Store: Running post-rehydration validation");
+          const storeInstance = useAuthStore.getState();
+          storeInstance.validateAuth();
+          storeInstance.setLoading(false);
+          useAuthStore.setState({ hydrated: true });
+        }, 0);
       },
     }
   )
