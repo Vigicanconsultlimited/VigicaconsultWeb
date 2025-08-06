@@ -1,0 +1,265 @@
+.travel-visa-section {
+  background: linear-gradient(
+    to bottom,
+    #1e40af 0%,
+    #1e40af 50%,
+    #f1f5f9 50%,
+    #f1f5f9 100%
+  );
+  padding: 4rem 2rem;
+  font-family: "Poppins", Arial, sans-serif;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.visa-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.visa-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.visa-title {
+  font-family: "Bricolage Grotesque", Arial, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: white;
+  margin-bottom: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.airplane-icons {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  margin-top: 1rem;
+}
+
+.airplane-left,
+.airplane-right {
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.3);
+  position: absolute;
+}
+
+.airplane-left {
+  left: -3rem;
+  transform: rotate(-15deg);
+}
+
+.airplane-right {
+  right: -3rem;
+  transform: rotate(15deg);
+}
+
+.country-card {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  height: 100%;
+  width: 90%;
+}
+
+.country-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+.country-image-container {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+}
+
+.country-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  object-position: top;
+  display: block;
+}
+
+.country-card:hover .country-image {
+  transform: scale(1.05);
+}
+
+.country-flag {
+  position: absolute;
+  top: 50%;
+  right: 4rem;
+  left: 50%;
+  width: 70px;
+  height: 50px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translate(-50%, -50%);
+}
+
+.flag-img {
+  width: 100px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.country-content {
+  padding: 0.2rem;
+  color: #333;
+  text-align: center;
+}
+
+.country-name {
+  font-family: "Bricolage Grotesque", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2135b0;
+  margin-bottom: 0.5rem;
+}
+
+.country-description {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.visa-cta-section {
+  background: linear-gradient(135deg, #2135b0 0%, #1a2a8f 100%);
+  margin-top: 3rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.cta-image-container {
+  height: 100%;
+  padding: 0;
+}
+
+.cta-image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center left;
+  display: block;
+}
+
+.cta-content {
+  padding-left: 2rem;
+  position: relative;
+}
+
+.cta-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.cta-title {
+  font-family: "Bricolage Grotesque", Arial, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.visa-apply-btn {
+  background-color: white;
+  color: #2135b0;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.visa-apply-btn:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cta-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .cta-content {
+    padding-left: 0;
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .cta-icon {
+    position: static;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .travel-visa-section {
+    padding: 2rem 0;
+  }
+
+  .airplane-icons {
+    display: none;
+  }
+
+  .visa-cta-section {
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .country-image-container {
+    height: 150px;
+  }
+
+  .country-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .visa-header {
+    margin-bottom: 2rem;
+  }
+
+  .country-flag {
+    width: 40px;
+    height: 30px;
+  }
+
+  .flag-emoji {
+    font-size: 1.2rem;
+  }
+
+  .visa-apply-btn {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
