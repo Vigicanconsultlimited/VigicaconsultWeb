@@ -1,0 +1,202 @@
+.supporting-docs {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 750px;
+  margin: auto;
+  box-shadow: 0 2px 8px #dde3f9;
+  font-family: "Inter", sans-serif;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1f3fd6;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #5b5e68;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.divider {
+  height: 2px;
+  background: #1f3fd6;
+  margin-bottom: 1rem;
+}
+
+.accordion-item {
+  margin-bottom: 12px;
+}
+
+.accordion-header {
+  background: #d6e3ff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #1f3fd6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.accordion-header:hover {
+  background: #bfd6ff;
+}
+
+.accordion-body {
+  background: #f4f8ff;
+  border: 2px dashed #c4d3f6;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.upload-box {
+  cursor: pointer;
+}
+
+.upload-placeholder {
+  color: #1f3fd6;
+  font-weight: 500;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.uploaded-file {
+  margin-top: 14px;
+  background: #edf3ff;
+  border: 1px solid #c1d2fa;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1f3fd6;
+  font-weight: 500;
+}
+
+.remove-file {
+  color: #d42785;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 0;
+  margin-top: 30px;
+  border-top: 1px solid #e3e8fd;
+  background: #e3e8fd;
+  border-radius: 0 0 16px 16px;
+}
+
+.footer .btn {
+  padding: 10px 20px;
+  font-weight: 600;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back-btn {
+  background: #f0f4ff;
+  border: 1px solid #c5d4f6;
+  color: #1f3fd6;
+}
+
+.draft-btn {
+  background: #c6d7f9;
+  border: none;
+  color: #1f3fd6;
+}
+
+.continue-btn {
+  background: #1f3fd6;
+  border: none;
+  color: white;
+}
+
+/* Application status styles */
+/* Status indicator styles */
+.application-status-indicator {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.application-status-indicator.submitted {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.application-status-indicator.pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffc107;
+}
+
+.application-status-indicator.under-review {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border-left: 4px solid #17a2b8;
+}
+
+.application-status-indicator.rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.application-status-indicator.approved {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.status-note {
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 0.3rem;
+  font-style: italic;
+}
+
+/* Disabled upload box styling */
+.upload-box.disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+  border: 2px dashed #ced4da;
+}
+
+.upload-box.disabled .upload-placeholder {
+  color: #6c757d;
+}
+
+/* Edit disabled notice */
+.edit-disabled-notice {
+  background-color: #f8f9fa;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+  display: block;
+}
+
+/* Required field marker */
+.required-field {
+  color: #dc3545;
+  margin-left: 2px;
+}
