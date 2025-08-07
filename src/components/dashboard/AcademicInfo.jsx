@@ -22,6 +22,7 @@ export default function AcademicInfo({
   const authData = useAuthStore((state) => state.allUserData);
 
   const [formData, setFormData] = useState({
+    Id: "", // Added Id field for updates
     PersonalInformationId: "",
     SchoolId: "",
     AcademicProgramId: "",
@@ -36,11 +37,11 @@ export default function AcademicInfo({
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState(null);
-  const [previouslySubmitted, setPreviouslySubmitted] = useState(false);
+  const [academicInfoId, setAcademicInfoId] = useState("");
 
   // Current date and time as specified
   const getCurrentDateTime = () => {
-    return "2025-08-06 08:51:54";
+    return "2025-08-07 22:20:32";
   };
 
   // Current user login as specified
@@ -48,159 +49,124 @@ export default function AcademicInfo({
     return "NeduStack";
   };
 
-  // Check if application status allows editing
+  // Check if application status allows editing (only Pending or Rejected)
   const canEdit =
-    (applicationStatus === null ||
-      applicationStatus === 2 ||
-      applicationStatus === 4) &&
-    !previouslySubmitted;
+    applicationStatus === null ||
+    applicationStatus === 2 ||
+    applicationStatus === 4;
 
-  // Check if application is submitted (status 1)
-  const isApplicationSubmitted = applicationStatus === 1;
-
-  // Fetch user's personal info ID with multiple fallbacks
+  // Fetch user's personal info ID and existing academic data
   useEffect(() => {
-    const fetchPersonalInfoId = async () => {
-      try {
-        // First check localStorage
-        const storedId = localStorage.getItem("studentPersonalInfoId");
+    const fetchExistingData = async () => {
+      if (authData) {
+        const userId = authData["uid"];
 
-        if (storedId) {
+        try {
           console.log(
-            `Found personal info ID in localStorage: ${storedId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            `Fetching personal info at ${getCurrentDateTime()} by ${getCurrentUser()}`
           );
-          setFormData((prev) => ({
-            ...prev,
-            PersonalInformationId: storedId,
-          }));
 
-          // Check application status
-          try {
-            const appResponse = await apiInstance.get(
-              `StudentApplication/application?StudentPersonalInformationId=${storedId}`
+          // First get the personal info ID
+          const personalResponse = await apiInstance.get(
+            `StudentPersonalInfo/user/${userId}`
+          );
+
+          if (personalResponse?.data?.result) {
+            const personalInfoId = personalResponse.data.result.id || "";
+            setFormData((prev) => ({
+              ...prev,
+              PersonalInformationId: personalInfoId,
+            }));
+
+            // Store in localStorage
+            localStorage.setItem("studentPersonalInfoId", personalInfoId);
+            console.log(
+              `Stored personal info ID in localStorage: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
             );
 
-            if (appResponse?.data?.result) {
-              const status = appResponse.data.result.applicationStatus;
-              setApplicationStatus(status);
-              console.log(
-                `Application status: ${getStatusText(
-                  status
-                )} (${status}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
-              );
-
-              // If application is submitted, also mark academic info as previously submitted
-              if (status === 1) {
-                setPreviouslySubmitted(true);
+            // Check application status
+            if (personalInfoId) {
+              try {
                 console.log(
-                  `Application is submitted, marking academic info as previously submitted at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                  `Fetching application status at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                );
+
+                const appResponse = await apiInstance.get(
+                  `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+                );
+
+                if (appResponse?.data?.result) {
+                  const status = appResponse.data.result.applicationStatus;
+                  setApplicationStatus(status);
+                  console.log(
+                    `Application status: ${getStatusText(
+                      status
+                    )} (${status}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                  );
+                }
+              } catch (err) {
+                console.log(
+                  `No application found or error: ${
+                    err.message
+                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                );
+                setApplicationStatus(2); // Default to Pending
+              }
+
+              // Now try to fetch existing academic info
+              try {
+                console.log(
+                  `Fetching academic data from Academic/StudentInformationId for PersonalInfoId: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                );
+
+                const academicResponse = await apiInstance.get(
+                  `Academic/StudentInformationId?PersonalInformationId=${personalInfoId}`
+                );
+
+                if (
+                  academicResponse?.data?.result &&
+                  academicResponse.data.statusCode === 201
+                ) {
+                  const savedData = academicResponse.data.result;
+                  setAcademicInfoId(savedData.id || "");
+
+                  console.log(
+                    `Retrieved academic data with ID: ${
+                      savedData.id
+                    } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                  );
+
+                  // Wait for schools, programs, and courses to be loaded before mapping
+                  // We'll handle the mapping in a separate useEffect
+                  setIsFormSubmitted(true);
+                }
+              } catch (academicErr) {
+                console.warn(
+                  `No existing academic info found or error: ${
+                    academicErr.message
+                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
                 );
               }
             }
-          } catch (err) {
-            console.log(
-              `No application found or error: ${
-                err.message
-              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
-            setApplicationStatus(2); // Default to Pending
           }
-        } else if (authData) {
-          // If not in localStorage, fetch from API
-          const userId = authData["uid"];
-          try {
-            console.log(
-              `Fetching personal info ID from API at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
 
-            const response = await apiInstance.get(
-              `StudentPersonalInfo/user/${userId}`
-            );
-
-            if (response?.data?.result) {
-              const personalInfoId = response.data.result.id || "";
-
-              setFormData((prev) => ({
-                ...prev,
-                PersonalInformationId: personalInfoId,
-              }));
-
-              // Also store in localStorage for future use
-              localStorage.setItem("studentPersonalInfoId", personalInfoId);
-              console.log(
-                `Stored personal info ID in localStorage: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-              );
-
-              // Check application status
-              if (personalInfoId) {
-                try {
-                  const appResponse = await apiInstance.get(
-                    `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
-                  );
-
-                  if (appResponse?.data?.result) {
-                    const status = appResponse.data.result.applicationStatus;
-                    setApplicationStatus(status);
-                    console.log(
-                      `Application status: ${getStatusText(
-                        status
-                      )} (${status}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                    );
-
-                    // If application is submitted, also mark academic info as previously submitted
-                    if (status === 1) {
-                      setPreviouslySubmitted(true);
-                      console.log(
-                        `Application is submitted, marking academic info as previously submitted at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                      );
-                    }
-                  }
-                } catch (appErr) {
-                  console.log(
-                    `No application found or error: ${
-                      appErr.message
-                    } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                  );
-                  setApplicationStatus(2); // Default to Pending
-                }
-              }
-            } else {
-              console.warn(
-                `No personal info ID found at ${getCurrentDateTime()} by ${getCurrentUser()}`
-              );
-              Toast.fire({
-                icon: "error",
-                title: "Please complete your personal information first",
-              });
-              if (onBack) onBack();
-            }
-          } catch (error) {
-            console.error(
-              `Error fetching personal info: ${
-                error.message
-              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
-            Toast.fire({
-              icon: "error",
-              title: "Please complete your personal information first",
-            });
-            if (onBack) onBack();
-          }
+          console.log(
+            `Existing data fetch completed at ${getCurrentDateTime()} by ${getCurrentUser()}`
+          );
+        } catch (error) {
+          console.warn(
+            `Error fetching existing data: ${
+              error.message
+            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+          );
+        } finally {
+          setLoading(false);
         }
-      } catch (mainError) {
-        console.error(
-          `Main personal info fetch error: ${
-            mainError.message
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-      } finally {
-        // Always set loading to false to prevent infinite loading
-        setTimeout(() => setLoading(false), 500);
       }
     };
 
-    fetchPersonalInfoId();
-  }, [authData, onBack]);
+    fetchExistingData();
+  }, [authData]);
 
   // Helper function to get status text
   const getStatusText = (status) => {
@@ -231,25 +197,6 @@ export default function AcademicInfo({
               response.data.result.length
             } schools fetched at ${getCurrentDateTime()} by ${getCurrentUser()}`
           );
-
-          // If we have schools and no school selected, auto-select the first school
-          if (response.data.result?.length > 0 && !formData.SchoolId) {
-            // Look for School of Science or select first one
-            const scienceSchool = response.data.result.find((s) =>
-              s.name.toLowerCase().includes("science")
-            );
-            const schoolToSelect = scienceSchool || response.data.result[0];
-
-            setFormData((prev) => ({
-              ...prev,
-              SchoolId: schoolToSelect.id,
-            }));
-            console.log(
-              `Auto-selected school: ${schoolToSelect.name} (${
-                schoolToSelect.id
-              }) at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
-          }
         }
       } catch (error) {
         console.error(
@@ -280,24 +227,6 @@ export default function AcademicInfo({
               response.data.result.length
             } programs fetched at ${getCurrentDateTime()} by ${getCurrentUser()}`
           );
-
-          // If we have programs and no program selected, auto-select the Computer Science program or first one
-          if (response.data.result?.length > 0 && !formData.AcademicProgramId) {
-            const csProgram = response.data.result.find((p) =>
-              p.description.toLowerCase().includes("computer science")
-            );
-            const programToSelect = csProgram || response.data.result[0];
-
-            setFormData((prev) => ({
-              ...prev,
-              AcademicProgramId: programToSelect.id,
-            }));
-            console.log(
-              `Auto-selected program: ${programToSelect.description} (${
-                programToSelect.id
-              }) at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
-          }
         }
       } catch (error) {
         console.error(
@@ -328,27 +257,6 @@ export default function AcademicInfo({
               response.data.result.length
             } courses fetched at ${getCurrentDateTime()} by ${getCurrentUser()}`
           );
-
-          // If we have courses and no course selected, auto-select the Computer Science course or first one
-          if (
-            response.data.result?.length > 0 &&
-            !formData.CourseOfInterestId
-          ) {
-            const csCourse = response.data.result.find((c) =>
-              c.name.toLowerCase().includes("computer science")
-            );
-            const courseToSelect = csCourse || response.data.result[0];
-
-            setFormData((prev) => ({
-              ...prev,
-              CourseOfInterestId: courseToSelect.id,
-            }));
-            console.log(
-              `Auto-selected course: ${courseToSelect.name} (${
-                courseToSelect.id
-              }) at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
-          }
         }
       } catch (error) {
         console.error(
@@ -362,56 +270,76 @@ export default function AcademicInfo({
     fetchCourses();
   }, []);
 
-  // Fetch existing academic info
-  const fetchExistingData = async (personalInfoId) => {
-    if (!personalInfoId) {
-      console.warn(
-        `Cannot fetch academic data: Personal Info ID is missing at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
-      return false;
-    }
-
-    try {
-      console.log(
-        `Fetching academic data for PersonalInfoId: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
-      const response = await apiInstance.get(
-        `Academic?PersonalInformationId=${personalInfoId}`
-      );
-
-      if (response?.data?.result) {
-        const savedData = response.data.result;
-        console.log(
-          `Retrieved academic data at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-
-        setFormData((prev) => ({
-          ...prev,
-          SchoolId: savedData.schoolId || "",
-          AcademicProgramId: savedData.academicProgramId || "",
-          CourseOfInterestId: savedData.courseOfInterestId || "",
-        }));
-        setIsFormSubmitted(true);
-        setPreviouslySubmitted(true); // Mark as previously submitted
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.warn(
-        `No existing academic info found or error: ${
-          error.message
-        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
-      return false;
-    }
-  };
-
-  // Call fetch existing data when personal info id is available
+  // Fetch and map existing academic data when all dropdowns are loaded
   useEffect(() => {
-    if (formData.PersonalInformationId) {
-      fetchExistingData(formData.PersonalInformationId);
-    }
-  }, [formData.PersonalInformationId]);
+    const fetchAndMapAcademicData = async () => {
+      if (
+        formData.PersonalInformationId &&
+        schools.length > 0 &&
+        programs.length > 0 &&
+        courses.length > 0 &&
+        academicInfoId
+      ) {
+        try {
+          console.log(
+            `Mapping academic data for ID: ${academicInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+          );
+
+          const response = await apiInstance.get(
+            `Academic/StudentInformationId?PersonalInformationId=${formData.PersonalInformationId}`
+          );
+
+          if (response?.data?.result && response.data.statusCode === 201) {
+            const savedData = response.data.result;
+
+            // Find the corresponding IDs from the fetched data
+            const schoolId =
+              schools.find((s) => s.name === savedData.schoolResponse?.name)
+                ?.id || "";
+            const programId =
+              programs.find(
+                (p) => p.description === savedData.program?.description
+              )?.id || "";
+            const courseId =
+              courses.find((c) => c.name === savedData.courseOfInterest?.name)
+                ?.id || "";
+
+            setFormData((prev) => ({
+              ...prev,
+              Id: savedData.id || "",
+              SchoolId: schoolId,
+              AcademicProgramId: programId,
+              CourseOfInterestId: courseId,
+            }));
+
+            console.log(
+              `Mapped academic data - School: ${
+                savedData.schoolResponse?.name
+              } (${schoolId}), Program: ${
+                savedData.program?.description
+              } (${programId}), Course: ${
+                savedData.courseOfInterest?.name
+              } (${courseId}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            );
+          }
+        } catch (error) {
+          console.warn(
+            `Error mapping academic data: ${
+              error.message
+            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+          );
+        }
+      }
+    };
+
+    fetchAndMapAcademicData();
+  }, [
+    formData.PersonalInformationId,
+    schools.length,
+    programs.length,
+    courses.length,
+    academicInfoId,
+  ]);
 
   // Get school name by ID
   const getSchoolName = (schoolId) => {
@@ -419,20 +347,21 @@ export default function AcademicInfo({
     return school ? school.name : "Unknown School";
   };
 
-  // Render selected school
-  const renderSelectedSchool = () => {
-    if (formData.SchoolId && schools.length > 0) {
-      const schoolName = getSchoolName(formData.SchoolId);
-      return (
-        <div className="selected-school-info mb-3">
-          <h4 className="selected-school-title">Selected School</h4>
-          <div className="school-badge">
-            <span>{schoolName}</span>
-          </div>
-        </div>
-      );
-    }
-    return null;
+  // Get course name by ID
+  const getCourseName = (courseId) => {
+    const course = courses.find((c) => c.id === courseId);
+    return course ? course.name : "Unknown Course";
+  };
+
+  // Get program level as human-readable text
+  const getProgramLevelText = (level) => {
+    const levels = {
+      0: "Undergraduate",
+      1: "Masters",
+      2: "PhD",
+      3: "Certificate",
+    };
+    return levels[level] || "Other";
   };
 
   const showLoadingOverlay = () => {
@@ -449,15 +378,13 @@ export default function AcademicInfo({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if editing is allowed
+    // Prevent submission if application status doesn't allow editing
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: previouslySubmitted
-          ? "This information has already been submitted."
-          : `Cannot edit. Application status: ${getStatusText(
-              applicationStatus
-            )}`,
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
       });
       return;
     }
@@ -467,17 +394,6 @@ export default function AcademicInfo({
       console.error(
         `Cannot submit academic info: Missing Personal Info ID at ${getCurrentDateTime()} by ${getCurrentUser()}`
       );
-
-      // Try to get from localStorage one more time
-      const storedId = localStorage.getItem("studentPersonalInfoId");
-      if (storedId) {
-        setFormData((prev) => ({ ...prev, PersonalInformationId: storedId }));
-        Toast.fire({
-          icon: "info",
-          title: "Please try submitting again",
-        });
-        return;
-      }
 
       Toast.fire({
         icon: "error",
@@ -523,32 +439,29 @@ export default function AcademicInfo({
         } at ${getCurrentDateTime()} by ${getCurrentUser()}`
       );
 
-      console.log(`Payload:
-PersonalInformationId: ${formData.PersonalInformationId}
-SchoolId: ${formData.SchoolId}
-AcademicProgramId: ${formData.AcademicProgramId}
-CourseOfInterestId: ${formData.CourseOfInterestId}
-at ${getCurrentDateTime()} by ${getCurrentUser()}`);
-
       const response = await apiInstance.post("Academic", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       Swal.close();
-
-      // Successfully submitted
       setIsFormSubmitted(true);
-      setPreviouslySubmitted(true); // Mark as previously submitted
-      Toast.fire({ icon: "success", title: "Submitted successfully" });
-      console.log(
-        `Program selection submitted at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
 
-      if (onContinue) {
-        setTimeout(() => {
-          onContinue();
-        }, 500); // Small delay to ensure everything is saved
+      // If we get a response with an ID, save it
+      if (response?.data?.result?.id) {
+        const newAcademicInfoId = response.data.result.id;
+        setAcademicInfoId(newAcademicInfoId);
+        setFormData((prev) => ({ ...prev, Id: newAcademicInfoId }));
+        console.log(
+          `New academic info ID: ${newAcademicInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
       }
+
+      Toast.fire({ icon: "success", title: "Submitted successfully" });
+
+      // Use setTimeout to ensure everything is saved before continuing
+      setTimeout(() => {
+        if (onContinue) onContinue();
+      }, 500);
     } catch (error) {
       Swal.close();
       console.error(
@@ -564,29 +477,14 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
         error.response.data.statusCode === 400 &&
         error.response.data.message.includes("Already exits")
       ) {
-        // Show a more helpful message with option to continue
-        Swal.fire({
-          title: "Program Already Selected",
-          text: "You have already selected an academic program. Would you like to continue to the next step?",
+        Toast.fire({
           icon: "info",
-          showCancelButton: false,
-          confirmButtonText: "Continue to Next Step",
-        }).then(() => {
-          setPreviouslySubmitted(true); // Mark as previously submitted
-          setIsFormSubmitted(true);
-          if (onContinue) onContinue();
+          title: "Academic information already exists",
         });
+        setIsFormSubmitted(true);
+        if (onContinue) onContinue();
       } else {
-        // Handle other errors
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.message
-        ) {
-          Toast.fire({ icon: "error", title: error.response.data.message });
-        } else {
-          Toast.fire({ icon: "error", title: "Submission failed" });
-        }
+        Toast.fire({ icon: "error", title: "Submission failed" });
       }
     } finally {
       setSubmitting(false);
@@ -594,23 +492,30 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
   };
 
   const handleEditSubmit = async () => {
-    // Check if editing is allowed
+    // Prevent editing if application status doesn't allow it
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: previouslySubmitted
-          ? "This information has already been submitted."
-          : `Cannot edit. Application status: ${getStatusText(
-              applicationStatus
-            )}`,
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
       });
       return;
     }
 
-    // Create payload with the correct field names for the update API
+    // Verify we have the ID for updates
+    if (!formData.Id) {
+      Toast.fire({
+        icon: "error",
+        title: "Cannot update: Missing record ID",
+      });
+      return;
+    }
+
     const payload = new FormData();
 
-    // Map field names as required by the API for update
+    // Add required fields for update API
+    payload.append("Id", formData.Id);
     payload.append(
       "PersonalInformationId",
       formData.PersonalInformationId || ""
@@ -620,18 +525,10 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
     payload.append("CourseId", formData.CourseOfInterestId || ""); // Note the field name change for update
 
     try {
-      setSubmitting(true);
       showLoadingOverlay();
-
       console.log(
-        `Updating program selection at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        `Updating academic info at ${getCurrentDateTime()} by ${getCurrentUser()}`
       );
-      console.log(`Update payload:
-PersonalInformationId: ${formData.PersonalInformationId}
-SchoolId: ${formData.SchoolId}
-ProgramId: ${formData.AcademicProgramId}
-CourseId: ${formData.CourseOfInterestId}
-at ${getCurrentDateTime()} by ${getCurrentUser()}`);
 
       await apiInstance.put("Academic/update", payload, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -640,14 +537,10 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
       Swal.close();
       Toast.fire({ icon: "success", title: "Updated successfully" });
       setIsEditing(false);
-      setPreviouslySubmitted(true); // Mark as previously submitted
 
-      // After successful update, continue to next step
-      if (onContinue) {
-        setTimeout(() => {
-          onContinue();
-        }, 1000); // Small delay to show the success toast
-      }
+      console.log(
+        `Academic info updated successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
     } catch (error) {
       Swal.close();
       console.error(
@@ -655,250 +548,63 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
           error.message
         } at ${getCurrentDateTime()} by ${getCurrentUser()}`
       );
-
-      // Show more detailed error message if available
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        Toast.fire({ icon: "error", title: error.response.data.message });
-      } else {
-        Toast.fire({ icon: "error", title: "Update failed" });
-      }
-    } finally {
-      setSubmitting(false);
+      Toast.fire({ icon: "error", title: "Update failed" });
     }
   };
 
-  // Get program level as human-readable text
-  const getProgramLevelText = (level) => {
-    const levels = {
-      0: "Undergraduate",
-      1: "Masters",
-      2: "PhD",
-      3: "Certificate",
-    };
-    return levels[level] || "Other";
-  };
-
-  // Handle continuing to next step
+  // Handle "Next" button click
   const handleContinue = () => {
-    if (onContinue) {
-      console.log(
-        `Continuing to next step at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
-      onContinue();
-    }
+    console.log(
+      `Continuing to next step at ${getCurrentDateTime()} by ${getCurrentUser()}`
+    );
+
+    // Use setTimeout to ensure any state updates are completed
+    setTimeout(() => {
+      if (onContinue) onContinue();
+    }, 200);
   };
 
-  // Get course name by ID
-  const getCourseName = (courseId) => {
-    const course = courses.find((c) => c.id === courseId);
-    return course ? course.name : "Unknown Course";
-  };
-
-  // Loading indicator when fetching data
   if (loading) {
     return (
-      <div className="form-container">
-        <h2 className="form-title">Academic Program Selection</h2>
-        <div className="loading-overlay">
-          <div className="spinner-container">
-            <div className="loading-spinner"></div>
-            <p>Loading Academic Programs...</p>
-          </div>
+      <div className="loading-overlay">
+        <div className="spinner-container">
+          <div className="loading-spinner"></div>
+          <p>Loading Academic Programs...</p>
         </div>
       </div>
     );
   }
 
-  // Determine what to render based on state
-  const renderButtons = () => {
-    // If we're in edit mode
-    if (isEditing) {
-      return (
-        <>
-          <button
-            type="button"
-            className="btn btn-success me-2"
-            onClick={handleEditSubmit}
-            disabled={submitting || !canEdit}
-          >
-            {submitting ? (
-              <>
-                <span
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-                Saving...
-              </>
-            ) : (
-              "✅ Save Changes"
-            )}
-          </button>
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            onClick={() => {
-              setIsEditing(false);
-              handleContinue();
-            }}
-          >
-            Skip Changes →
-          </button>
-        </>
-      );
-    }
-
-    // If form is submitted but not in edit mode
-    if (isFormSubmitted || previouslySubmitted) {
-      return (
-        <>
-          {/* Only show Edit button if editing is allowed */}
-          {canEdit && (
-            <button
-              type="button"
-              className="btn btn-outline-secondary me-2"
-              onClick={() => setIsEditing(true)}
-            >
-              ✏️ Edit
-            </button>
-          )}
-
-          {/* Continue button with NO disabled prop */}
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={handleContinue}
-          >
-            Continue →
-          </button>
-        </>
-      );
-    }
-
-    // Initial state - form not submitted yet
-    return (
-      <button
-        type="submit"
-        className="btn btn-primary"
-        disabled={submitting || !canEdit}
-      >
-        {submitting ? (
-          <>
-            <span
-              className="spinner-border spinner-border-sm me-2"
-              role="status"
-              aria-hidden="true"
-            ></span>
-            Saving...
-          </>
-        ) : (
-          "Continue →"
-        )}
-      </button>
-    );
-  };
-
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Academic Program Selection</h2>
 
-      {/* Show "already submitted" message only if editing is allowed and not previously submitted */}
-      {isFormSubmitted && !isEditing && canEdit && !previouslySubmitted && (
+      {/* Only show "already submitted" message if editing is allowed */}
+      {isFormSubmitted && !isEditing && canEdit && (
         <div className="alert alert-info mt-3">
           <strong>You've already saved this form.</strong>
           <br />
           Click edit to update your program selection.
+          <br />
           <p className="form-subtitle">
-            Select the academic program you wish to apply for.
-            {canEdit ? " Your choice can be updated later if needed." : ""}
+            Select the academic program you wish to apply for. Your choice can
+            be updated later if needed.
           </p>
         </div>
       )}
 
-      {/* Show message for previously submitted data */}
-      {previouslySubmitted && (
-        <div className="alert alert-primary mt-3">
-          <strong>Your academic information has been saved.</strong>
-          <br />
-
-          {canEdit
-            ? "You can edit your selections or continue to the next step."
-            : "This information cannot be modified, but you can proceed to the next step."}
-        </div>
-      )}
-
-      {/* Show special message for submitted applications */}
-      {isApplicationSubmitted && !previouslySubmitted && (
-        <div className="alert alert-success mt-3">
-          <strong>Your application has been submitted.</strong>
-          <br />
-          Program selections cannot be modified at this time, but you can
-          proceed to the next step.
-        </div>
-      )}
-
-      {/* Show warning for other non-editable statuses */}
       {applicationStatus &&
-        applicationStatus !== 1 &&
         applicationStatus !== 2 &&
-        applicationStatus !== 4 &&
-        !previouslySubmitted && (
-          <div className="alert alert-warning mt-3">
+        applicationStatus !== 4 && (
+          <div className="alert alert-primary mt-3">
             <strong>Notice: Your application cannot be edited.</strong>
             <br />
-            Current status: {getStatusText(applicationStatus)}. Only
-            applications with status "Pending" or "Rejected" can be edited.
+            Current status: <strong>{getStatusText(applicationStatus)}</strong>.
+            <br />
+            This information cannot be modified at this time, but you can
+            proceed to the next step.
           </div>
         )}
-
-      {/* Debug info - only visible in development */}
-      {/*
-      {process.env.NODE_ENV === "development" && (
-        <div
-          className="debug-info mt-2 mb-2"
-          style={{
-            fontSize: "0.8rem",
-            color: "#666",
-            background: "#f8f9fa",
-            padding: "8px",
-            borderRadius: "4px",
-          }}
-        >
-          <p style={{ margin: 0 }}>
-            <strong>Debug Info:</strong> Personal Info ID:{" "}
-            {formData.PersonalInformationId || "Not set"}
-          </p>
-          <p style={{ margin: 0 }}>
-            School ID: {formData.SchoolId || "Not set"}
-          </p>
-          <p style={{ margin: 0 }}>
-            Program ID: {formData.AcademicProgramId || "Not set"}
-          </p>
-          <p style={{ margin: 0 }}>
-            Course ID: {formData.CourseOfInterestId || "Not set"}
-          </p>
-          <p style={{ margin: 0 }}>
-            Application Status: {applicationStatus} (
-            {getStatusText(applicationStatus)})
-          </p>
-          <p style={{ margin: 0 }}>
-            Can Edit: {canEdit ? "Yes" : "No"} | Previously Submitted:{" "}
-            {previouslySubmitted ? "Yes" : "No"}
-          </p>
-          <p style={{ margin: 0 }}>
-            Is Form Submitted: {isFormSubmitted ? "Yes" : "No"} | Is Editing:{" "}
-            {isEditing ? "Yes" : "No"}
-          </p>
-          <p style={{ margin: 0 }}>
-            Is Application Submitted: {isApplicationSubmitted ? "Yes" : "No"}
-          </p>
-        </div>
-      )}
-      */}
 
       {/* School Selection */}
       <div className="row g-3 pb-3">
@@ -909,12 +615,7 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
           <select
             className="form-select"
             value={formData.SchoolId}
-            disabled={
-              (!isEditing && isFormSubmitted) ||
-              submitting ||
-              !canEdit ||
-              previouslySubmitted
-            }
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, SchoolId: e.target.value })
             }
@@ -926,11 +627,6 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
               </option>
             ))}
           </select>
-          {formData.SchoolId && schools.length > 0 && (
-            <small className="text-muted">
-              Selected: {getSchoolName(formData.SchoolId)}
-            </small>
-          )}
         </div>
       </div>
 
@@ -962,12 +658,7 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
           <select
             className="form-select"
             value={formData.AcademicProgramId}
-            disabled={
-              (!isEditing && isFormSubmitted) ||
-              submitting ||
-              !canEdit ||
-              previouslySubmitted
-            }
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, AcademicProgramId: e.target.value })
             }
@@ -980,12 +671,6 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
               </option>
             ))}
           </select>
-          {formData.AcademicProgramId && programs.length > 0 && (
-            <small className="text-muted">
-              {programs.find((p) => p.id === formData.AcademicProgramId)
-                ?.description || ""}
-            </small>
-          )}
         </div>
       </div>
 
@@ -998,12 +683,7 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
           <select
             className="form-select"
             value={formData.CourseOfInterestId}
-            disabled={
-              (!isEditing && isFormSubmitted) ||
-              submitting ||
-              !canEdit ||
-              previouslySubmitted
-            }
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, CourseOfInterestId: e.target.value })
             }
@@ -1015,12 +695,6 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
               </option>
             ))}
           </select>
-          {formData.CourseOfInterestId && courses.length > 0 && (
-            <small className="text-muted">
-              {courses.find((c) => c.id === formData.CourseOfInterestId)
-                ?.name || ""}
-            </small>
-          )}
         </div>
       </div>
 
@@ -1074,17 +748,83 @@ at ${getCurrentDateTime()} by ${getCurrentUser()}`);
       )}
 
       {/* Footer Buttons */}
-      <div className="form-footer">
+      <div
+        className="form-footer d-flex justify-content-between"
+        style={{
+          marginTop: "20px",
+          backgroundColor: "#e3e8fd",
+          padding: "15px",
+          borderRadius: "8px",
+        }}
+      >
         <button
           type="button"
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary px-4"
           onClick={onBack}
-          disabled={submitting}
         >
           ← Back
         </button>
 
-        <div className="button-group">{renderButtons()}</div>
+        <div>
+          {!isFormSubmitted ? (
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!canEdit || submitting}
+            >
+              {submitting ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Saving...
+                </>
+              ) : (
+                "Continue →"
+              )}
+            </button>
+          ) : isEditing ? (
+            <>
+              <button
+                type="button"
+                className="btn btn-success me-2"
+                onClick={handleEditSubmit}
+                disabled={!canEdit}
+              >
+                ✅ Finish Editing
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleContinue}
+              >
+                ➡ Next
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Only show Edit button if editing is allowed */}
+              {canEdit && (
+                <button
+                  type="button"
+                  className="btn btn-secondary me-2 btn-outline-primary"
+                  onClick={() => setIsEditing(true)}
+                >
+                  ✏️ Edit
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleContinue}
+              >
+                ➡ Next
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </form>
   );
