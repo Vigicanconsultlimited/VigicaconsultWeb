@@ -150,7 +150,10 @@ export default function PersonalInfo({ onContinue, onBack }) {
                 savedData.firstLanguage,
                 languageOptions
               ),
-              Gender: getLabelFromMappedValue(savedData.gender, genderOptions),
+              Gender: getLabelFromMappedValue(
+                savedData.gender || 0, // Default to 0 if not set
+                genderOptions
+              ),
             });
 
             setIsFormSubmitted(true);
@@ -185,7 +188,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
           console.log(
             `Existing personal info fetched successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
           );
-          console.log("Fetched data:", response.data.result);
         } catch (error) {
           console.warn(
             `No existing personal info found or error: ${
