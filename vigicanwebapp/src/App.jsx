@@ -39,9 +39,9 @@ function App() {
   useEffect(() => {
     // Only run validation after store is hydrated
     if (hydrated) {
-      console.log(
-        "App: Store hydrated, running validation - Time: 2025-07-28 12:36:28 UTC - User: NeduStack"
-      );
+      //console.log(
+        //"App: Store hydrated, running validation - Time: 2025-07-28 12:36:28 UTC - User: NeduStack"
+      //);
       validateAuth();
     }
   }, [hydrated, validateAuth]);

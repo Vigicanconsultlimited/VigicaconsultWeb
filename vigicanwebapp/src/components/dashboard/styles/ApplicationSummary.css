@@ -1,29 +1,211 @@
 .application-summary-container {
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  background: #ffffff;
+  border-radius: 16px;
   padding: 2rem;
-  background: #f8f9fa;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+  font-family: "Segoe UI", sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .application-summary-title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #333;
+  color: #1b2ebf;
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .application-summary-text {
-  font-size: 1.2rem;
-  color: #555;
+  color: #5c6fb2;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  line-height: 1.6;
 }
 
 .application-summary-button {
-  padding: 0.6rem 1.5rem;
+  background-color: #1b2ebf;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
   font-size: 1rem;
-  margin-top: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: block;
+  margin: 0 auto;
+  min-width: 200px;
+}
+
+.application-summary-button:hover {
+  background-color: #14239d;
+}
+
+.application-status-card {
+  background-color: #f3f6ff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  border-left: 4px solid #1b2ebf;
+}
+
+.status-icon {
+  font-size: 2rem;
+  margin-right: 1.5rem;
+}
+
+.status-details h3 {
+  color: #1b2ebf;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.status-details p {
+  color: #5c6fb2;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.summary-section {
+  margin: 2rem 0;
+}
+
+.section-title {
+  color: #1b2ebf;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e3e8fd;
+  padding-bottom: 0.5rem;
+}
+
+.summary-list {
+  padding-left: 1.5rem;
+  color: #5c6fb2;
+}
+
+.summary-list li {
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-secondary {
+  background: transparent;
+  border: 2px solid #5c6fb2;
+  color: #5c6fb2;
+}
+
+.btn-outline-secondary:hover:not(:disabled) {
+  background-color: #f0f3ff;
+}
+
+.btn-success {
+  background-color: #1c964a;
+  color: #fff;
+  border: none;
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: #157a3c;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.submit-button {
+  min-width: 200px;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+}
+
+.submission-success {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: bounce 1s infinite alternate;
+}
+
+.application-reference {
+  background-color: #f3f6ff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 2rem 0;
+  text-align: center;
+  color: #3b4ea1;
+  font-size: 0.9rem;
+}
+
+.application-reference p {
+  margin: 0.3rem 0;
+}
+
+@keyframes bounce {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .application-summary-container {
+    padding: 1.5rem;
+  }
+
+  .application-summary-title {
+    font-size: 1.5rem;
+  }
+
+  .application-status-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .status-icon {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .button-container {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.8rem;
+  }
 }

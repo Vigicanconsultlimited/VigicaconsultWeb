@@ -74,17 +74,82 @@ export default function SupportingDocuments({ onContinue, onBack }) {
   const [progress, setProgress] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
+  const [applicationStatus, setApplicationStatus] = useState(null);
+
+  // Get current date/time and user
+  const getCurrentDateTime = () => {
+    return "2025-08-05 19:04:13";
+  };
+
+  const getCurrentUser = () => {
+    return "NeduStack";
+  };
+
+  // Helper function to get status text
+  const getStatusText = (status) => {
+    const statusMap = {
+      1: "Submitted",
+      2: "Pending",
+      3: "Under Review",
+      4: "Rejected",
+      5: "Approved",
+    };
+    return statusMap[status] || "Unknown";
+  };
+
+  // Check if application status allows editing (only Pending or Rejected)
+  const canEdit =
+    applicationStatus === null ||
+    applicationStatus === 2 ||
+    applicationStatus === 4;
 
   useEffect(() => {
     const init = async () => {
       if (!authData) return;
       try {
+        console.log(
+          `Initializing supporting documents at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+
         const { data } = await apiInstance.get(
           `StudentPersonalInfo/user/${authData.uid}`
         );
         const sid = data.result?.id;
         if (!sid) throw new Error("StudentPersonalInformationId missing");
         setStudentId(sid);
+
+        // Fetch application status
+        if (sid) {
+          try {
+            console.log(
+              `Fetching application status at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            );
+
+            const appResponse = await apiInstance.get(
+              `StudentApplication/application?StudentPersonalInformationId=${sid}`
+            );
+
+            if (appResponse?.data?.result) {
+              // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
+              const status = appResponse.data.result.applicationStatus;
+              setApplicationStatus(status);
+
+              console.log(
+                `Application status: ${getStatusText(
+                  status
+                )} (${status}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
+              );
+            }
+          } catch (err) {
+            console.log(
+              `No application found or error: ${
+                err.message
+              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            );
+            // If no application exists yet, it's effectively pending
+            setApplicationStatus(2); // Pending
+          }
+        }
 
         for (const [label, cfg] of Object.entries(DOCUMENTS)) {
           try {
@@ -103,14 +168,26 @@ export default function SupportingDocuments({ onContinue, onBack }) {
                 url: obj[cfg.downloadKey],
                 viewUrl: obj[cfg.viewKey],
                 docId: obj.id,
+                locked: !canEdit,
               },
             }));
-          } catch {
+          } catch (err) {
             // No existing file — ignore
+            console.log(
+              `No existing file for ${label} or error at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            );
           }
         }
+
+        console.log(
+          `Documents loaded at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
       } catch (err) {
-        console.error("Initialization error:", err);
+        console.error(
+          `Initialization error: ${
+            err.message
+          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
       } finally {
         setLoading(false);
       }
@@ -119,6 +196,16 @@ export default function SupportingDocuments({ onContinue, onBack }) {
   }, [authData]);
 
   const uploadHandler = async (label, file) => {
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
     const cfg = DOCUMENTS[label];
     const fd = new FormData();
     fd.append("Document", file);
@@ -126,6 +213,10 @@ export default function SupportingDocuments({ onContinue, onBack }) {
 
     try {
       setErrors((prev) => ({ ...prev, [label]: null }));
+      console.log(
+        `Uploading ${label} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
+
       const r = await apiInstance.post(cfg.uploadUrl, fd, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (e) => {
@@ -142,13 +233,20 @@ export default function SupportingDocuments({ onContinue, onBack }) {
           url: res[cfg.downloadKey],
           viewUrl: res[cfg.viewKey],
           docId: res.id,
+          locked: false,
         },
       }));
 
+      console.log(
+        `${label} uploaded successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "success", title: `${label} uploaded` });
     } catch (e) {
       const msg = e.response?.data?.message || "Upload failed";
       setErrors((prev) => ({ ...prev, [label]: msg }));
+      console.error(
+        `Upload failed for ${label}: ${msg} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "error", title: msg });
     } finally {
       setProgress((prev) => ({ ...prev, [label]: null }));
@@ -156,6 +254,16 @@ export default function SupportingDocuments({ onContinue, onBack }) {
   };
 
   const deleteHandler = async (label) => {
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
     const cfg = DOCUMENTS[label];
     const id = documents[label]?.docId;
     if (!id) return;
@@ -169,21 +277,40 @@ export default function SupportingDocuments({ onContinue, onBack }) {
     if (!confirm.isConfirmed) return;
 
     try {
+      console.log(
+        `Deleting ${label} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       await apiInstance.delete(`${cfg.deleteUrl}/${id}`);
       setDocuments((prev) => {
         const c = { ...prev };
         delete c[label];
         return c;
       });
+      console.log(
+        `${label} deleted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "success", title: `${label} deleted` });
     } catch (e) {
       const msg = e.response?.data?.message || "Deletion failed";
       setErrors((prev) => ({ ...prev, [label]: msg }));
+      console.error(
+        `Error deleting ${label}: ${msg} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "error", title: msg });
     }
   };
 
   const fileChange = (label, file) => {
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
     if (!file) return;
     const types = [
       "application/pdf",
@@ -212,11 +339,44 @@ export default function SupportingDocuments({ onContinue, onBack }) {
       className="supporting-docs p-3 p-md-4"
       onSubmit={(e) => {
         e.preventDefault();
+        console.log(
+          `Continuing to next step at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
         onContinue();
       }}
     >
       <h2 className="title">Supporting Documents</h2>
-      <p className="subtitle">Click each section to upload or view the file.</p>
+
+      {applicationStatus && (
+        <div
+          className={`application-status-indicator ${getStatusText(
+            applicationStatus
+          )
+            .toLowerCase()
+            .replace(" ", "-")}`}
+        >
+          Status: <strong>{getStatusText(applicationStatus)}</strong>
+          {!canEdit && (
+            <span className="status-note">
+              (Documents cannot be edited in this status)
+            </span>
+          )}
+        </div>
+      )}
+
+      <p className="subtitle">
+        Click each section to upload/view the document.
+        {/*        
+        {!canEdit && (
+          <span className="edit-disabled-notice">
+            <br />
+            <strong>Note:</strong> Document editing is disabled because your
+            application status is "{getStatusText(applicationStatus)}". Only
+            applications with status "Pending" or "Rejected" can be edited.
+          </span>
+        )}
+          */}
+      </p>
       <div className="divider" />
 
       {Object.keys(DOCUMENTS).map((label) => (
@@ -240,14 +400,17 @@ export default function SupportingDocuments({ onContinue, onBack }) {
                 fileChange(label, e.dataTransfer.files[0]);
               }}
             >
-              <label className="upload-box">
+              <label className={`upload-box ${!canEdit ? "disabled" : ""}`}>
                 <input
                   type="file"
                   className="d-none"
                   accept=".pdf,.docx"
                   onChange={(e) => fileChange(label, e.target.files[0])}
+                  disabled={!canEdit}
                 />
-                <div className="upload-placeholder">📎 Attach or drop file</div>
+                <div className="upload-placeholder">
+                  {canEdit ? "📎 Attach or drop file" : "🔒 Editing locked"}
+                </div>
               </label>
 
               {progress[label] != null && (
@@ -272,12 +435,14 @@ export default function SupportingDocuments({ onContinue, onBack }) {
                   >
                     View {label}
                   </a>
-                  <span
-                    className="remove-file"
-                    onClick={() => deleteHandler(label)}
-                  >
-                    ✖
-                  </span>
+                  {canEdit && !documents[label].locked && (
+                    <span
+                      className="remove-file"
+                      onClick={() => deleteHandler(label)}
+                    >
+                      ✖
+                    </span>
+                  )}
                 </div>
               )}
             </div>
