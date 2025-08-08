@@ -3,6 +3,16 @@ import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import { useNavigate } from "react-router-dom";
 import "./styles/StudentDashboard.css";
+import Swal from "sweetalert2";
+
+// SweetAlert Toast
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top",
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+});
 
 export default function StudentDashboard({
   setCurrentStep,
@@ -11,9 +21,11 @@ export default function StudentDashboard({
   const authData = useAuthStore((state) => state.allUserData);
   const [applications, setApplications] = useState([]);
   const [availableApplications, setAvailableApplications] = useState([]);
+  const [submittedAcademicApps, setSubmittedAcademicApps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [displayName, setDisplayName] = useState("");
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [personalInfoId, setPersonalInfoId] = useState("");
 
   const navigate = useNavigate();
   const userId = authData?.uid;
@@ -22,7 +34,7 @@ export default function StudentDashboard({
 
   // Updated current date and time as specified
   const getCurrentDateTime = () => {
-    return "2025-08-07 21:20:19";
+    return "2025-08-08 21:25:31";
   };
 
   // Updated current user login as specified
@@ -40,7 +52,7 @@ export default function StudentDashboard({
 
         let submittedApps = [];
         let personalInfoData = null;
-        let personalInfoId = null;
+        let currentPersonalInfoId = null;
 
         // Step 1: Get StudentPersonalInformationId (with individual error handling)
         try {
@@ -52,21 +64,29 @@ export default function StudentDashboard({
             `StudentPersonalInfo/user/${userId}`
           );
           const personalInfo = personalRes?.data?.result;
-          personalInfoId = personalInfo?.id;
+          currentPersonalInfoId = personalInfo?.id;
+          setPersonalInfoId(currentPersonalInfoId); // Store for delete operations
 
           console.log(
-            `Dashboard: Personal info ID found: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            `Dashboard: Personal info ID found: ${currentPersonalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
           );
 
+          // Set display name from personal info
+          if (personalInfo?.firstName && personalInfo?.lastName) {
+            setDisplayName(
+              `${personalInfo.firstName} ${personalInfo.lastName}`
+            );
+          }
+
           // Step 2: Get submitted application with that ID (only if we have personalInfoId)
-          if (personalInfoId) {
+          if (currentPersonalInfoId) {
             try {
               console.log(
-                `Dashboard: Fetching applications for personal info ID ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                `Dashboard: Fetching applications for personal info ID ${currentPersonalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
               );
 
               const submittedAppRes = await apiInstance.get(
-                `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+                `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`
               );
 
               submittedApps = submittedAppRes?.data?.result || [];
@@ -77,12 +97,6 @@ export default function StudentDashboard({
                 Array.isArray(submittedApps) ? submittedApps : [submittedApps]
               );
 
-              if (personalInfoData?.firstName && personalInfoData?.lastName) {
-                setDisplayName(
-                  `${personalInfoData.firstName} ${personalInfoData.lastName}`
-                );
-              }
-
               console.log(
                 `Dashboard: Found ${
                   Array.isArray(submittedApps)
@@ -90,7 +104,7 @@ export default function StudentDashboard({
                     : submittedApps
                     ? 1
                     : 0
-                } applications at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                } general applications at ${getCurrentDateTime()} by ${getCurrentUser()}`
               );
             } catch (appErr) {
               console.warn(
@@ -98,7 +112,67 @@ export default function StudentDashboard({
                   appErr.message
                 } at ${getCurrentDateTime()} by ${getCurrentUser()}`
               );
-              // Don't stop execution, continue to fetch programs
+              // Don't stop execution, continue to fetch other data
+            }
+
+            // Step 2.5: Get submitted academic applications using the new API
+            try {
+              console.log(
+                `Dashboard: Fetching academic applications for personal info ID ${currentPersonalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+              );
+
+              const academicAppRes = await apiInstance.get(
+                `Academic/StudentInformationId?PersonalInformationId=${currentPersonalInfoId}`
+              );
+
+              if (
+                academicAppRes?.data?.result &&
+                academicAppRes.data.statusCode === 201
+              ) {
+                const academicData = academicAppRes.data.result;
+
+                // Format the academic application data to match the table structure
+                const formattedAcademicApp = {
+                  id: academicData.id,
+                  school: academicData.schoolResponse?.name || "Unknown School",
+                  description:
+                    academicData.program?.description || "Unknown Program",
+                  course:
+                    academicData.courseOfInterest?.name || "Unknown Course",
+                  faculty: academicData.program?.faculty || "Unknown Faculty",
+                  programLevel: academicData.program?.programLevel || 0,
+                  duration: academicData.program?.durationInYears || 0,
+                  type: "academic", // Mark as academic application
+                  address: academicData.schoolResponse?.addresss || "",
+                  town: academicData.schoolResponse?.town || "",
+                  county: academicData.schoolResponse?.county || "",
+                  postCode: academicData.schoolResponse?.postCode || "",
+                  // Store the exact program ID for comparison
+                  appliedProgramId: academicData.program?.id || null,
+                };
+
+                setSubmittedAcademicApps([formattedAcademicApp]);
+
+                console.log(
+                  `Dashboard: Found 1 academic application (${
+                    formattedAcademicApp.school
+                  } - ${formattedAcademicApp.description}) with program ID: ${
+                    formattedAcademicApp.appliedProgramId
+                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                );
+              } else {
+                setSubmittedAcademicApps([]);
+                console.log(
+                  `Dashboard: No academic applications found at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                );
+              }
+            } catch (academicErr) {
+              console.warn(
+                `Dashboard: Error fetching academic applications: ${
+                  academicErr.message
+                } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+              );
+              setSubmittedAcademicApps([]);
             }
           }
         } catch (personalErr) {
@@ -116,7 +190,7 @@ export default function StudentDashboard({
             `Dashboard: Fetching available academic programs at ${getCurrentDateTime()} by ${getCurrentUser()}`
           );
 
-          const availableRes = await apiInstance.get(`AcademicProgram`); // Removed the leading slash
+          const availableRes = await apiInstance.get(`AcademicProgram`);
 
           if (availableRes?.data?.result) {
             setAvailableApplications(availableRes.data.result);
@@ -166,30 +240,193 @@ export default function StudentDashboard({
     }
   }, [userId]);
 
+  // Helper function to get program level text
+  const getProgramLevelText = (level) => {
+    const levels = {
+      0: "Undergraduate",
+      1: "Masters",
+      2: "PhD",
+      3: "Certificate",
+    };
+    return levels[level] || "Other";
+  };
+
+  // Helper function to check if a specific program has been applied for
+  const isProgramApplied = (programId) => {
+    return submittedAcademicApps.some(
+      (app) => app.appliedProgramId === programId
+    );
+  };
+
+  // Helper function to get applied program IDs
+  const getAppliedProgramIds = () => {
+    return submittedAcademicApps
+      .map((app) => app.appliedProgramId)
+      .filter(Boolean);
+  };
+
   const handleEdit = (id) => {
     navigate("/dashboard", {
       state: { step: "saved-personal-info", applicationId: id },
     });
   };
 
+  // Updated delete function for general applications using SweetAlert
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this application?"))
-      return;
     try {
-      console.log(
-        `Dashboard: Deleting application ${id} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
-      await apiInstance.delete(`StudentApplication/${id}`);
-      setApplications(applications.filter((app) => app.id !== id));
-      console.log(
-        `Dashboard: Application ${id} deleted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
+      const result = await Swal.fire({
+        title: "Delete Application",
+        text: "Are you sure you want to delete this application? This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+      });
+
+      if (result.isConfirmed) {
+        console.log(
+          `Dashboard: Deleting general application ${id} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+
+        // Show loading
+        Swal.fire({
+          title: "Deleting...",
+          text: "Please wait while we delete your application.",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        await apiInstance.delete(`StudentApplication/${id}`);
+        setApplications(applications.filter((app) => app.id !== id));
+
+        console.log(
+          `Dashboard: General application ${id} deleted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+
+        Swal.close();
+        Toast.fire({
+          icon: "success",
+          title: "Application deleted successfully!",
+        });
+      }
     } catch (err) {
       console.error(
-        `Dashboard: Delete failed for application ${id}: ${
+        `Dashboard: Delete failed for general application ${id}: ${
           err.message
         } at ${getCurrentDateTime()} by ${getCurrentUser()}`
       );
+
+      Swal.close();
+      Toast.fire({
+        icon: "error",
+        title: "Failed to delete application. Please try again.",
+      });
+    }
+  };
+
+  // New delete function for academic applications using SweetAlert
+  const handleDeleteAcademic = async (academicId) => {
+    if (!personalInfoId) {
+      console.error(
+        `Dashboard: Cannot delete academic application - missing personalInfoId at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
+
+      Toast.fire({
+        icon: "error",
+        title: "Unable to delete application. Please refresh the page.",
+      });
+      return;
+    }
+
+    try {
+      const result = await Swal.fire({
+        title: "Delete Academic Application",
+        html: `
+          <p>Are you sure you want to delete this academic application?</p>
+          <p><strong>This action cannot be undone and will remove:</strong></p>
+          <ul style="text-align: left; margin: 10px 0;">
+            <li>Your program selection</li>
+            <li>School information</li>
+            <li>Course preferences</li>
+          </ul>
+        `,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel",
+        customClass: {
+          htmlContainer: "text-start",
+        },
+      });
+
+      if (result.isConfirmed) {
+        console.log(
+          `Dashboard: Deleting academic application ${academicId} using personalInfoId ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+
+        // Show loading
+        Swal.fire({
+          title: "Deleting Academic Application...",
+          text: "Please wait while we delete your academic application.",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        // Use the Academic delete API with studentPersonalInformationId
+        await apiInstance.delete(
+          `Academic?StudentPersonalInformationId=${personalInfoId}`
+        );
+
+        // Remove from local state
+        setSubmittedAcademicApps([]);
+
+        console.log(
+          `Dashboard: Academic application ${academicId} deleted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+
+        Swal.close();
+
+        // Show success message with details
+        await Swal.fire({
+          title: "Application Deleted!",
+          text: "Your academic application has been successfully deleted. You can now apply for other programs.",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (err) {
+      console.error(
+        `Dashboard: Delete failed for academic application ${academicId}: ${
+          err.message
+        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
+
+      Swal.close();
+
+      // Show user-friendly error message
+      if (err.response?.status === 404) {
+        Toast.fire({
+          icon: "info",
+          title: "Application not found. It may have already been deleted.",
+        });
+        // Remove from local state anyway since it doesn't exist on server
+        setSubmittedAcademicApps([]);
+      } else {
+        Toast.fire({
+          icon: "error",
+          title: "Failed to delete application. Please try again later.",
+        });
+      }
     }
   };
 
@@ -212,6 +449,14 @@ export default function StudentDashboard({
     }
   };
 
+  // Calculate total applications (general + academic)
+  const totalApplications = submittedAcademicApps.length;
+  const hasAnyApplications = totalApplications > 0;
+
+  // Check if any application is already submitted (to disable Apply buttons)
+  const hasSubmittedApplications = hasAnyApplications;
+  const appliedProgramIds = getAppliedProgramIds();
+
   if (!initialLoadComplete) {
     return (
       <div className="loading-overlay">
@@ -231,9 +476,9 @@ export default function StudentDashboard({
         </h2>
         <p className="subtitle">This is your application dashboard</p>
 
-        {applications.length > 0 ? (
+        {hasAnyApplications ? (
           <>
-            <h3>{applications.length} Applications Found</h3>
+            <h3>{totalApplications} Application(s) Found</h3>
             <p>You have submitted these applications. Continue to edit.</p>
             <button
               className="btn btn-success"
@@ -251,9 +496,18 @@ export default function StudentDashboard({
                 <button
                   className="btn btn-primary"
                   onClick={() => setCurrentStep("personal-info")}
+                  disabled={hasSubmittedApplications}
                 >
-                  ➕ Start New Application
+                  {hasSubmittedApplications
+                    ? "✅ Application Submitted"
+                    : "➕ Start New Application"}
                 </button>
+                {hasSubmittedApplications && (
+                  <small className="text-muted d-block mt-1">
+                    You already have an active application. Delete existing
+                    application to create a new one.
+                  </small>
+                )}
               </>
             )}
 
@@ -265,24 +519,19 @@ export default function StudentDashboard({
               <button
                 className="btn btn-primary"
                 onClick={() => setCurrentStep("personal-info")}
+                disabled={hasSubmittedApplications}
               >
-                ➕ Start Document Submission
+                {hasSubmittedApplications
+                  ? "✅ Application Submitted"
+                  : "➕ Start Document Submission"}
               </button>
+              {hasSubmittedApplications && (
+                <small className="text-muted d-block mt-1">
+                  You already have an active application. Delete existing
+                  application to create a new one.
+                </small>
+              )}
             </>
-
-            {/* <div className="mt-4 text-center">
-              <p className="text-muted">
-                Can't find a program of interest yet? Start your application
-                anyway:
-              </p>
-              <button
-                className="btn btn-outline-primary"
-                onClick={() => setCurrentStep("personal-info")}
-              >
-                📝 Start Application
-              </button>
-            </div>
-            */}
           </>
         )}
       </div>
@@ -296,7 +545,7 @@ export default function StudentDashboard({
               <div className="small-spinner"></div>
               <span>Loading applications...</span>
             </div>
-          ) : applications.length === 0 ? (
+          ) : !hasAnyApplications ? (
             <p className="p-2">No applications found.</p>
           ) : (
             <table className="styled-table">
@@ -304,35 +553,43 @@ export default function StudentDashboard({
                 <tr>
                   <th></th>
                   <th>School Name</th>
-                  <th>Course</th>
+                  <th>Program</th>
+                  <th>Level</th>
+                  <th>Type</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {applications.map((app) => (
-                  <tr key={app.id}>
+                {/* Academic Applications */}
+                {submittedAcademicApps.map((app) => (
+                  <tr key={`academic-${app.id}`}>
                     <td data-label="Select">
                       <input type="checkbox" />
                     </td>
-                    <td data-label="School Name">
-                      {app.school || "University of Greater Manchester"}
+                    <td data-label="School Name">{app.school}</td>
+                    <td data-label="Program">{app.description}</td>
+                    <td data-label="Level">
+                      {getProgramLevelText(app.programLevel)}
                     </td>
-                    <td data-label="Course">
-                      {app.description || "Industrial Chemistry"}
+                    <td data-label="Type">
+                      <span className="badge bg-success">Academic</span>
                     </td>
                     <td data-label="Action" className="actions">
-                      <button className="icon-btn">
+                      <button className="icon-btn" title="Contact Support">
                         <i className="fas fa-envelope"></i>
                       </button>
                       <button
                         className="icon-btn"
                         onClick={() => setCurrentStep("personal-info")}
+                        title="Edit Academic Application"
                       >
                         ✏️
                       </button>
                       <button
                         className="icon-btn"
-                        onClick={() => handleDelete(app.id)}
+                        onClick={() => handleDeleteAcademic(app.id)}
+                        title="Delete Academic Application"
+                        style={{ color: "#dc3545" }}
                       >
                         <i className="fas fa-trash-alt"></i>
                       </button>
@@ -345,7 +602,7 @@ export default function StudentDashboard({
         </div>
 
         {/* Available Applications */}
-        <h3 className="section-title">🎓 Available Programs</h3>
+        <h3 className="section-title mt-4">🎓 Available Programs</h3>
         <div className="table-container responsive-table">
           {loading ? (
             <div className="table-loading">
@@ -358,56 +615,73 @@ export default function StudentDashboard({
             <table className="styled-table">
               <thead>
                 <tr>
-                  <th>School</th>
-                  <th>Course</th>
+                  <th>Program</th>
+                  <th>Faculty</th>
+                  <th>Level</th>
+                  <th>Duration</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {availableApplications.map((app, index) => (
-                  <tr key={index}>
-                    <td>{app.school || "Others"}</td>
-                    <td>{app.description || "General"}</td>
-                    <td>
-                      <button
-                        className="apply-btn"
-                        onClick={() => setCurrentStep("personal-info")}
-                      >
-                        ➕ Apply
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {availableApplications.map((app, index) => {
+                  const isThisProgramApplied = isProgramApplied(app.id);
+                  const isAnyOtherProgramApplied =
+                    hasSubmittedApplications && !isThisProgramApplied;
+
+                  return (
+                    <tr key={index}>
+                      <td>{app.description || "General"}</td>
+                      <td>{app.faculty || "General"}</td>
+                      <td>{getProgramLevelText(app.programLevel)}</td>
+                      <td>{app.durationInYears} years</td>
+                      <td>
+                        <button
+                          className={`apply-btn ${
+                            isThisProgramApplied || isAnyOtherProgramApplied
+                              ? "disabled"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            !isThisProgramApplied &&
+                            !isAnyOtherProgramApplied &&
+                            setCurrentStep("personal-info")
+                          }
+                          disabled={
+                            isThisProgramApplied || isAnyOtherProgramApplied
+                          }
+                          title={
+                            isThisProgramApplied
+                              ? "You have already applied for this program"
+                              : isAnyOtherProgramApplied
+                              ? "You have applied for another program. Delete existing application to apply for this one."
+                              : "Apply for this program"
+                          }
+                        >
+                          {isThisProgramApplied
+                            ? "✅ Applied"
+                            : isAnyOtherProgramApplied
+                            ? "🚫 You have an Open Application"
+                            : "➕ Apply"}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
         </div>
-      </div>
 
-      {/* Debug info - only visible in development */}
-      {/*
-      {process.env.NODE_ENV === "development" && (
-        <div
-          className="debug-info mt-3"
-          style={{
-            fontSize: "0.8rem",
-            color: "#666",
-            background: "#f8f9fa",
-            padding: "8px",
-            borderRadius: "4px",
-          }}
-        >
-          <p style={{ margin: 0 }}>
-            <strong>Debug Info:</strong> Applications: {applications.length},
-            Available Programs: {availableApplications.length}
-          </p>
-          <p style={{ margin: 0 }}>
-            User ID: {userId || "Not set"} | Date/Time: {getCurrentDateTime()} |
-            User: {getCurrentUser()}
-          </p>
-        </div>
-      )}
-        */}
+        {/* Show message when applications are disabled */}
+        {hasSubmittedApplications && (
+          <div className="alert alert-info mt-3">
+            <i className="fas fa-info-circle me-2"></i>
+            <strong>Note:</strong> You currently have an active application. To
+            apply for a different program, you must first delete your existing
+            application.
+          </div>
+        )}
+      </div>
     </div>
   );
 }
