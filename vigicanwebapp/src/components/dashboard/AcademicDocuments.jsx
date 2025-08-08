@@ -68,17 +68,83 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [uploadProgress, setUploadProgress] = useState({});
   const [errors, setErrors] = useState({});
+  const [applicationStatus, setApplicationStatus] = useState(null);
   const dropRef = useRef(null);
+
+  // Get current date/time and user
+  const getCurrentDateTime = () => {
+    return "2025-08-05 19:04:13";
+  };
+
+  const getCurrentUser = () => {
+    return "NeduStack";
+  };
+
+  // Helper function to get status text
+  const getStatusText = (status) => {
+    const statusMap = {
+      1: "Submitted",
+      2: "Pending",
+      3: "Under Review",
+      4: "Rejected",
+      5: "Approved",
+    };
+    return statusMap[status] || "Unknown";
+  };
+
+  // Check if application status allows editing (only Pending or Rejected)
+  const canEdit =
+    applicationStatus === null ||
+    applicationStatus === 2 ||
+    applicationStatus === 4;
 
   useEffect(() => {
     const fetchStudentInfo = async () => {
       if (!authData) return;
       try {
+        console.log(
+          `Fetching student info at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+
         const userId = authData["uid"];
         const res = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
         const studentId = res.data?.result?.id;
+
         if (!studentId) throw new Error("Student ID not found");
         setAppId(studentId);
+
+        // Fetch application status
+        if (studentId) {
+          try {
+            console.log(
+              `Fetching application status at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            );
+
+            const appResponse = await apiInstance.get(
+              `StudentApplication/application?StudentPersonalInformationId=${studentId}`
+            );
+
+            if (appResponse?.data?.result) {
+              // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
+              const status = appResponse.data.result.applicationStatus;
+              setApplicationStatus(status);
+
+              console.log(
+                `Application status: ${getStatusText(
+                  status
+                )} (${status}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
+              );
+            }
+          } catch (err) {
+            console.log(
+              `No application found or error: ${
+                err.message
+              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            );
+            // If no application exists yet, it's effectively pending
+            setApplicationStatus(2); // Pending
+          }
+        }
 
         // Create an array of promises for all document fetches
         const documentPromises = documentTypes.map(async (type) => {
@@ -102,11 +168,15 @@ export default function AcademicDocuments({ onContinue, onBack }) {
                 url: data[downloadKey],
                 viewUrl: data[viewKey],
                 docId: data.id,
-                locked: false,
+                locked: !canEdit,
               },
             };
           } catch (err) {
-            console.warn(`Error fetching document for ${type}:`, err);
+            console.warn(
+              `Error fetching document for ${type}: ${
+                err.message
+              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            );
             return null;
           }
         });
@@ -123,8 +193,15 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         });
 
         setUploadedFiles(newUploadedFiles);
+        console.log(
+          `Documents loaded at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
       } catch (err) {
-        console.error("Error fetching student data:", err);
+        console.error(
+          `Error fetching student data: ${
+            err.message
+          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
       } finally {
         setLoading(false);
       }
@@ -138,6 +215,16 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   };
 
   const uploadFile = async (type, file) => {
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
     const { uploadUrl, downloadKey, viewKey } = documentAPIMap[type];
     const formData = new FormData();
     formData.append("Document", file);
@@ -145,6 +232,9 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
     try {
       setErrors((prev) => ({ ...prev, [type]: null }));
+      console.log(
+        `Uploading ${type} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
 
       const res = await apiInstance.post(uploadUrl, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -166,10 +256,16 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         },
       }));
 
+      console.log(
+        `${type} uploaded successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "success", title: `${type} uploaded successfully` });
     } catch (err) {
       const msg = err?.response?.data?.message || "Upload failed.";
       setErrors((prev) => ({ ...prev, [type]: msg }));
+      console.error(
+        `Upload failed for ${type}: ${msg} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "error", title: msg });
     } finally {
       setUploadProgress((prev) => ({ ...prev, [type]: null }));
@@ -177,6 +273,16 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   };
 
   const handleFileChange = (type, file) => {
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
     if (
       file &&
       [
@@ -194,6 +300,16 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   };
 
   const handleRemoveFile = async (type) => {
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
     const { deleteUrl } = documentAPIMap[type];
     const docId = uploadedFiles[type]?.docId;
 
@@ -211,22 +327,40 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     if (!confirm.isConfirmed) return;
 
     try {
+      console.log(
+        `Deleting ${type} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       await apiInstance.delete(`${deleteUrl}/${docId}`);
       setUploadedFiles((prev) => {
         const updated = { ...prev };
         delete updated[type];
         return updated;
       });
+      console.log(
+        `${type} deleted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "success", title: `${type} deleted` });
     } catch (err) {
       const msg = err?.response?.data?.message || "Error deleting file.";
       setErrors((prev) => ({ ...prev, [type]: msg }));
+      console.error(
+        `Error deleting ${type}: ${msg} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "error", title: msg });
     }
   };
 
   const handleDrop = (e, type) => {
     e.preventDefault();
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
     const file = e.dataTransfer.files[0];
     handleFileChange(type, file);
   };
@@ -235,6 +369,9 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(
+      `Continuing to next step at ${getCurrentDateTime()} by ${getCurrentUser()}`
+    );
     onContinue && onContinue();
   };
 
@@ -256,9 +393,37 @@ export default function AcademicDocuments({ onContinue, onBack }) {
       onSubmit={handleSubmit}
     >
       <h2 className="academic-docs-title">Academic Documents</h2>
+
+      {applicationStatus && (
+        <div
+          className={`application-status-indicator  ${getStatusText(
+            applicationStatus
+          )
+            .toLowerCase()
+            .replace(" ", "-")}`}
+        >
+          Status: <strong>{getStatusText(applicationStatus)}</strong>
+          {!canEdit && (
+            <span className="status-note">
+              (Documents cannot be modified in this status)
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="academic-docs-desc">
-        Click a drop-down to upload the relevant document.
+        Click a drop-down to upload/view the document.
+        {/*
+        {!canEdit && (
+          <div className="edit-disabled-notice">
+            <strong>Note:</strong> Document editing is disabled because your
+            application status is "{getStatusText(applicationStatus)}". Only
+            applications with status "Pending" or "Rejected" can be edited.
+          </div>
+        )}
+          */}
       </div>
+      <div className="divider" />
 
       {documentTypes.map((type) => (
         <div key={type} className="accordion-item mb-2">
@@ -279,14 +444,19 @@ export default function AcademicDocuments({ onContinue, onBack }) {
               onDragOver={handleDragOver}
               ref={dropRef}
             >
-              <label className="upload-box">
+              <label className={`upload-box ${!canEdit ? "disabled" : ""}`}>
                 <input
                   type="file"
                   accept=".pdf,.docx"
                   className="d-none"
                   onChange={(e) => handleFileChange(type, e.target.files[0])}
+                  disabled={!canEdit}
                 />
-                <div className="upload-area">📎 Attach file or drag & drop</div>
+                <div className="upload-area">
+                  {canEdit
+                    ? "📎 Attach file or drag & drop"
+                    : "🔒 Application submitted, you cannot edit this document."}
+                </div>
               </label>
 
               {uploadProgress[type] && (
@@ -313,7 +483,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
                   >
                     View {type}
                   </a>
-                  {!uploadedFiles[type].locked && (
+                  {!uploadedFiles[type].locked && canEdit && (
                     <span
                       className="remove-file"
                       onClick={() => handleRemoveFile(type)}
@@ -337,9 +507,6 @@ export default function AcademicDocuments({ onContinue, onBack }) {
           ← Back
         </button>
         <div>
-          {/* <button type="button" className="btn btn-outline-secondary px-4 me-2">
-            Save as Draft
-          </button> */}
           <button type="submit" className="btn btn-primary px-4">
             Continue →
           </button>

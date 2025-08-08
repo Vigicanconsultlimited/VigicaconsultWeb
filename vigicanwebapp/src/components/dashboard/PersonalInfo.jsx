@@ -42,6 +42,25 @@ export default function PersonalInfo({ onContinue, onBack }) {
     "Other",
   ];
 
+  // Gender options
+  const genderOptions = [
+    "Male",
+    "Female",
+    "Non-binary",
+    "Prefer not to say",
+    "Other",
+  ];
+
+  // Updated current date and time as specified
+  const getCurrentDateTime = () => {
+    return "2025-08-06 09:32:18";
+  };
+
+  // Updated current user as specified
+  const getCurrentUser = () => {
+    return "NeduStack";
+  };
+
   const getMappedValue = (label, options) => {
     const index = options.indexOf(label);
     return index !== -1 ? index + 1 : 0;
@@ -63,11 +82,20 @@ export default function PersonalInfo({ onContinue, onBack }) {
     UserId: "",
     PreferredPronoun: "",
     FirstLanguage: "",
+    Gender: "", // Added gender field
   });
 
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [applicationStatus, setApplicationStatus] = useState(null);
+  const [personalInfoId, setPersonalInfoId] = useState("");
+
+  // Check if application status allows editing (only Pending or Rejected)
+  const canEdit =
+    applicationStatus === null ||
+    applicationStatus === 2 ||
+    applicationStatus === 4;
 
   useEffect(() => {
     const fetchExistingData = async () => {
@@ -84,11 +112,26 @@ export default function PersonalInfo({ onContinue, onBack }) {
         }));
 
         try {
+          console.log(
+            `Fetching personal info at ${getCurrentDateTime()} by ${getCurrentUser()}`
+          );
+
           const response = await apiInstance.get(
             `StudentPersonalInfo/user/${userId}`
           );
+
           if (response?.data?.result) {
             const savedData = response.data.result;
+            setPersonalInfoId(savedData.id || "");
+
+            // Store the personal info ID in localStorage for access by other components
+            localStorage.setItem("studentPersonalInfoId", savedData.id || "");
+            console.log(
+              `Stored personal info ID in localStorage: ${
+                savedData.id
+              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            );
+
             setFormData({
               FirstName: savedData.firstName || "",
               MiddleName: savedData.middleName || "",
@@ -107,11 +150,48 @@ export default function PersonalInfo({ onContinue, onBack }) {
                 savedData.firstLanguage,
                 languageOptions
               ),
+              Gender: getLabelFromMappedValue(savedData.gender, genderOptions),
             });
+
             setIsFormSubmitted(true);
+
+            // Now fetch application status
+            if (savedData.id) {
+              try {
+                console.log(
+                  `Fetching application status at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                );
+
+                const appResponse = await apiInstance.get(
+                  `StudentApplication/application?StudentPersonalInformationId=${savedData.id}`
+                );
+
+                if (appResponse?.data?.result) {
+                  // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
+                  const status = appResponse.data.result.applicationStatus;
+                  setApplicationStatus(status);
+                }
+              } catch (err) {
+                console.log(
+                  `No application found or error: ${
+                    err.message
+                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                );
+                // If no application exists yet, it's effectively pending
+                setApplicationStatus(2); // Pending
+              }
+            }
           }
+          console.log(
+            `Existing personal info fetched successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
+          );
+          console.log("Fetched data:", response.data.result);
         } catch (error) {
-          console.warn("No existing personal info found or error:", error);
+          console.warn(
+            `No existing personal info found or error: ${
+              error.message
+            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+          );
         } finally {
           setLoading(false);
         }
@@ -120,6 +200,18 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
     fetchExistingData();
   }, [authData]);
+
+  // Helper function to get status text
+  const getStatusText = (status) => {
+    const statusMap = {
+      1: "Submitted",
+      2: "Pending",
+      3: "Under Review",
+      4: "Rejected",
+      5: "Approved",
+    };
+    return statusMap[status] || "Unknown";
+  };
 
   const showLoadingOverlay = () => {
     Swal.fire({
@@ -135,6 +227,17 @@ export default function PersonalInfo({ onContinue, onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prevent submission if application status doesn't allow editing
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
     const requiredFields = [
       "FirstName",
       "LastName",
@@ -144,6 +247,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
       "PostCode",
       "FirstLanguage",
       "PreferredPronoun",
+      "Gender", // Added gender as required field
     ];
     const isFormComplete = requiredFields.every(
       (field) => formData[field] && formData[field].trim() !== ""
@@ -165,25 +269,81 @@ export default function PersonalInfo({ onContinue, onBack }) {
         formData.PreferredPronoun,
         pronounOptions
       ),
+      Gender: getMappedValue(formData.Gender, genderOptions), // Add gender to payload
     }).forEach(([key, value]) => payload.append(key, value));
 
     try {
       showLoadingOverlay();
-      await apiInstance.post("StudentPersonalInfo/create", payload, {
-        headers: { "Content-Type": "multipart/form-data" },
+      console.log(
+        `Submitting personal info at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
+
+      // Log the payload for debugging
+      console.log("Payload data:", {
+        FirstName: formData.FirstName,
+        LastName: formData.LastName,
+        Phone: formData.Phone,
+        DOB: formData.DOB,
+        Address: formData.Address,
+        PostCode: formData.PostCode,
+        FirstLanguage: getMappedValue(formData.FirstLanguage, languageOptions),
+        PreferredPronoun: getMappedValue(
+          formData.PreferredPronoun,
+          pronounOptions
+        ),
+        Gender: getMappedValue(formData.Gender, genderOptions),
       });
+
+      const response = await apiInstance.post(
+        "StudentPersonalInfo/create",
+        payload,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
       Swal.close();
       setIsFormSubmitted(true);
+
+      // If we get a response with an ID, save it to localStorage
+      if (response?.data?.result?.id) {
+        const newPersonalInfoId = response.data.result.id;
+        setPersonalInfoId(newPersonalInfoId);
+        localStorage.setItem("studentPersonalInfoId", newPersonalInfoId);
+        console.log(
+          `New personal info ID stored in localStorage: ${newPersonalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+      }
+
       Toast.fire({ icon: "success", title: "Submitted successfully" });
-      if (onContinue) onContinue();
+
+      // Use setTimeout to ensure the localStorage is updated before continuing
+      setTimeout(() => {
+        if (onContinue) onContinue();
+      }, 500);
     } catch (error) {
       Swal.close();
-      console.error("Submission failed:", error);
+      console.error(
+        `Submission failed: ${
+          error.message
+        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "error", title: "Submission failed" });
     }
   };
 
   const handleEditSubmit = async () => {
+    // Prevent editing if application status doesn't allow it
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
     const payload = new FormData();
     Object.entries({
       ...formData,
@@ -192,21 +352,65 @@ export default function PersonalInfo({ onContinue, onBack }) {
         formData.PreferredPronoun,
         pronounOptions
       ),
+      Gender: getMappedValue(formData.Gender, genderOptions), // Add gender to update payload
     }).forEach(([key, value]) => payload.append(key, value));
 
     try {
       showLoadingOverlay();
+      console.log(
+        `Updating personal info at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
+
+      // Log the payload for debugging
+      console.log("Update payload data:", {
+        Id: formData.Id,
+        FirstName: formData.FirstName,
+        LastName: formData.LastName,
+        Gender: getMappedValue(formData.Gender, genderOptions),
+      });
+
       await apiInstance.put("StudentPersonalInfo/update", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       Swal.close();
       Toast.fire({ icon: "success", title: "Updated successfully" });
       setIsEditing(false);
+
+      // Make sure localStorage has the latest ID
+      if (formData.Id) {
+        localStorage.setItem("studentPersonalInfoId", formData.Id);
+        console.log(
+          `Updated personal info ID in localStorage: ${
+            formData.Id
+          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+      }
     } catch (error) {
       Swal.close();
-      console.error("Update failed:", error);
+      console.error(
+        `Update failed: ${
+          error.message
+        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
       Toast.fire({ icon: "error", title: "Update failed" });
     }
+  };
+
+  // Handle "Next" button click
+  const handleContinue = () => {
+    // Make sure the ID is stored in localStorage before continuing
+    if (personalInfoId) {
+      localStorage.setItem("studentPersonalInfoId", personalInfoId);
+      console.log(
+        `Ensured personal info ID is in localStorage before continuing: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+      );
+    }
+
+    // Use setTimeout to ensure the localStorage is updated before continuing
+    setTimeout(() => {
+      if (onContinue) onContinue();
+    }, 200);
   };
 
   if (loading) {
@@ -223,19 +427,32 @@ export default function PersonalInfo({ onContinue, onBack }) {
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Personal Information</h2>
-
-      {isFormSubmitted && !isEditing && (
+      {/* Only show "already submitted" message if editing is allowed */}
+      {isFormSubmitted && !isEditing && canEdit && (
         <div className="alert alert-info mt-3">
-          <strong>You’ve already submitted this form.</strong>
+          <strong>You've already Saved this form.</strong>
           <br />
           Click edit to update your information.
+          <br />
+          <p className="form-subtitle">
+            Please provide accurate information. Inaccuracies may delay or
+            reject your application.
+          </p>
         </div>
       )}
 
-      <p className="form-subtitle">
-        Please provide accurate information. Inaccuracies may delay or reject
-        your application.
-      </p>
+      {applicationStatus &&
+        applicationStatus !== 2 &&
+        applicationStatus !== 4 && (
+          <div className="alert alert-primary mt-3">
+            <strong>Notice: Your application cannot be edited.</strong>
+            <br />
+            Current status: <strong>{getStatusText(applicationStatus)}</strong>.
+            <br />
+            This information cannot be modified at this time, but you can
+            proceed to the next step.
+          </div>
+        )}
 
       {/* Name Fields */}
       <div className="row g-3 pb-3">
@@ -243,12 +460,15 @@ export default function PersonalInfo({ onContinue, onBack }) {
           <div className="col-md-4 col-12" key={i}>
             <label className="form-label">
               {field.replace("Name", " Name")}
+              {(field === "FirstName" || field === "LastName") && (
+                <span className="required-field">*</span>
+              )}
             </label>
             <input
               type="text"
               className="form-input"
               value={formData[field]}
-              disabled={!isEditing && isFormSubmitted}
+              disabled={(!isEditing && isFormSubmitted) || !canEdit}
               onChange={(e) =>
                 setFormData({ ...formData, [field]: e.target.value })
               }
@@ -269,83 +489,95 @@ export default function PersonalInfo({ onContinue, onBack }) {
           />
         </div>
         <div className="col-md-4 col-12">
-          <label className="form-label">Phone Number</label>
+          <label className="form-label">
+            Phone Number<span className="required-field">*</span>
+          </label>
           <input
             type="tel"
             className="form-input"
             value={formData.Phone}
-            disabled={!isEditing && isFormSubmitted}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, Phone: e.target.value })
             }
           />
         </div>
         <div className="col-md-4 col-12">
-          <label className="form-label">Date of Birth</label>
+          <label className="form-label">
+            Date of Birth<span className="required-field">*</span>
+          </label>
           <input
             type="date"
             className="form-input"
             value={formData.DOB}
-            disabled={!isEditing && isFormSubmitted}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) => setFormData({ ...formData, DOB: e.target.value })}
           />
         </div>
       </div>
 
-      {/* Address */}
+      {/* Address and Post Code - MOVED POSTCODE NEXT TO ADDRESS */}
       <div className="row g-3 pb-3">
-        <div className="col-12">
-          <label className="form-label">Permanent Address</label>
+        <div className="col-md-8 col-12">
+          <label className="form-label">
+            Permanent Address<span className="required-field">*</span>
+          </label>
           <input
             type="text"
             className="form-input"
             value={formData.Address}
-            disabled={!isEditing && isFormSubmitted}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, Address: e.target.value })
             }
           />
         </div>
-      </div>
-
-      {/* Post Code & Preferences */}
-      <div className="row g-3 pb-3">
         <div className="col-md-4 col-12">
-          <label className="form-label">Post Code</label>
+          <label className="form-label">
+            Post Code<span className="required-field">*</span>
+          </label>
           <input
             type="text"
             className="form-input"
             value={formData.PostCode}
-            disabled={!isEditing && isFormSubmitted}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, PostCode: e.target.value })
             }
           />
         </div>
+      </div>
+
+      {/* Gender, Pronoun, Language */}
+      <div className="row g-3 pb-3">
         <div className="col-md-4 col-12">
-          <label className="form-label">Preferred Language</label>
+          <label className="form-label">
+            Gender<span className="required-field">*</span>
+          </label>
           <select
             className="form-select"
-            value={formData.FirstLanguage}
-            disabled={!isEditing && isFormSubmitted}
+            value={formData.Gender}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
-              setFormData({ ...formData, FirstLanguage: e.target.value })
+              setFormData({ ...formData, Gender: e.target.value })
             }
           >
-            <option value="">Select language</option>
-            {languageOptions.map((lang, i) => (
-              <option key={i} value={lang}>
-                {lang}
+            <option value="">Select gender</option>
+            {genderOptions.map((gender, i) => (
+              <option key={i} value={gender}>
+                {gender}
               </option>
             ))}
           </select>
         </div>
         <div className="col-md-4 col-12">
-          <label className="form-label">Preferred Pronoun</label>
+          <label className="form-label">
+            Preferred Pronoun<span className="required-field">*</span>
+          </label>
           <select
             className="form-select"
             value={formData.PreferredPronoun}
-            disabled={!isEditing && isFormSubmitted}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, PreferredPronoun: e.target.value })
             }
@@ -354,6 +586,26 @@ export default function PersonalInfo({ onContinue, onBack }) {
             {pronounOptions.map((p, i) => (
               <option key={i} value={p}>
                 {p}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="col-md-4 col-12">
+          <label className="form-label">
+            Preferred Language<span className="required-field">*</span>
+          </label>
+          <select
+            className="form-select"
+            value={formData.FirstLanguage}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
+            onChange={(e) =>
+              setFormData({ ...formData, FirstLanguage: e.target.value })
+            }
+          >
+            <option value="">Select language</option>
+            {languageOptions.map((lang, i) => (
+              <option key={i} value={lang}>
+                {lang}
               </option>
             ))}
           </select>
@@ -380,7 +632,11 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
         <div>
           {!isFormSubmitted ? (
-            <button type="submit" className="btn btn-primary">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!canEdit}
+            >
               Continue →
             </button>
           ) : isEditing ? (
@@ -389,30 +645,34 @@ export default function PersonalInfo({ onContinue, onBack }) {
                 type="button"
                 className="btn btn-success me-2 "
                 onClick={handleEditSubmit}
+                disabled={!canEdit}
               >
                 ✅ Finish Editing
               </button>
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={onContinue}
+                onClick={handleContinue}
               >
                 ➡ Next
               </button>
             </>
           ) : (
             <>
-              <button
-                type="button"
-                className="btn btn-secondary me-2 btn-outline-primary"
-                onClick={() => setIsEditing(true)}
-              >
-                ✏️ Edit
-              </button>
+              {/* Only show Edit button if editing is allowed */}
+              {canEdit && (
+                <button
+                  type="button"
+                  className="btn btn-secondary me-2 btn-outline-primary"
+                  onClick={() => setIsEditing(true)}
+                >
+                  ✏️ Edit
+                </button>
+              )}
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={onContinue}
+                onClick={handleContinue}
               >
                 ➡ Next
               </button>

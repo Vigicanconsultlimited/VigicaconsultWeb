@@ -8,16 +8,13 @@ import PersonalInfo from "../components/dashboard/PersonalInfo";
 import AcademicDocuments from "../components/dashboard/AcademicDocuments";
 import SupportingDocuments from "../components/dashboard/SupportingDocuments";
 import StudentDashboard from "../components/dashboard/StudentDashboard";
-import SavedPersonalInfo from "../components/dashboard/SavedPersonalInfo";
-import SavedAcademicDocuments from "../components/dashboard/SavedAcademicDocuments";
-import SavedSupportingDocuments from "../components/dashboard/SavedSupportingDocuments";
-import SavedApplication from "../components/dashboard/SavedApplication";
 
 import Inbox from "../components/dashboard/Inbox";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ApplicationStatus from "../components/dashboard/ApplicationStatus";
 import apiInstance from "../utils/axios";
 import ApplicationSummary from "../components/dashboard/ApplicationSummary";
+import AcademicInfo from "../components/dashboard/AcademicInfo";
 
 function Dashboard() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
@@ -25,6 +22,8 @@ function Dashboard() {
 
   const setAllUserData = useAuthStore((state) => state.setAllUserData);
   const [currentStep, setCurrentStep] = useState("dashboard-home");
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -46,18 +45,43 @@ function Dashboard() {
     setUser();
   }, []);
 
+  const handleStartApplication = (school, program) => {
+    console.log(
+      `Application started at 2025-08-05 14:09:14 by NeduStack for ${school} - ${program}`
+    );
+    setSelectedSchool(school);
+    setSelectedProgram(program);
+    setCurrentStep("academic-info");
+  };
+
   const steps = {
     "dashboard-home": {
-      component: <StudentDashboard setCurrentStep={setCurrentStep} />,
+      component: (
+        <StudentDashboard
+          setCurrentStep={setCurrentStep}
+          handleStartApplication={handleStartApplication}
+        />
+      ),
     },
+
     "personal-info": {
       component: (
         <PersonalInfo
-          userEmail={user?.email}
-          userId={user?.UserId}
-          onContinue={() => setCurrentStep("academic-documents")}
+          //userEmail={user?.email}
+          //userId={user?.UserId}
+          onContinue={() => setCurrentStep("academic-info")}
           onBack={() => setCurrentStep("dashboard-home")}
           setCurrentStep={setCurrentStep}
+        />
+      ),
+    },
+    "academic-info": {
+      component: (
+        <AcademicInfo
+          onContinue={() => setCurrentStep("academic-documents")}
+          onBack={() => setCurrentStep("personal-info")}
+          defaultSchool={selectedSchool}
+          defaultProgram={selectedProgram}
         />
       ),
     },
@@ -65,7 +89,7 @@ function Dashboard() {
       component: (
         <AcademicDocuments
           onContinue={() => setCurrentStep("supporting-documents")}
-          onBack={() => setCurrentStep("personal-info")}
+          onBack={() => setCurrentStep("academic-info")}
         />
       ),
     },
@@ -84,29 +108,6 @@ function Dashboard() {
     // ✅ SAVED COMPONENTS
     "application-status": {
       component: <ApplicationStatus />,
-    },
-    "saved-application": {
-      component: <SavedApplication userId={user?.uid} />,
-    },
-
-    "saved-personal-info": {
-      component: (
-        <SavedPersonalInfo onBack={() => setCurrentStep("dashboard-home")} />
-      ),
-    },
-    "saved-academic-documents": {
-      component: (
-        <SavedAcademicDocuments
-          onBack={() => setCurrentStep("dashboard-home")}
-        />
-      ),
-    },
-    "saved-supporting-documents": {
-      component: (
-        <SavedSupportingDocuments
-          onBack={() => setCurrentStep("dashboard-home")}
-        />
-      ),
     },
 
     // ✅ Inbox page
