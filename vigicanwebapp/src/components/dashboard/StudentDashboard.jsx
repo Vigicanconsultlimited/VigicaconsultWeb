@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import "./styles/StudentDashboard.css";
 import Swal from "sweetalert2";
 
+// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 16:30:08
+// Current User's Login: NeduStack
+
 // SweetAlert Toast
 const Toast = Swal.mixin({
   toast: true,
@@ -26,50 +29,31 @@ export default function StudentDashboard({
   const [displayName, setDisplayName] = useState("");
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [personalInfoId, setPersonalInfoId] = useState("");
+  const [applicationStatus, setApplicationStatus] = useState(null);
 
   const navigate = useNavigate();
   const userId = authData?.uid;
   const userEmail =
     authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
 
-  // Updated current date and time as specified
-  const getCurrentDateTime = () => {
-    return "2025-08-08 21:25:31";
-  };
-
-  // Updated current user login as specified
-  const getCurrentUser = () => {
-    return "NeduStack";
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log(
-          `Dashboard: Fetching data at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
 
         let submittedApps = [];
         let personalInfoData = null;
         let currentPersonalInfoId = null;
+        let fetchedApplicationStatus = null;
 
         // Step 1: Get StudentPersonalInformationId (with individual error handling)
         try {
-          console.log(
-            `Dashboard: Fetching personal info for user ${userId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
           const personalRes = await apiInstance.get(
             `StudentPersonalInfo/user/${userId}`
           );
           const personalInfo = personalRes?.data?.result;
           currentPersonalInfoId = personalInfo?.id;
           setPersonalInfoId(currentPersonalInfoId); // Store for delete operations
-
-          console.log(
-            `Dashboard: Personal info ID found: ${currentPersonalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
 
           // Set display name from personal info
           if (personalInfo?.firstName && personalInfo?.lastName) {
@@ -78,13 +62,30 @@ export default function StudentDashboard({
             );
           }
 
-          // Step 2: Get submitted application with that ID (only if we have personalInfoId)
+          // Step 2: Fetch application status first if we have personalInfoId
           if (currentPersonalInfoId) {
             try {
-              console.log(
-                `Dashboard: Fetching applications for personal info ID ${currentPersonalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
+              const appResponse = await apiInstance.get(
+                `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`
               );
 
+              if (appResponse?.data?.result) {
+                // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
+                const status = appResponse.data.result.applicationStatus;
+                setApplicationStatus(status);
+                fetchedApplicationStatus = status;
+              }
+            } catch (statusErr) {
+              console.log(
+                `No application found or error: ${statusErr.message}`
+              );
+              // If no application exists yet, it's effectively pending
+              setApplicationStatus(2); // Pending
+              fetchedApplicationStatus = 2;
+            }
+
+            // Step 3: Get submitted general applications
+            try {
               const submittedAppRes = await apiInstance.get(
                 `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`
               );
@@ -96,31 +97,13 @@ export default function StudentDashboard({
               setApplications(
                 Array.isArray(submittedApps) ? submittedApps : [submittedApps]
               );
-
-              console.log(
-                `Dashboard: Found ${
-                  Array.isArray(submittedApps)
-                    ? submittedApps.length
-                    : submittedApps
-                    ? 1
-                    : 0
-                } general applications at ${getCurrentDateTime()} by ${getCurrentUser()}`
-              );
             } catch (appErr) {
-              console.warn(
-                `Dashboard: Error fetching applications: ${
-                  appErr.message
-                } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-              );
+              console.warn(`Error fetching applications: ${appErr.message}`);
               // Don't stop execution, continue to fetch other data
             }
 
-            // Step 2.5: Get submitted academic applications using the new API
+            // Step 4: Get submitted academic applications using the new API
             try {
-              console.log(
-                `Dashboard: Fetching academic applications for personal info ID ${currentPersonalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-              );
-
               const academicAppRes = await apiInstance.get(
                 `Academic/StudentInformationId?PersonalInformationId=${currentPersonalInfoId}`
               );
@@ -149,92 +132,56 @@ export default function StudentDashboard({
                   postCode: academicData.schoolResponse?.postCode || "",
                   // Store the exact program ID for comparison
                   appliedProgramId: academicData.program?.id || null,
+                  // Use the fetched application status
+                  applicationStatus: fetchedApplicationStatus || 2, // Default to Pending if not found
+                  isSubmitted: fetchedApplicationStatus >= 1, // Submitted if status is 1 or higher
+                  submittedAt: academicData.submittedAt || null,
+                  updatedAt: academicData.updatedAt || null,
                 };
 
                 setSubmittedAcademicApps([formattedAcademicApp]);
-
-                console.log(
-                  `Dashboard: Found 1 academic application (${
-                    formattedAcademicApp.school
-                  } - ${formattedAcademicApp.description}) with program ID: ${
-                    formattedAcademicApp.appliedProgramId
-                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                );
               } else {
                 setSubmittedAcademicApps([]);
-                console.log(
-                  `Dashboard: No academic applications found at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                );
               }
             } catch (academicErr) {
               console.warn(
-                `Dashboard: Error fetching academic applications: ${
-                  academicErr.message
-                } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                `Error fetching academic applications: ${academicErr.message}`
               );
               setSubmittedAcademicApps([]);
             }
           }
         } catch (personalErr) {
-          console.warn(
-            `Dashboard: Error fetching personal info: ${
-              personalErr.message
-            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
+          console.warn(`Error fetching personal info: ${personalErr.message}`);
           // Don't stop execution, continue to fetch programs
         }
 
-        // Step 3: Get available programs (always execute this, regardless of previous errors)
+        // Step 5: Get available programs (always execute this, regardless of previous errors)
         try {
-          console.log(
-            `Dashboard: Fetching available academic programs at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
           const availableRes = await apiInstance.get(`AcademicProgram`);
 
           if (availableRes?.data?.result) {
             setAvailableApplications(availableRes.data.result);
-            console.log(
-              `Dashboard: Loaded ${
-                availableRes.data.result.length
-              } programs at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
           } else {
-            console.warn(
-              `Dashboard: No programs found in response at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
+            console.warn("No programs found in response");
             setAvailableApplications([]);
           }
         } catch (programErr) {
-          console.error(
-            `Dashboard: Error fetching programs: ${
-              programErr.message
-            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
+          console.error(`Error fetching programs: ${programErr.message}`);
           console.error("Full error details:", programErr);
           setAvailableApplications([]);
         }
       } catch (err) {
-        console.error(
-          `Dashboard: General error in fetchData: ${
-            err.message
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        console.error(`General error in fetchData: ${err.message}`);
       } finally {
         setLoading(false);
         setInitialLoadComplete(true);
-        console.log(
-          `Dashboard: Data fetching completed at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
       }
     };
 
     if (userId) {
       fetchData();
     } else {
-      console.warn(
-        `Dashboard: No userId found at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
+      console.warn("No userId found");
       setLoading(false);
       setInitialLoadComplete(true);
     }
@@ -251,6 +198,44 @@ export default function StudentDashboard({
     return levels[level] || "Other";
   };
 
+  // Helper function to get status text (matching ApplicationSummary)
+  const getStatusText = (status) => {
+    const statusMap = {
+      1: "Submitted",
+      2: "Pending",
+      3: "Under Review",
+      4: "Rejected",
+      5: "Approved",
+    };
+    return statusMap[status] || "Unknown";
+  };
+
+  // Helper function to get status badge based on applicationStatus codes
+  const getStatusBadge = (applicationStatus) => {
+    // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
+    switch (applicationStatus) {
+      case 1:
+        return <span className="badge bg-primary">Submitted</span>;
+      case 2:
+        return <span className="badge bg-warning">Pending</span>;
+      case 3:
+        return <span className="badge bg-info">Under Review</span>;
+      case 4:
+        return <span className="badge bg-danger">Rejected</span>;
+      case 5:
+        return <span className="badge bg-success">Approved</span>;
+      case 0:
+      default:
+        return <span className="badge bg-secondary">Draft</span>;
+    }
+  };
+
+  // Helper function to check if application can be edited (matching ApplicationSummary logic)
+  const canEditApplication = (app) => {
+    // Can only edit if status is Pending (2) or Rejected (4)
+    return [2, 4].includes(app.applicationStatus);
+  };
+
   // Helper function to check if a specific program has been applied for
   const isProgramApplied = (programId) => {
     return submittedAcademicApps.some(
@@ -265,9 +250,211 @@ export default function StudentDashboard({
       .filter(Boolean);
   };
 
-  const handleEdit = (id) => {
+  // Contact Support Modal Function
+  const handleContactSupport = async (
+    applicationId = null,
+    applicationDetails = null
+  ) => {
+    const { value: formValues } = await Swal.fire({
+      title: "Contact Support",
+      html: `
+        <div style="text-align: left;">
+          <div style="margin-bottom: 15px;">
+            <label for="subject" style="display: block; margin-bottom: 5px; font-weight: 600; color: #374151;">Subject *</label>
+            <select id="subject" class="swal2-select" style="width: 100%; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+              <option value="">Select a subject</option>
+              <option value="Application Status Inquiry">Application Status Inquiry</option>
+              <option value="Document Upload Issue">Document Upload Issue</option>
+              <option value="Application Editing Problem">Application Editing Problem</option>
+              <option value="Payment Related">Payment Related</option>
+              <option value="Technical Support">Technical Support</option>
+              <option value="General Inquiry">General Inquiry</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label for="priority" style="display: block; margin-bottom: 5px; font-weight: 600; color: #374151;">Priority Level</label>
+            <select id="priority" class="swal2-select" style="width: 100%; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+              <option value="low">Low - General inquiry</option>
+              <option value="medium" selected>Medium - Standard request</option>
+              <option value="high">High - Urgent issue</option>
+            </select>
+          </div>
+
+          ${
+            applicationDetails
+              ? `
+          <div style="margin-bottom: 15px; padding: 10px; background: #f8fafc; border-radius: 6px; border-left: 4px solid #3b82f6;">
+            <strong>Application Details:</strong><br>
+            <small>School: ${applicationDetails.school}</small><br>
+            <small>Program: ${applicationDetails.description}</small><br>
+            <small>Status: ${getStatusText(
+              applicationDetails.applicationStatus
+            )}</small>
+          </div>
+          `
+              : ""
+          }
+
+          <div style="margin-bottom: 15px;">
+            <label for="message" style="display: block; margin-bottom: 5px; font-weight: 600; color: #374151;">Message *</label>
+            <textarea id="message" class="swal2-textarea" placeholder="Please describe your issue or inquiry in detail..." style="width: 100%; min-height: 120px; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px; resize: vertical;"></textarea>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label for="email" style="display: block; margin-bottom: 5px; font-weight: 600; color: #374151;">Contact Email</label>
+            <input id="email" class="swal2-input" type="email" value="${
+              userEmail || ""
+            }" placeholder="your.email@example.com" style="width: 100%; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px; margin: 0;">
+          </div>
+
+          <div style="font-size: 12px; color: #6b7280; margin-top: 10px;">
+            <i class="fas fa-info-circle"></i> Our support team typically responds within 24-48 hours during business days.
+          </div>
+        </div>
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: "Send Message",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#6b7280",
+      width: "600px",
+      customClass: {
+        container: "support-modal-container",
+      },
+      preConfirm: () => {
+        const subject = document.getElementById("subject").value;
+        const priority = document.getElementById("priority").value;
+        const message = document.getElementById("message").value;
+        const email = document.getElementById("email").value;
+
+        if (!subject) {
+          Swal.showValidationMessage("Please select a subject");
+          return false;
+        }
+        if (!message || message.trim().length < 10) {
+          Swal.showValidationMessage(
+            "Please enter a detailed message (at least 10 characters)"
+          );
+          return false;
+        }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          Swal.showValidationMessage("Please enter a valid email address");
+          return false;
+        }
+
+        return {
+          subject: subject,
+          priority: priority,
+          message: message.trim(),
+          email: email,
+          applicationId: applicationId,
+          applicationDetails: applicationDetails,
+        };
+      },
+    });
+
+    if (formValues) {
+      // Show sending message
+      Swal.fire({
+        title: "Sending Message...",
+        text: "Please wait while we send your message to our support team.",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      try {
+        // Simulate API call for sending support message
+        // Replace this with your actual support API endpoint
+        const supportData = {
+          subject: formValues.subject,
+          priority: formValues.priority,
+          message: formValues.message,
+          contactEmail: formValues.email,
+          userId: userId,
+          personalInfoId: personalInfoId,
+          applicationId: formValues.applicationId,
+          applicationDetails: formValues.applicationDetails,
+          timestamp: "2025-08-11 16:30:08",
+          submittedBy: "NeduStack",
+        };
+
+        // For now, we'll simulate the API call
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Success response
+        Swal.fire({
+          title: "Message Sent Successfully!",
+          html: `
+            <div style="text-align: center;">
+              <i class="fas fa-check-circle" style="font-size: 48px; color: #10b981; margin-bottom: 15px;"></i>
+              <p>Your support request has been submitted successfully.</p>
+              <div style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 15px; margin: 15px 0; text-align: left;">
+                <strong>Ticket Details:</strong><br>
+                <small><strong>Subject:</strong> ${
+                  formValues.subject
+                }</small><br>
+                <small><strong>Priority:</strong> ${formValues.priority.toUpperCase()}</small><br>
+                <small><strong>Submitted:</strong> 2025-08-11 16:30:08</small><br>
+                <small><strong>Reference ID:</strong> SUP-${Date.now()
+                  .toString()
+                  .slice(-6)}</small>
+              </div>
+              <p style="font-size: 14px; color: #6b7280;">
+                Our support team will review your request and respond to <strong>${
+                  formValues.email
+                }</strong> within 24-48 hours.
+              </p>
+            </div>
+          `,
+          icon: "success",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#10b981",
+        });
+
+        // Show success toast
+        Toast.fire({
+          icon: "success",
+          title: "Support request submitted successfully!",
+        });
+      } catch (error) {
+        console.error("Error sending support message:", error);
+
+        Swal.fire({
+          title: "Failed to Send Message",
+          text: "There was an error sending your message. Please try again later or contact support directly.",
+          icon: "error",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#ef4444",
+        });
+
+        Toast.fire({
+          icon: "error",
+          title: "Failed to send support request",
+        });
+      }
+    }
+  };
+
+  const handleEdit = (app) => {
+    if (!canEditApplication(app)) {
+      Toast.fire({
+        icon: "warning",
+        title: "Cannot edit application",
+        text: `This application is ${getStatusText(
+          app.applicationStatus
+        ).toLowerCase()} and cannot be modified. Only Pending or Rejected applications can be edited.`,
+      });
+      return;
+    }
+
     navigate("/dashboard", {
-      state: { step: "saved-personal-info", applicationId: id },
+      state: { step: "saved-personal-info", applicationId: app.id },
     });
   };
 
@@ -286,10 +473,6 @@ export default function StudentDashboard({
       });
 
       if (result.isConfirmed) {
-        console.log(
-          `Dashboard: Deleting general application ${id} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-
         // Show loading
         Swal.fire({
           title: "Deleting...",
@@ -304,10 +487,6 @@ export default function StudentDashboard({
         await apiInstance.delete(`StudentApplication/${id}`);
         setApplications(applications.filter((app) => app.id !== id));
 
-        console.log(
-          `Dashboard: General application ${id} deleted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-
         Swal.close();
         Toast.fire({
           icon: "success",
@@ -316,9 +495,7 @@ export default function StudentDashboard({
       }
     } catch (err) {
       console.error(
-        `Dashboard: Delete failed for general application ${id}: ${
-          err.message
-        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        `Delete failed for general application ${id}: ${err.message}`
       );
 
       Swal.close();
@@ -330,12 +507,22 @@ export default function StudentDashboard({
   };
 
   // New delete function for academic applications using SweetAlert
-  const handleDeleteAcademic = async (academicId) => {
+  const handleDeleteAcademic = async (app) => {
+    if (!canEditApplication(app)) {
+      Toast.fire({
+        icon: "warning",
+        title: "Cannot delete application",
+        text: `This application is ${getStatusText(
+          app.applicationStatus
+        ).toLowerCase()} and cannot be deleted. Only Pending or Rejected applications can be deleted.`,
+      });
+      return;
+    }
+
     if (!personalInfoId) {
       console.error(
-        `Dashboard: Cannot delete academic application - missing personalInfoId at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        "Cannot delete academic application - missing personalInfoId"
       );
-
       Toast.fire({
         icon: "error",
         title: "Unable to delete application. Please refresh the page.",
@@ -367,10 +554,6 @@ export default function StudentDashboard({
       });
 
       if (result.isConfirmed) {
-        console.log(
-          `Dashboard: Deleting academic application ${academicId} using personalInfoId ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-
         // Show loading
         Swal.fire({
           title: "Deleting Academic Application...",
@@ -389,10 +572,7 @@ export default function StudentDashboard({
 
         // Remove from local state
         setSubmittedAcademicApps([]);
-
-        console.log(
-          `Dashboard: Academic application ${academicId} deleted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        setApplicationStatus(null);
 
         Swal.close();
 
@@ -406,9 +586,7 @@ export default function StudentDashboard({
       }
     } catch (err) {
       console.error(
-        `Dashboard: Delete failed for academic application ${academicId}: ${
-          err.message
-        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        `Delete failed for academic application ${app.id}: ${err.message}`
       );
 
       Swal.close();
@@ -421,6 +599,7 @@ export default function StudentDashboard({
         });
         // Remove from local state anyway since it doesn't exist on server
         setSubmittedAcademicApps([]);
+        setApplicationStatus(null);
       } else {
         Toast.fire({
           icon: "error",
@@ -432,10 +611,6 @@ export default function StudentDashboard({
 
   // Modified to use the parent component's handleStartApplication
   const onStartApplication = (school, description) => {
-    console.log(
-      `Starting application for ${school} - ${description} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-    );
-
     // Check if parent provided the handler
     if (typeof handleStartApplication === "function") {
       // Use the parent's handler which will set the school/program and change step
@@ -443,7 +618,7 @@ export default function StudentDashboard({
     } else {
       // Fallback to direct step change if handler not provided
       console.warn(
-        `handleStartApplication not provided, falling back to direct step change at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        "handleStartApplication not provided, falling back to direct step change"
       );
       setCurrentStep("academic-info");
     }
@@ -456,6 +631,11 @@ export default function StudentDashboard({
   // Check if any application is already submitted (to disable Apply buttons)
   const hasSubmittedApplications = hasAnyApplications;
   const appliedProgramIds = getAppliedProgramIds();
+
+  // Check if user has any submitted applications (cannot edit)
+  const hasSubmittedNonEditableApp = submittedAcademicApps.some(
+    (app) => !canEditApplication(app)
+  );
 
   if (!initialLoadComplete) {
     return (
@@ -479,13 +659,38 @@ export default function StudentDashboard({
         {hasAnyApplications ? (
           <>
             <h3>{totalApplications} Application(s) Found</h3>
-            <p>You have submitted these applications. Continue to edit.</p>
-            <button
-              className="btn btn-success"
-              onClick={() => setCurrentStep("personal-info")}
-            >
-              Continue
-            </button>
+            {applicationStatus && (
+              <div
+                className={`application-status ${getStatusText(
+                  applicationStatus
+                )
+                  .toLowerCase()
+                  .replace(" ", "-")}`}
+              >
+                <p>
+                  Current Application Status:{" "}
+                  <strong>{getStatusText(applicationStatus)}</strong>
+                </p>
+              </div>
+            )}
+            {hasSubmittedNonEditableApp ? (
+              <div className="alert alert-primary mb-2 mt-0 p-2">
+                <p>
+                  <strong>Notice:</strong> Your application cannot be edited at
+                  this time.
+                </p>
+              </div>
+            ) : (
+              <>
+                <p>You have an open application. Continue to make changes.</p>
+                <button
+                  className="btn btn-success"
+                  onClick={() => setCurrentStep("personal-info")}
+                >
+                  Continue Editing
+                </button>
+              </>
+            )}
           </>
         ) : (
           <>
@@ -505,33 +710,11 @@ export default function StudentDashboard({
                 {hasSubmittedApplications && (
                   <small className="text-muted d-block mt-1">
                     You already have an active application. Delete existing
-                    application to create a new one.
+                    application to create a new one (only if status allows).
                   </small>
                 )}
               </>
             )}
-
-            <>
-              <p className="mt-4 mb-0">
-                Can't find a program of interest yet? Start your application
-                anyway:
-              </p>
-              <button
-                className="btn btn-primary"
-                onClick={() => setCurrentStep("personal-info")}
-                disabled={hasSubmittedApplications}
-              >
-                {hasSubmittedApplications
-                  ? "✅ Application Submitted"
-                  : "➕ Start Document Submission"}
-              </button>
-              {hasSubmittedApplications && (
-                <small className="text-muted d-block mt-1">
-                  You already have an active application. Delete existing
-                  application to create a new one.
-                </small>
-              )}
-            </>
           </>
         )}
       </div>
@@ -555,7 +738,7 @@ export default function StudentDashboard({
                   <th>School Name</th>
                   <th>Program</th>
                   <th>Level</th>
-                  <th>Type</th>
+                  <th>Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -571,25 +754,51 @@ export default function StudentDashboard({
                     <td data-label="Level">
                       {getProgramLevelText(app.programLevel)}
                     </td>
-                    <td data-label="Type">
-                      <span className="badge bg-success">Academic</span>
+                    <td data-label="Status">
+                      {getStatusBadge(app.applicationStatus)}
                     </td>
                     <td data-label="Action" className="actions">
-                      <button className="icon-btn" title="Contact Support">
+                      <button
+                        className="icon-btn"
+                        title="Contact Support"
+                        onClick={() => handleContactSupport(app.id, app)}
+                      >
                         <i className="fas fa-envelope"></i>
                       </button>
                       <button
-                        className="icon-btn"
-                        onClick={() => setCurrentStep("personal-info")}
-                        title="Edit Academic Application"
+                        className={`icon-btn ${
+                          !canEditApplication(app) ? "disabled" : ""
+                        }`}
+                        onClick={() => handleEdit(app)}
+                        title={
+                          canEditApplication(app)
+                            ? "Edit Academic Application"
+                            : `Cannot edit ${getStatusText(
+                                app.applicationStatus
+                              ).toLowerCase()} application - only Pending or Rejected applications can be edited`
+                        }
+                        disabled={!canEditApplication(app)}
                       >
-                        ✏️
+                        {canEditApplication(app) ? "✏️" : "🔒"}
                       </button>
                       <button
-                        className="icon-btn"
-                        onClick={() => handleDeleteAcademic(app.id)}
-                        title="Delete Academic Application"
-                        style={{ color: "#dc3545" }}
+                        className={`icon-btn ${
+                          !canEditApplication(app) ? "disabled" : ""
+                        }`}
+                        onClick={() => handleDeleteAcademic(app)}
+                        title={
+                          canEditApplication(app)
+                            ? "Delete Academic Application"
+                            : `Cannot delete ${getStatusText(
+                                app.applicationStatus
+                              ).toLowerCase()} application - only Pending or Rejected applications can be deleted`
+                        }
+                        style={{
+                          color: canEditApplication(app)
+                            ? "#dc3545"
+                            : "#6c757d",
+                        }}
+                        disabled={!canEditApplication(app)}
                       >
                         <i className="fas fa-trash-alt"></i>
                       </button>
@@ -653,7 +862,7 @@ export default function StudentDashboard({
                             isThisProgramApplied
                               ? "You have already applied for this program"
                               : isAnyOtherProgramApplied
-                              ? "You have applied for another program. Delete existing application to apply for this one."
+                              ? "You have applied for another program. Delete existing application to apply for this one (only if status allows)."
                               : "Apply for this program"
                           }
                         >
@@ -671,16 +880,6 @@ export default function StudentDashboard({
             </table>
           )}
         </div>
-
-        {/* Show message when applications are disabled */}
-        {hasSubmittedApplications && (
-          <div className="alert alert-info mt-3">
-            <i className="fas fa-info-circle me-2"></i>
-            <strong>Note:</strong> You currently have an active application. To
-            apply for a different program, you must first delete your existing
-            application.
-          </div>
-        )}
       </div>
     </div>
   );

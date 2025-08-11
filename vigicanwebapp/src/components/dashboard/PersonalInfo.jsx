@@ -4,6 +4,9 @@ import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import Swal from "sweetalert2";
 
+// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 17:13:28
+// Current User's Login: NeduStack
+
 // SweetAlert Toast
 const Toast = Swal.mixin({
   toast: true,
@@ -50,16 +53,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
     "Prefer not to say",
     "Other",
   ];
-
-  // Updated current date and time as specified
-  const getCurrentDateTime = () => {
-    return "2025-08-06 09:32:18";
-  };
-
-  // Updated current user as specified
-  const getCurrentUser = () => {
-    return "NeduStack";
-  };
 
   const getMappedValue = (label, options) => {
     const index = options.indexOf(label);
@@ -112,10 +105,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
         }));
 
         try {
-          console.log(
-            `Fetching personal info at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
           const response = await apiInstance.get(
             `StudentPersonalInfo/user/${userId}`
           );
@@ -126,11 +115,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
             // Store the personal info ID in localStorage for access by other components
             localStorage.setItem("studentPersonalInfoId", savedData.id || "");
-            console.log(
-              `Stored personal info ID in localStorage: ${
-                savedData.id
-              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
 
             setFormData({
               FirstName: savedData.firstName || "",
@@ -158,10 +142,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
             // Now fetch application status
             if (savedData.id) {
               try {
-                console.log(
-                  `Fetching application status at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                );
-
                 const appResponse = await apiInstance.get(
                   `StudentApplication/application?StudentPersonalInformationId=${savedData.id}`
                 );
@@ -172,25 +152,15 @@ export default function PersonalInfo({ onContinue, onBack }) {
                   setApplicationStatus(status);
                 }
               } catch (err) {
-                console.log(
-                  `No application found or error: ${
-                    err.message
-                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                );
+                console.log(`No application found or error: ${err.message}`);
                 // If no application exists yet, it's effectively pending
                 setApplicationStatus(2); // Pending
               }
             }
           }
-          console.log(
-            `Existing personal info fetched successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-          console.log("Fetched data:", response.data.result);
         } catch (error) {
           console.warn(
-            `No existing personal info found or error: ${
-              error.message
-            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+            `No existing personal info found or error: ${error.message}`
           );
         } finally {
           setLoading(false);
@@ -274,25 +244,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
     try {
       showLoadingOverlay();
-      console.log(
-        `Submitting personal info at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
-
-      // Log the payload for debugging
-      console.log("Payload data:", {
-        FirstName: formData.FirstName,
-        LastName: formData.LastName,
-        Phone: formData.Phone,
-        DOB: formData.DOB,
-        Address: formData.Address,
-        PostCode: formData.PostCode,
-        FirstLanguage: getMappedValue(formData.FirstLanguage, languageOptions),
-        PreferredPronoun: getMappedValue(
-          formData.PreferredPronoun,
-          pronounOptions
-        ),
-        Gender: getMappedValue(formData.Gender, genderOptions),
-      });
 
       const response = await apiInstance.post(
         "StudentPersonalInfo/create",
@@ -310,9 +261,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
         const newPersonalInfoId = response.data.result.id;
         setPersonalInfoId(newPersonalInfoId);
         localStorage.setItem("studentPersonalInfoId", newPersonalInfoId);
-        console.log(
-          `New personal info ID stored in localStorage: ${newPersonalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
       }
 
       Toast.fire({ icon: "success", title: "Submitted successfully" });
@@ -323,11 +271,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
       }, 500);
     } catch (error) {
       Swal.close();
-      console.error(
-        `Submission failed: ${
-          error.message
-        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
+      console.error(`Submission failed: ${error.message}`);
       Toast.fire({ icon: "error", title: "Submission failed" });
     }
   };
@@ -357,17 +301,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
     try {
       showLoadingOverlay();
-      console.log(
-        `Updating personal info at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
-
-      // Log the payload for debugging
-      console.log("Update payload data:", {
-        Id: formData.Id,
-        FirstName: formData.FirstName,
-        LastName: formData.LastName,
-        Gender: getMappedValue(formData.Gender, genderOptions),
-      });
 
       await apiInstance.put("StudentPersonalInfo/update", payload, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -380,19 +313,10 @@ export default function PersonalInfo({ onContinue, onBack }) {
       // Make sure localStorage has the latest ID
       if (formData.Id) {
         localStorage.setItem("studentPersonalInfoId", formData.Id);
-        console.log(
-          `Updated personal info ID in localStorage: ${
-            formData.Id
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
       }
     } catch (error) {
       Swal.close();
-      console.error(
-        `Update failed: ${
-          error.message
-        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
+      console.error(`Update failed: ${error.message}`);
       Toast.fire({ icon: "error", title: "Update failed" });
     }
   };
@@ -402,9 +326,6 @@ export default function PersonalInfo({ onContinue, onBack }) {
     // Make sure the ID is stored in localStorage before continuing
     if (personalInfoId) {
       localStorage.setItem("studentPersonalInfoId", personalInfoId);
-      console.log(
-        `Ensured personal info ID is in localStorage before continuing: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
     }
 
     // Use setTimeout to ensure the localStorage is updated before continuing
@@ -427,6 +348,21 @@ export default function PersonalInfo({ onContinue, onBack }) {
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Personal Information</h2>
+
+      {/* Application Status Display */}
+      {applicationStatus && (
+        <div
+          className={`application-status ${getStatusText(applicationStatus)
+            .toLowerCase()
+            .replace(" ", "-")}`}
+        >
+          <p>
+            Current Application Status:{" "}
+            <strong>{getStatusText(applicationStatus)}</strong>
+          </p>
+        </div>
+      )}
+
       {/* Only show "already submitted" message if editing is allowed */}
       {isFormSubmitted && !isEditing && canEdit && (
         <div className="alert alert-info mt-3">
@@ -444,13 +380,11 @@ export default function PersonalInfo({ onContinue, onBack }) {
       {applicationStatus &&
         applicationStatus !== 2 &&
         applicationStatus !== 4 && (
-          <div className="alert alert-primary mt-3">
-            <strong>Notice: Your application cannot be edited.</strong>
-            <br />
-            Current status: <strong>{getStatusText(applicationStatus)}</strong>.
-            <br />
-            This information cannot be modified at this time, but you can
-            proceed to the next step.
+          <div className="alert alert-primary mb-2 mt-0 p-2">
+            <p>
+              <strong>Notice:</strong> Your application cannot be edited at this
+              time.
+            </p>
           </div>
         )}
 
