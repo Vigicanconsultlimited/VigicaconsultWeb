@@ -1,73 +1,8 @@
-/* Container spacing */
-.container {
-  padding-top: 1rem;
-  padding-bottom: 2rem;
-}
-
-/* Card style - compact, colorful borders */
-.doc-card-hover {
-  transition: box-shadow 0.25s ease, transform 0.2s ease;
-  border-left: 5px solid #0d6efd; /* default border color */
-  border-radius: 0.8rem;
-  padding: 1rem 1rem 0.85rem 1rem;
-  background-color: #f9faff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.doc-card-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 64, 255, 0.12);
-  z-index: 1;
-}
-
-/* Title */
-.doc-card-hover .doc-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #0d6efd;
-  margin-bottom: 0.35rem;
-}
-
-/* Link */
-.doc-card-hover .doc-link {
-  font-size: 0.92rem;
-  font-weight: 500;
-  color: #0a58ca;
-  word-break: break-word;
-  text-decoration: underline;
-}
-
-.doc-card-hover .doc-link:hover {
-  color: #06357a;
-  text-decoration: none;
-}
-
-/* Status Badge */
-.doc-card-hover .doc-status {
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  width: fit-content;
-  text-transform: capitalize;
-}
-
-.doc-status.uploaded {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
-
-.doc-status.pending {
-  background-color: #fff3cd;
-  color: #664d03;
-}
-
-/* Loading Spinner */
 .loading-overlay {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 70vh;
+  min-height: 300px;
 }
 
 .spinner-container {
@@ -75,13 +10,13 @@
 }
 
 .loading-spinner {
+  width: 40px;
+  height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #0d6efd;
+  border-top: 4px solid #007bff;
   border-radius: 50%;
-  width: 45px;
-  height: 45px;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 1rem;
 }
 
 @keyframes spin {
@@ -93,21 +28,143 @@
   }
 }
 
-/* Mobile */
-@media (max-width: 767.98px) {
-  .doc-card-hover {
-    padding: 0.9rem 1rem !important;
+.doc-card-hover {
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  border-radius: 8px !important;
+}
+
+.doc-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.doc-title {
+  color: #495057;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.doc-link {
+  color: #0d6efd !important;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.doc-link:hover {
+  color: #0b5ed7 !important;
+  text-decoration: underline;
+}
+
+/* Status Badge Styles */
+.doc-status {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.doc-status.uploaded {
+  background-color: #198754 !important;
+  color: white !important;
+}
+
+.doc-status.under-review {
+  background-color: #0d6efd !important;
+  color: white !important;
+}
+
+.doc-status.rejected {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.doc-status.approved {
+  background-color: #20c997 !important;
+  color: white !important;
+}
+
+.doc-status.pending {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+/* Card Border Colors */
+.doc-card-hover[style*="borderLeftColor: #198754"] {
+  border-left: 4px solid #198754 !important;
+}
+
+.doc-card-hover[style*="borderLeftColor: #0d6efd"] {
+  border-left: 4px solid #0d6efd !important;
+}
+
+.doc-card-hover[style*="borderLeftColor: #dc3545"] {
+  border-left: 4px solid #dc3545 !important;
+}
+
+.doc-card-hover[style*="borderLeftColor: #20c997"] {
+  border-left: 4px solid #20c997 !important;
+}
+
+.doc-card-hover[style*="borderLeftColor: #ffc107"] {
+  border-left: 4px solid #ffc107 !important;
+}
+
+/* Status Icons */
+.doc-status.uploaded::before {
+  content: "✅ ";
+}
+
+.doc-status.under-review::before {
+  content: "🔍 ";
+}
+
+.doc-status.rejected::before {
+  content: "❌ ";
+}
+
+.doc-status.approved::before {
+  content: "✅ ";
+}
+
+.doc-status.pending::before {
+  content: "⏳ ";
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .doc-title {
+    font-size: 0.9rem;
   }
 
-  .doc-card-hover .doc-title {
-    font-size: 1rem !important;
+  .doc-status {
+    font-size: 0.7rem !important;
+    padding: 3px 6px !important;
   }
+}
 
-  .doc-card-hover .doc-link {
-    font-size: 0.9rem !important;
-  }
+/* Container spacing */
+.container {
+  padding: 1rem;
+}
 
-  .doc-card-hover .doc-status {
-    font-size: 0.82rem !important;
-  }
+/* Card grid improvements */
+.row.g-3 {
+  margin: 0;
+}
+
+.col-12.col-sm-6.col-lg-4 {
+  margin-bottom: 1rem;
+}
+
+/* Loading state */
+.loading-overlay {
+  min-height: 400px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.spinner-container p {
+  color: #6c757d;
+  font-weight: 500;
+  margin-top: 1rem;
 }
