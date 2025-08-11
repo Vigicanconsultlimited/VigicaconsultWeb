@@ -32,9 +32,9 @@ function Dashboard() {
         try {
           const res = await apiInstance.get("/Auth/user");
           setUser(res.data);
-          console.log("User data fetched after login:", res.data);
+          //console.log("User data fetched after login:", res.data);
         } catch (err) {
-          console.error("Failed to fetch user data after login:", err);
+          //console.error("Failed to fetch user data after login:", err);
         }
       }
     };
@@ -46,9 +46,9 @@ function Dashboard() {
   }, []);
 
   const handleStartApplication = (school, program) => {
-    console.log(
-      `Application started at 2025-08-05 14:09:14 by NeduStack for ${school} - ${program}`
-    );
+    //console.log(
+    //  `Application started at 2025-08-05 14:09:14 by NeduStack for ${school} - ${program}`
+    //);
     setSelectedSchool(school);
     setSelectedProgram(program);
     setCurrentStep("academic-info");
