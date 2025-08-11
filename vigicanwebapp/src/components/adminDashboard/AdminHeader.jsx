@@ -50,7 +50,7 @@ export default function AdminHeader({ toggleSidebar }) {
         setAdminRole("");
         setAdminEmail("");
         setAdminName("Admin");
-        console.warn("Failed to fetch admin info:", error);
+        //console.warn("Failed to fetch admin info:", error);
       }
     };
 

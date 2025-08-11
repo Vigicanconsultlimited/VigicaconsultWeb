@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import profile from "../../../assets/images/default-profile.jpg";
 import {
   Eye,
@@ -8,6 +8,22 @@ import {
   MessageSquare,
   RefreshCw,
   Clock,
+  ChevronDown,
+  Settings,
+  GraduationCap,
+  BookOpen,
+  Building,
+  MapPin,
+  ChevronUp,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  Globe,
+  MapPin as LocationIcon,
+  CreditCard,
+  UserCheck as StatusIcon,
+  Download,
 } from "lucide-react";
 import apiInstance from "../../../utils/axios";
 import "../styles/DocumentReview.css";
@@ -111,6 +127,15 @@ const docFields = [
 ];
 
 export default function DocumentReview() {
+  // Current date/time and user as specified
+  const getCurrentDateTime = () => {
+    return "2025-08-10 23:33:36";
+  };
+
+  const getCurrentUser = () => {
+    return "NeduStack";
+  };
+
   // Get JWT token from cookies with debugging
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
@@ -124,8 +149,9 @@ export default function DocumentReview() {
       getCookie("token") || getCookie("authToken") || getCookie("access_token");
 
     if (token) {
+      //console.log("Auth token found for DocumentReview");
     } else {
-      //console.error("No authentication token found in cookies");
+      //console.warn("No auth token found in DocumentReview");
       Toast.fire({
         icon: "error",
         title: "Authentication Invalid. Please login again.",
@@ -138,6 +164,11 @@ export default function DocumentReview() {
   const [studentList, setStudentList] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [academicInfo, setAcademicInfo] = useState(null);
+  const [loadingAcademicInfo, setLoadingAcademicInfo] = useState(false);
+  const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
+  const [personalDropdownOpen, setPersonalDropdownOpen] = useState(true);
+  const [applicationDropdownOpen, setApplicationDropdownOpen] = useState(true);
   const [toggleStates, setToggleStates] = useState({
     approve: false,
     reject: false,
@@ -162,16 +193,83 @@ export default function DocumentReview() {
   const [updatingApplication, setUpdatingApplication] = useState(false);
   const [refreshingStatuses, setRefreshingStatuses] = useState(false);
   const [deletingDocument, setDeletingDocument] = useState(null);
+  const [bulkActionsOpen, setBulkActionsOpen] = useState(false);
+
+  // Ref for dropdown to handle outside clicks
+  const dropdownRef = useRef(null);
 
   // Check token on component mount
   useEffect(() => {
     const token = getAuthToken();
     if (!token) {
-      console.error(
-        "DocumentReview component loaded without valid authentication token"
-      );
+      //console.error(
+      //  "DocumentReview component loaded without valid authentication token"
+      //);
     }
   }, []);
+
+  // Handle click outside dropdown to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setBulkActionsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Fetch academic information for a student
+  const fetchAcademicInfo = async (personalInformationId) => {
+    setLoadingAcademicInfo(true);
+    try {
+      const res = await apiInstance.get(
+        `Academic/StudentInformationId?PersonalInformationId=${personalInformationId}`
+      );
+
+      if (res?.data?.statusCode === 201 && res.data.result) {
+        const result = res.data.result;
+        setAcademicInfo({
+          programDescription:
+            result.program?.description || "No program information",
+          courseOfInterest: result.courseOfInterest?.name || "Not specified",
+          schoolName: result.schoolResponse?.name || "Not specified",
+          programLevel: result.program?.programLevel || 0,
+          duration: result.program?.durationInYears || 0,
+          faculty: result.program?.faculty || "Not specified",
+          schoolAddress: result.schoolResponse?.addresss || "",
+          schoolTown: result.schoolResponse?.town || "",
+          schoolCounty: result.schoolResponse?.county || "",
+          schoolPostCode: result.schoolResponse?.postCode || "",
+        });
+      } else {
+        setAcademicInfo(null);
+      }
+    } catch (error) {
+      setAcademicInfo(null);
+    } finally {
+      setLoadingAcademicInfo(false);
+    }
+  };
+
+  // Utility function to get program level text
+  const getProgramLevelText = (level) => {
+    switch (level) {
+      case 1:
+        return "Master's";
+      case 2:
+        return "Bachelor's";
+      case 3:
+        return "PhD";
+      case 4:
+        return "Certificate";
+      default:
+        return "Unknown";
+    }
+  };
 
   // Fetch all students function
   const fetchStudents = async (isRefresh = false) => {
@@ -179,9 +277,7 @@ export default function DocumentReview() {
     loadingState(true);
 
     try {
-      //console.log("Fetching students...");
       const res = await apiInstance.get("StudentPersonalInfo");
-      //console.log("Students API response:", res?.data);
 
       if (res?.data?.statusCode === 200 && Array.isArray(res.data.result)) {
         const students = res.data.result.map((student) => ({
@@ -224,9 +320,9 @@ export default function DocumentReview() {
                 };
               }
             } catch (error) {
-              console.error(
-                `Error fetching application status for student ${student.id}: ${error.message}`
-              );
+              //console.error(
+              //  `Error fetching application status for student ${student.id}: ${error.message}`
+              //);
             }
             return student;
           })
@@ -254,12 +350,12 @@ export default function DocumentReview() {
           });
         }
       } else {
-        console.error("Invalid students API response:", res?.data);
+        //console.error("Invalid students API response:", res?.data);
         throw new Error("Invalid response from students API");
       }
     } catch (error) {
-      console.error(`Error fetching students: ${error.message}`);
-      console.error("Full error:", error);
+      //console.error(`Error fetching students: ${error.message}`);
+      //console.error("Full error:", error);
 
       if (!isRefresh) {
         setStudentList([]);
@@ -281,11 +377,94 @@ export default function DocumentReview() {
     fetchStudents(true);
   };
 
-  // Fetch selected student's application & docs
+  // Toggle dropdown functions
+  const toggleAcademicDropdown = () => {
+    setAcademicDropdownOpen(!academicDropdownOpen);
+  };
+
+  const togglePersonalDropdown = () => {
+    setPersonalDropdownOpen(!personalDropdownOpen);
+  };
+
+  const toggleApplicationDropdown = () => {
+    setApplicationDropdownOpen(!applicationDropdownOpen);
+  };
+
+  // Format date function
+  const formatDate = (dateString) => {
+    if (!dateString) return "Not provided";
+    try {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  // FIXED: Document View Handler
+  const handleViewDocument = (document, event) => {
+    //console.log("View document clicked:", document);
+
+    // Prevent event bubbling
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    // Validate document object
+    if (!document) {
+      //console.error("No document provided to view");
+      Toast.fire({
+        icon: "error",
+        title: "No document selected",
+      });
+      return;
+    }
+
+    // Validate document URL
+    if (!document.url) {
+      //console.error("Document has no URL:", document);
+      Toast.fire({
+        icon: "error",
+        title: "Document URL not available",
+      });
+      return;
+    }
+
+    // Set the selected document for preview
+    setSelectedDocument(document);
+
+    //console.log("Document set for preview:", document.name);
+
+    Toast.fire({
+      icon: "success",
+      title: `Viewing ${document.name}`,
+    });
+  };
+
+  // FIXED: Legacy View Handler for backward compatibility
+  const handleViewUser = (user) => {
+    setSelectedStudent(user);
+    setIsViewModalOpen && setIsViewModalOpen(true);
+  };
+
+  // Fetch selected student's application & docs and academic info
   useEffect(() => {
     async function fetchStudentApplication() {
       if (!selectedStudent) return;
       setLoadingDetails(true);
+
+      // Reset dropdowns when switching students
+      setAcademicDropdownOpen(false);
+      setPersonalDropdownOpen(true);
+      setApplicationDropdownOpen(true);
+
+      // Fetch academic information
+      await fetchAcademicInfo(selectedStudent.id);
+
       try {
         const res = await apiInstance.get(
           `StudentApplication/application?StudentPersonalInformationId=${selectedStudent.id}`
@@ -315,9 +494,9 @@ export default function DocumentReview() {
                         item.studentPersonalInformationId === selectedStudent.id
                     );
                     if (!docData) {
-                      console.warn(
-                        `No matching document found for ${doc.label} and student ${selectedStudent.id}`
-                      );
+                      //console.warn(
+                      //  `No matching document found for ${doc.label} and student ${selectedStudent.id}`
+                      //);
                       return null;
                     }
                   } else {
@@ -342,15 +521,19 @@ export default function DocumentReview() {
                 }
                 return null;
               } catch (error) {
-                console.error(
-                  `Failed to fetch document ID for ${doc.label}: ${error.message}`
-                );
+                //console.error(
+                //  `Failed to fetch document ID for ${doc.label}: ${error.message}`
+                //);
                 return null;
               }
             });
 
           const documentsResults = await Promise.all(documentsPromises);
           const documents = documentsResults.filter((doc) => doc !== null);
+
+          //console.log(
+          //  `Loaded ${documents.length} documents for student ${selectedStudent.name}`
+          //);
 
           const p = result.personalInformation || selectedStudent;
           setSelectedStudent((prev) =>
@@ -388,7 +571,7 @@ export default function DocumentReview() {
             )
           );
         } else {
-          console.warn("No application data found for student");
+          //console.warn("No application data found for student");
           setSelectedStudent((prev) =>
             prev
               ? { ...prev, documents: [], applicationStatus: "pending" }
@@ -396,8 +579,8 @@ export default function DocumentReview() {
           );
         }
       } catch (error) {
-        console.error(`Error fetching application details: ${error.message}`);
-        console.error("Full error:", error);
+        //console.error(`Error fetching application details: ${error.message}`);
+        //console.error("Full error:", error);
         setSelectedStudent((prev) =>
           prev ? { ...prev, documents: [], applicationStatus: "pending" } : prev
         );
@@ -437,7 +620,6 @@ export default function DocumentReview() {
 
       if (response?.data?.statusCode === 200) {
         const newStatus = statusMap[status] || "pending";
-        //console.log(`Application status updated successfully to: ${newStatus}`);
 
         setSelectedStudent((prev) => ({
           ...prev,
@@ -465,13 +647,13 @@ export default function DocumentReview() {
         throw new Error("Failed to update application status");
       }
     } catch (error) {
-      console.error(`Error updating application status: ${error.message}`);
-      console.error("Full error:", error);
+      //console.error(`Error updating application status: ${error.message}`);
+      //console.error("Full error:", error);
 
       if (error.response?.status === 401) {
-        console.error(
-          "Authentication failed - token may be expired or invalid"
-        );
+        //console.error(
+        //  "Authentication failed - token may be expired or invalid"
+        //);
         Toast.fire({
           icon: "error",
           title: "Authentication failed. Please login again.",
@@ -489,7 +671,7 @@ export default function DocumentReview() {
   // Update document status
   const updateDocumentStatus = async (document, status) => {
     if (!document || !document.apiEndpoint || !document.documentId) {
-      console.error("Invalid document information:", document);
+      //console.error("Invalid document information:", document);
       Toast.fire({
         icon: "error",
         title: "Invalid document information",
@@ -573,15 +755,15 @@ export default function DocumentReview() {
         );
       }
     } catch (error) {
-      console.error(
-        `Failed to update document status for ${document.name}: ${error.message}`
-      );
-      console.error("Full error:", error);
+      //console.error(
+      //  `Failed to update document status for ${document.name}: ${error.message}`
+      //);
+      //console.error("Full error:", error);
 
       if (error.response?.status === 401) {
-        console.error(
-          "Authentication failed - token may be expired or invalid"
-        );
+        //console.error(
+        //  "Authentication failed - token may be expired or invalid"
+        //);
         Toast.fire({
           icon: "error",
           title: "Authentication failed. Please login again.",
@@ -599,7 +781,7 @@ export default function DocumentReview() {
   // Delete document function
   const deleteDocument = async (document) => {
     if (!document || !document.apiEndpoint || !document.documentId) {
-      console.error("Invalid document information for deletion:", document);
+      //console.error("Invalid document information for deletion:", document);
       Toast.fire({
         icon: "error",
         title: "Invalid document information",
@@ -676,15 +858,15 @@ export default function DocumentReview() {
         }
       }
     } catch (error) {
-      console.error(
-        `Failed to delete document ${document.name}: ${error.message}`
-      );
-      console.error("Full error:", error);
+      //console.error(
+      //  `Failed to delete document ${document.name}: ${error.message}`
+      //);
+      //console.error("Full error:", error);
 
       if (error.response?.status === 401) {
-        console.error(
-          "Authentication failed - token may be expired or invalid"
-        );
+        //console.error(
+        //  "Authentication failed - token may be expired or invalid"
+        //);
         Toast.fire({
           icon: "error",
           title: "Authentication failed. Please login again.",
@@ -748,6 +930,10 @@ export default function DocumentReview() {
         if (selectedStudent && selectedStudent.id === id) {
           setSelectedStudent(filtered[0] || null);
           setSelectedDocument(null);
+          setAcademicInfo(null);
+          setAcademicDropdownOpen(false);
+          setPersonalDropdownOpen(true);
+          setApplicationDropdownOpen(true);
         }
 
         Toast.fire({
@@ -756,8 +942,8 @@ export default function DocumentReview() {
         });
       }
     } catch (error) {
-      console.error(`Error deleting student: ${error.message}`);
-      console.error("Full error:", error);
+      //console.error(`Error deleting student: ${error.message}`);
+      //console.error("Full error:", error);
       Toast.fire({
         icon: "error",
         title: "Failed to delete student",
@@ -836,6 +1022,9 @@ export default function DocumentReview() {
         });
       }
     }
+
+    // Close dropdown after action
+    setBulkActionsOpen(false);
   };
 
   const handleDocToggle = (type) => {
@@ -858,8 +1047,19 @@ export default function DocumentReview() {
     }
   };
 
-  const handleDeleteDocument = (document) => {
+  const handleDeleteDocument = (document, event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     deleteDocument(document);
+  };
+
+  const toggleDropdown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    //console.log("Dropdown clicked, current state:", bulkActionsOpen);
+    setBulkActionsOpen(!bulkActionsOpen);
   };
 
   return (
@@ -908,6 +1108,10 @@ export default function DocumentReview() {
                       onClick={() => {
                         setSelectedStudent(student);
                         setSelectedDocument(null);
+                        setAcademicInfo(null);
+                        setAcademicDropdownOpen(false);
+                        setPersonalDropdownOpen(true);
+                        setApplicationDropdownOpen(true);
                       }}
                     >
                       <td className="student-name">
@@ -960,192 +1164,583 @@ export default function DocumentReview() {
             </div>
           ) : selectedStudent ? (
             <>
-              <img
-                src={selectedStudent.avatar}
-                className="profile-avatar-large"
-                alt={selectedStudent.name}
-              />
-              <div className="details-info">
-                <h3 className="applicant-details-name">
-                  {selectedStudent.name}
-                </h3>
-                <p>Email: {selectedStudent.email}</p>
-                <p>Phone: {selectedStudent.phone}</p>
-                <p>Address: {selectedStudent.address}</p>
-                <p>Post Code: {selectedStudent.postCode}</p>
-                <p>Preferred Language: {selectedStudent.language}</p>
-                <p>Date of Birth: {selectedStudent.dateOfBirth}</p>
-                <p>Joined: {selectedStudent.joined}</p>
-                <p>
-                  Application Status:{" "}
-                  <span
-                    className={getStatusClass(deriveStatus(selectedStudent))}
-                  >
-                    {selectedStudent.applicationStatus
-                      ? selectedStudent.applicationStatus
-                          .charAt(0)
-                          .toUpperCase() +
-                        selectedStudent.applicationStatus.slice(1)
-                      : deriveStatus(selectedStudent).charAt(0).toUpperCase() +
-                        deriveStatus(selectedStudent).slice(1)}
-                  </span>
-                </p>
-
-                {/* Application-level approve/reject/under review/comment buttons */}
-                <div className="action-buttons-container">
-                  <button
-                    className={`action-button approve-button ${
-                      appToggleStates.approve ? "active" : ""
-                    }`}
-                    onClick={() => handleAppToggle("approve")}
-                    disabled={updatingApplication}
-                  >
-                    <CheckCircle size={12} />
-                    {updatingApplication ? "Approving..." : "Approve"}
-                  </button>
-                  <button
-                    className={`action-button reject-button ${
-                      appToggleStates.reject ? "active" : ""
-                    }`}
-                    onClick={() => handleAppToggle("reject")}
-                    disabled={updatingApplication}
-                  >
-                    <XCircle size={12} />
-                    {updatingApplication ? "Rejecting..." : "Reject"}
-                  </button>
-                  <button
-                    className={`action-button under-review-button ${
-                      appToggleStates.underReview ? "active" : ""
-                    }`}
-                    onClick={() => handleAppToggle("underReview")}
-                    disabled={updatingApplication}
-                  >
-                    <Clock size={12} />
-                    {updatingApplication ? "Updating..." : "Under Review"}
-                  </button>
-                  <button
-                    className={`action-button comment-button ${
-                      appToggleStates.comment ? "active" : ""
-                    }`}
-                    onClick={() => handleAppToggle("comment")}
-                  >
-                    <MessageSquare size={12} />
-                    Comment
-                  </button>
+              {/* Enhanced Profile Header */}
+              <div className="enhanced-profile-header">
+                <div className="profile-avatar-section">
+                  <img
+                    src={selectedStudent.avatar}
+                    className="enhanced-profile-avatar"
+                    alt={selectedStudent.name}
+                  />
+                  <div className="profile-status-indicator">
+                    <div
+                      className={`status-dot ${deriveStatus(selectedStudent)}`}
+                    ></div>
+                  </div>
+                </div>
+                <div className="profile-title-section">
+                  <h2 className="profile-name">{selectedStudent.name}</h2>
+                  <p className="profile-subtitle">Student Application Review</p>
+                  <div className="profile-status">
+                    <span
+                      className={`enhanced-status-badge ${getStatusClass(
+                        deriveStatus(selectedStudent)
+                      )}`}
+                    >
+                      <StatusIcon size={12} />
+                      {selectedStudent.applicationStatus
+                        ? selectedStudent.applicationStatus
+                            .charAt(0)
+                            .toUpperCase() +
+                          selectedStudent.applicationStatus.slice(1)
+                        : deriveStatus(selectedStudent)
+                            .charAt(0)
+                            .toUpperCase() +
+                          deriveStatus(selectedStudent).slice(1)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="action-buttons-container bulk-actions">
-                <button
-                  className={`action-button approve-button ${
-                    toggleStates.approve ? "active" : ""
-                  }`}
-                  onClick={() => handleToggle("approve")}
-                  disabled={updatingDocument || updatingApplication}
-                >
-                  <CheckCircle size={14} />
-                  {updatingApplication ? "Approving..." : "Approve All"}
-                </button>
-                <button
-                  className={`action-button reject-button ${
-                    toggleStates.reject ? "active" : ""
-                  }`}
-                  onClick={() => handleToggle("reject")}
-                  disabled={updatingDocument || updatingApplication}
-                >
-                  <XCircle size={14} />
-                  {updatingApplication ? "Rejecting..." : "Reject All"}
-                </button>
-                <button
-                  className={`action-button under-review-button ${
-                    toggleStates.underReview ? "active" : ""
-                  }`}
-                  onClick={() => handleToggle("underReview")}
-                  disabled={updatingDocument || updatingApplication}
-                >
-                  <Clock size={14} />
-                  {updatingApplication ? "Updating..." : "Review All"}
-                </button>
-                <button
-                  className={`action-button comment-button ${
-                    toggleStates.comment ? "active" : ""
-                  }`}
-                  onClick={() => handleToggle("comment")}
-                >
-                  <MessageSquare size={14} />
-                  Comment
-                </button>
-              </div>
-              <div className="uploaded-documents-card">
-                <div className="uploaded-documents-header">
-                  <span>Uploaded Documents</span>
-                  <span className="document-count">
-                    {selectedStudent.documents
-                      ? selectedStudent.documents.length
-                      : 0}
-                  </span>
+              <div className="enhanced-details-container">
+                {/* Personal Information Dropdown Section */}
+                <div className="enhanced-info-section personal-section">
+                  <div
+                    className="enhanced-dropdown-header"
+                    onClick={togglePersonalDropdown}
+                  >
+                    <h4 className="enhanced-section-header clickable">
+                      <User size={16} />
+                      Personal Information
+                      {personalDropdownOpen ? (
+                        <ChevronUp size={16} className="dropdown-chevron" />
+                      ) : (
+                        <ChevronDown size={16} className="dropdown-chevron" />
+                      )}
+                    </h4>
+                  </div>
+
+                  <div
+                    className={`enhanced-dropdown-content ${
+                      personalDropdownOpen ? "open" : "closed"
+                    }`}
+                  >
+                    <div className="enhanced-details-grid">
+                      <div className="detail-item">
+                        <div className="detail-icon">
+                          <Mail size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">Email Address</span>
+                          <span className="detail-value">
+                            {selectedStudent.email || "Not provided"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <div className="detail-icon">
+                          <Phone size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">Phone Number</span>
+                          <span className="detail-value">
+                            {selectedStudent.phone || "Not provided"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <div className="detail-icon">
+                          <LocationIcon size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">Address</span>
+                          <span className="detail-value">
+                            {selectedStudent.address || "Not provided"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <div className="detail-icon">
+                          <CreditCard size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">Post Code</span>
+                          <span className="detail-value">
+                            {selectedStudent.postCode || "Not provided"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <div className="detail-icon">
+                          <Globe size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">
+                            Preferred Language
+                          </span>
+                          <span className="detail-value">
+                            {selectedStudent.language || "Not specified"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <div className="detail-icon">
+                          <Calendar size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">Date of Birth</span>
+                          <span className="detail-value">
+                            {formatDate(selectedStudent.dateOfBirth)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <div className="detail-icon">
+                          <Calendar size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">Date Joined</span>
+                          <span className="detail-value">
+                            {formatDate(selectedStudent.joined)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <table className="uploaded-documents-table">
-                  <thead>
-                    <tr>
-                      <th>Document</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedStudent.documents &&
-                    selectedStudent.documents.length > 0 ? (
-                      selectedStudent.documents.map((doc, idx) => (
-                        <tr key={idx}>
-                          <td>{doc.name}</td>
-                          <td>
-                            <span className={getStatusClass(doc.status)}>
-                              {doc.status.charAt(0).toUpperCase() +
-                                doc.status.slice(1)}
+
+                {/* Academic Information Dropdown Section */}
+                <div className="enhanced-info-section academic-section">
+                  <div
+                    className="enhanced-dropdown-header"
+                    onClick={toggleAcademicDropdown}
+                  >
+                    <h4 className="enhanced-section-header clickable">
+                      <GraduationCap size={16} />
+                      Academic Information
+                      {academicDropdownOpen ? (
+                        <ChevronUp size={16} className="dropdown-chevron" />
+                      ) : (
+                        <ChevronDown size={16} className="dropdown-chevron" />
+                      )}
+                    </h4>
+                  </div>
+
+                  <div
+                    className={`enhanced-dropdown-content ${
+                      academicDropdownOpen ? "open" : "closed"
+                    }`}
+                  >
+                    {loadingAcademicInfo ? (
+                      <div className="enhanced-loading">
+                        <div className="loading-spinner small"></div>
+                        <span>Loading academic details...</span>
+                      </div>
+                    ) : academicInfo ? (
+                      <div className="enhanced-details-grid">
+                        <div className="detail-item full-width">
+                          <div className="detail-icon">
+                            <GraduationCap size={16} />
+                          </div>
+                          <div className="detail-content">
+                            <span className="detail-label">
+                              Program Description
                             </span>
-                          </td>
-                          <td>
-                            <button
-                              className="action-btn view-btn"
-                              title="View"
-                              onClick={() => {
-                                setSelectedDocument(doc);
-                              }}
+                            <span
+                              className="detail-value"
+                              title={academicInfo.programDescription}
                             >
-                              <Eye size={14} />
-                            </button>
-                            <button
-                              className="action-btn delete-btn"
-                              title="Delete Document"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteDocument(doc);
-                              }}
-                              disabled={deletingDocument === doc.documentId}
-                            >
-                              {deletingDocument === doc.documentId ? (
-                                <div className="delete-spinner"></div>
-                              ) : (
-                                <Trash2 size={14} />
-                              )}
-                            </button>
+                              {academicInfo.programDescription}
+                            </span>
+                            {academicInfo.programLevel > 0 && (
+                              <div className="program-meta-enhanced">
+                                <span className="program-level-badge">
+                                  {getProgramLevelText(
+                                    academicInfo.programLevel
+                                  )}
+                                </span>
+                                {academicInfo.duration > 0 && (
+                                  <span className="program-duration-badge">
+                                    {academicInfo.duration} year
+                                    {academicInfo.duration > 1 ? "s" : ""}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <BookOpen size={16} />
+                          </div>
+                          <div className="detail-content">
+                            <span className="detail-label">
+                              Course of Interest
+                            </span>
+                            <span className="detail-value">
+                              {academicInfo.courseOfInterest}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <Building size={16} />
+                          </div>
+                          <div className="detail-content">
+                            <span className="detail-label">
+                              School/University
+                            </span>
+                            <span className="detail-value">
+                              {academicInfo.schoolName}
+                            </span>
+                          </div>
+                        </div>
+
+                        {academicInfo.faculty !== "Not specified" && (
+                          <div className="detail-item">
+                            <div className="detail-icon">
+                              <Building size={16} />
+                            </div>
+                            <div className="detail-content">
+                              <span className="detail-label">Faculty</span>
+                              <span className="detail-value">
+                                {academicInfo.faculty}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {academicInfo.schoolAddress && (
+                          <div className="detail-item full-width">
+                            <div className="detail-icon">
+                              <MapPin size={16} />
+                            </div>
+                            <div className="detail-content">
+                              <span className="detail-label">
+                                School Address
+                              </span>
+                              <div className="address-value">
+                                <div>{academicInfo.schoolAddress}</div>
+                                {academicInfo.schoolTown && (
+                                  <div>
+                                    {academicInfo.schoolTown}
+                                    {academicInfo.schoolCounty &&
+                                      `, ${academicInfo.schoolCounty}`}
+                                  </div>
+                                )}
+                                {academicInfo.schoolPostCode && (
+                                  <div>{academicInfo.schoolPostCode}</div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="no-academic-info-enhanced">
+                        <div className="no-info-icon">
+                          <GraduationCap size={24} />
+                        </div>
+                        <p>No academic information available</p>
+                        <span>
+                          Academic details will appear here once submitted
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Application Status Section */}
+                <div className="enhanced-info-section application-section">
+                  <div
+                    className="enhanced-dropdown-header"
+                    onClick={toggleApplicationDropdown}
+                  >
+                    <h4 className="enhanced-section-header clickable">
+                      <StatusIcon size={16} />
+                      Application Status & Actions
+                      {applicationDropdownOpen ? (
+                        <ChevronUp size={16} className="dropdown-chevron" />
+                      ) : (
+                        <ChevronDown size={16} className="dropdown-chevron" />
+                      )}
+                    </h4>
+                  </div>
+
+                  <div
+                    className={`enhanced-dropdown-content ${
+                      applicationDropdownOpen ? "open" : "closed"
+                    }`}
+                  >
+                    <div className="application-status-display">
+                      <div className="current-status">
+                        <span className="status-label">Current Status:</span>
+                        <span
+                          className={`enhanced-status-badge large ${getStatusClass(
+                            deriveStatus(selectedStudent)
+                          )}`}
+                        >
+                          <StatusIcon size={14} />
+                          {selectedStudent.applicationStatus
+                            ? selectedStudent.applicationStatus
+                                .charAt(0)
+                                .toUpperCase() +
+                              selectedStudent.applicationStatus.slice(1)
+                            : deriveStatus(selectedStudent)
+                                .charAt(0)
+                                .toUpperCase() +
+                              deriveStatus(selectedStudent).slice(1)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Enhanced Action Buttons */}
+                    <div className="enhanced-action-buttons">
+                      <button
+                        className={`enhanced-action-btn approve-btn ${
+                          appToggleStates.approve ? "active" : ""
+                        }`}
+                        onClick={() => handleAppToggle("approve")}
+                        disabled={updatingApplication}
+                      >
+                        <CheckCircle size={16} />
+                        <span>
+                          {updatingApplication
+                            ? "Approving..."
+                            : "Approve Application"}
+                        </span>
+                      </button>
+
+                      <button
+                        className={`enhanced-action-btn reject-btn ${
+                          appToggleStates.reject ? "active" : ""
+                        }`}
+                        onClick={() => handleAppToggle("reject")}
+                        disabled={updatingApplication}
+                      >
+                        <XCircle size={16} />
+                        <span>
+                          {updatingApplication
+                            ? "Rejecting..."
+                            : "Reject Application"}
+                        </span>
+                      </button>
+
+                      <button
+                        className={`enhanced-action-btn review-btn ${
+                          appToggleStates.underReview ? "active" : ""
+                        }`}
+                        onClick={() => handleAppToggle("underReview")}
+                        disabled={updatingApplication}
+                      >
+                        <Clock size={16} />
+                        <span>
+                          {updatingApplication
+                            ? "Updating..."
+                            : "Mark Under Review"}
+                        </span>
+                      </button>
+
+                      <button
+                        className={`enhanced-action-btn comment-btn ${
+                          appToggleStates.comment ? "active" : ""
+                        }`}
+                        onClick={() => handleAppToggle("comment")}
+                      >
+                        <MessageSquare size={16} />
+                        <span>Add Comment</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bulk Actions Dropdown*/}
+              <div className="bulk-actions-dropdown" ref={dropdownRef}>
+                <button
+                  className="dropdown-trigger enhanced"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setBulkActionsOpen(!bulkActionsOpen);
+                  }}
+                  disabled={updatingDocument || updatingApplication}
+                  type="button"
+                >
+                  <Settings size={16} />
+                  <span>Bulk Actions</span>
+                  <ChevronDown
+                    size={16}
+                    className={`chevron-icon ${
+                      bulkActionsOpen ? "rotated" : ""
+                    }`}
+                  />
+                </button>
+
+                <div
+                  className="dropdown-menu enhanced"
+                  style={{
+                    display: bulkActionsOpen ? "block" : "none",
+                    opacity: bulkActionsOpen ? 1 : 0,
+                    visibility: bulkActionsOpen ? "visible" : "hidden",
+                  }}
+                >
+                  <button
+                    className="dropdown-item approve-item"
+                    onClick={() => handleToggle("approve")}
+                    disabled={updatingDocument || updatingApplication}
+                    type="button"
+                  >
+                    <CheckCircle size={16} />
+                    <span>
+                      {updatingApplication ? "Approving..." : "Approve All"}
+                    </span>
+                  </button>
+                  <button
+                    className="dropdown-item reject-item"
+                    onClick={() => handleToggle("reject")}
+                    disabled={updatingDocument || updatingApplication}
+                    type="button"
+                  >
+                    <XCircle size={16} />
+                    <span>
+                      {updatingApplication ? "Rejecting..." : "Reject All"}
+                    </span>
+                  </button>
+                  <button
+                    className="dropdown-item under-review-item"
+                    onClick={() => handleToggle("underReview")}
+                    disabled={updatingDocument || updatingApplication}
+                    type="button"
+                  >
+                    <Clock size={16} />
+                    <span>
+                      {updatingApplication ? "Updating..." : "Review All"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="uploaded-documents-card enhanced">
+                <div className="uploaded-documents-header">
+                  <div className="documents-title">
+                    <h4>Uploaded Documents</h4>
+                    <span className="document-count">
+                      {selectedStudent.documents
+                        ? selectedStudent.documents.length
+                        : 0}{" "}
+                      documents
+                    </span>
+                  </div>
+                </div>
+                <div className="documents-table-wrapper">
+                  <table className="uploaded-documents-table enhanced">
+                    <thead>
+                      <tr>
+                        <th>Document Name</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedStudent.documents &&
+                      selectedStudent.documents.length > 0 ? (
+                        selectedStudent.documents.map((doc, idx) => (
+                          <tr key={`${doc.documentId}-${idx}`}>
+                            <td>
+                              <div className="document-name">
+                                <div className="doc-icon">
+                                  <Eye size={14} />
+                                </div>
+                                <span>{doc.name}</span>
+                              </div>
+                            </td>
+                            <td>
+                              <span
+                                className={`enhanced-status-badge small ${getStatusClass(
+                                  doc.status
+                                )}`}
+                              >
+                                {getStatusClass(doc.status).includes(
+                                  "approved"
+                                ) && <CheckCircle size={12} />}
+                                {getStatusClass(doc.status).includes(
+                                  "rejected"
+                                ) && <XCircle size={12} />}
+                                {getStatusClass(doc.status).includes(
+                                  "under-review"
+                                ) && <Clock size={12} />}
+                                {getStatusClass(doc.status).includes(
+                                  "pending"
+                                ) && <Clock size={12} />}
+                                {getStatusClass(doc.status).includes(
+                                  "uploaded"
+                                ) && <CheckCircle size={12} />}
+                                {doc.status.charAt(0).toUpperCase() +
+                                  doc.status.slice(1)}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="document-actions">
+                                <button
+                                  className="enhanced-doc-action-btn view-btn"
+                                  title="View Document"
+                                  onClick={(e) => handleViewDocument(doc, e)}
+                                  type="button"
+                                >
+                                  <Eye size={14} />
+                                </button>
+                                <button
+                                  className="enhanced-doc-action-btn delete-btn"
+                                  title="Delete Document"
+                                  onClick={(e) => handleDeleteDocument(doc, e)}
+                                  disabled={deletingDocument === doc.documentId}
+                                  type="button"
+                                >
+                                  {deletingDocument === doc.documentId ? (
+                                    <div className="delete-spinner small"></div>
+                                  ) : (
+                                    <Trash2 size={14} />
+                                  )}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={3} className="empty-state enhanced">
+                            <div className="empty-documents">
+                              <Eye size={24} />
+                              <span>No documents uploaded yet</span>
+                            </div>
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={3} className="empty-state">
-                          No documents found
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </>
           ) : (
-            <div className="empty-state">Select a student to view details</div>
+            <div className="empty-state enhanced">
+              <div className="empty-selection">
+                <User size={48} />
+                <h3>Select a Student</h3>
+                <p>
+                  Choose a student from the list to view their details and
+                  documents
+                </p>
+              </div>
+            </div>
           )}
         </div>
 
@@ -1153,8 +1748,16 @@ export default function DocumentReview() {
         <div className="document-preview-panel">
           {selectedDocument ? (
             <>
-              <div className="document-preview-header">
-                <span className="document-preview-title">Document Preview</span>
+              <div className="document-preview-header enhanced">
+                <h4 className="document-preview-title">Document Preview</h4>
+                <span
+                  className={`document-status-indicator ${getStatusClass(
+                    selectedDocument.status
+                  )}`}
+                >
+                  {selectedDocument.status.charAt(0).toUpperCase() +
+                    selectedDocument.status.slice(1)}
+                </span>
               </div>
               <div className="document-preview-content">
                 <div className="pdf-preview-image">
@@ -1164,79 +1767,103 @@ export default function DocumentReview() {
                     className="document-iframe"
                   />
                 </div>
-                <div className="document-preview-info">
-                  <div className="doc-meta">
-                    <div>
-                      <span>File name:</span> {selectedDocument.name}
+                <div className="document-preview-info enhanced">
+                  <div className="doc-meta enhanced">
+                    <div className="meta-item">
+                      <span className="meta-label">File name:</span>
+                      <span className="meta-value">
+                        {selectedDocument.name}
+                      </span>
                     </div>
-                    <div>
-                      <span>Status:</span>
-                      <span className={getStatusClass(selectedDocument.status)}>
+                    <div className="meta-item">
+                      <span className="meta-label">Status:</span>
+                      <span
+                        className={`enhanced-status-badge small ${getStatusClass(
+                          selectedDocument.status
+                        )}`}
+                      >
                         {selectedDocument.status.charAt(0).toUpperCase() +
                           selectedDocument.status.slice(1)}
                       </span>
                     </div>
-                    <div className="download-link">
+                    <div className="download-section">
                       <a
                         href={selectedDocument.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         download
+                        className="download-btn enhanced"
                       >
-                        Click to download file
+                        <Download size={16} />
+                        Download File
                       </a>
                     </div>
                   </div>
-                  {/* Document Review Actions */}
-                  <div className="action-buttons-container document-preview-buttons">
-                    <button
-                      className={`action-button approve-button ${
-                        docToggleStates.approve ? "active" : ""
-                      }`}
-                      onClick={() => handleDocToggle("approve")}
-                      disabled={updatingDocument}
-                    >
-                      <CheckCircle size={14} />
-                      {updatingDocument ? "Updating..." : "Approve"}
-                    </button>
-                    <button
-                      className={`action-button reject-button ${
-                        docToggleStates.reject ? "active" : ""
-                      }`}
-                      onClick={() => handleDocToggle("reject")}
-                      disabled={updatingDocument}
-                    >
-                      <XCircle size={14} />
-                      {updatingDocument ? "Updating..." : "Reject"}
-                    </button>
-                    <button
-                      className={`action-button under-review-button ${
-                        docToggleStates.underReview ? "active" : ""
-                      }`}
-                      onClick={() => handleDocToggle("underReview")}
-                      disabled={updatingDocument}
-                    >
-                      <Clock size={14} />
-                      {updatingDocument ? "Updating..." : "Under Review"}
-                    </button>
-                    <button
-                      className={`action-button comment-button ${
-                        docToggleStates.comment ? "active" : ""
-                      }`}
-                      onClick={() => handleDocToggle("comment")}
-                    >
-                      <MessageSquare size={14} />
-                      Comment
-                    </button>
+
+                  {/* Enhanced Document Review Actions */}
+                  <div className="enhanced-document-actions">
+                    <h5>Document Review Actions</h5>
+                    <div className="document-action-buttons">
+                      <button
+                        className={`enhanced-doc-review-btn approve-btn ${
+                          docToggleStates.approve ? "active" : ""
+                        }`}
+                        onClick={() => handleDocToggle("approve")}
+                        disabled={updatingDocument}
+                      >
+                        <CheckCircle size={16} />
+                        <span>
+                          {updatingDocument ? "Updating..." : "Approve"}
+                        </span>
+                      </button>
+
+                      <button
+                        className={`enhanced-doc-review-btn reject-btn ${
+                          docToggleStates.reject ? "active" : ""
+                        }`}
+                        onClick={() => handleDocToggle("reject")}
+                        disabled={updatingDocument}
+                      >
+                        <XCircle size={16} />
+                        <span>
+                          {updatingDocument ? "Updating..." : "Reject"}
+                        </span>
+                      </button>
+
+                      <button
+                        className={`enhanced-doc-review-btn review-btn ${
+                          docToggleStates.underReview ? "active" : ""
+                        }`}
+                        onClick={() => handleDocToggle("underReview")}
+                        disabled={updatingDocument}
+                      >
+                        <Clock size={16} />
+                        <span>
+                          {updatingDocument ? "Updating..." : "Under Review"}
+                        </span>
+                      </button>
+
+                      <button
+                        className={`enhanced-doc-review-btn comment-btn ${
+                          docToggleStates.comment ? "active" : ""
+                        }`}
+                        onClick={() => handleDocToggle("comment")}
+                      >
+                        <MessageSquare size={16} />
+                        <span>Add Comment</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </>
           ) : (
-            <div className="document-preview-header">
-              <span className="document-preview-title">
-                Select a document to preview
-              </span>
+            <div className="document-preview-header enhanced">
+              <div className="no-document-selected">
+                <Eye size={48} />
+                <h4>No Document Selected</h4>
+                <p>Select a document from the list to preview it here</p>
+              </div>
             </div>
           )}
         </div>
