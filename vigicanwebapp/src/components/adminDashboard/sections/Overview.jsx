@@ -154,9 +154,9 @@ export default function Overview() {
     async function fetchApplicationStats() {
       try {
         setLoading(true);
-        console.log(
-          `Overview: Fetching application statistics at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        //console.log(
+        //`Overview: Fetching application statistics at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        //);
 
         const response = await apiInstance.get(
           "StudentApplication/allapplications"
@@ -171,10 +171,6 @@ export default function Overview() {
             numberOfMale = 0,
             numberOfFemale = 0,
           } = response.data.result;
-
-          console.log(
-            `Overview: Retrieved stats - Total: ${totalNumOfApplications}, Approved: ${approvedApplications}, Rejected: ${rejectedApplications}, Pending: ${pendingApplications}, Male: ${numberOfMale}, Female: ${numberOfFemale} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
 
           // Calculate change percentages
           const totalChange = calculateChangePercent(
@@ -241,9 +237,6 @@ export default function Overview() {
           });
 
           setError(null);
-          console.log(
-            `Overview: Successfully updated all statistics at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
         } else {
           throw new Error("Invalid response format from API");
         }
@@ -256,9 +249,9 @@ export default function Overview() {
         setError("Failed to load application statistics");
 
         // Keep default values on error
-        console.log(
-          `Overview: Using default values due to API error at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        //console.log(
+        //  `Overview: Using default values due to API error at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        //);
       } finally {
         setLoading(false);
       }
