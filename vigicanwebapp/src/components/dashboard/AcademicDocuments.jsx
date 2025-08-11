@@ -4,6 +4,9 @@ import { useAuthStore } from "../../store/auth";
 import "./styles/AcademicDocuments.css";
 import Swal from "sweetalert2";
 
+// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 17:24:51
+// Current User's Login: NeduStack
+
 const Toast = Swal.mixin({
   toast: true,
   position: "top",
@@ -71,15 +74,6 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   const [applicationStatus, setApplicationStatus] = useState(null);
   const dropRef = useRef(null);
 
-  // Get current date/time and user
-  const getCurrentDateTime = () => {
-    return "2025-08-05 19:04:13";
-  };
-
-  const getCurrentUser = () => {
-    return "NeduStack";
-  };
-
   // Helper function to get status text
   const getStatusText = (status) => {
     const statusMap = {
@@ -102,10 +96,6 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     const fetchStudentInfo = async () => {
       if (!authData) return;
       try {
-        console.log(
-          `Fetching student info at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-
         const userId = authData["uid"];
         const res = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
         const studentId = res.data?.result?.id;
@@ -116,10 +106,6 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         // Fetch application status
         if (studentId) {
           try {
-            console.log(
-              `Fetching application status at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
-
             const appResponse = await apiInstance.get(
               `StudentApplication/application?StudentPersonalInformationId=${studentId}`
             );
@@ -128,19 +114,9 @@ export default function AcademicDocuments({ onContinue, onBack }) {
               // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
               const status = appResponse.data.result.applicationStatus;
               setApplicationStatus(status);
-
-              console.log(
-                `Application status: ${getStatusText(
-                  status
-                )} (${status}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
-              );
             }
           } catch (err) {
-            console.log(
-              `No application found or error: ${
-                err.message
-              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
+            console.log(`No application found or error: ${err.message}`);
             // If no application exists yet, it's effectively pending
             setApplicationStatus(2); // Pending
           }
@@ -172,11 +148,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
               },
             };
           } catch (err) {
-            console.warn(
-              `Error fetching document for ${type}: ${
-                err.message
-              } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
+            console.warn(`Error fetching document for ${type}: ${err.message}`);
             return null;
           }
         });
@@ -193,15 +165,8 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         });
 
         setUploadedFiles(newUploadedFiles);
-        console.log(
-          `Documents loaded at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
       } catch (err) {
-        console.error(
-          `Error fetching student data: ${
-            err.message
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        console.error(`Error fetching student data: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -232,9 +197,6 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
     try {
       setErrors((prev) => ({ ...prev, [type]: null }));
-      console.log(
-        `Uploading ${type} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
 
       const res = await apiInstance.post(uploadUrl, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -256,16 +218,10 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         },
       }));
 
-      console.log(
-        `${type} uploaded successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
       Toast.fire({ icon: "success", title: `${type} uploaded successfully` });
     } catch (err) {
       const msg = err?.response?.data?.message || "Upload failed.";
       setErrors((prev) => ({ ...prev, [type]: msg }));
-      console.error(
-        `Upload failed for ${type}: ${msg} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
       Toast.fire({ icon: "error", title: msg });
     } finally {
       setUploadProgress((prev) => ({ ...prev, [type]: null }));
@@ -327,25 +283,16 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     if (!confirm.isConfirmed) return;
 
     try {
-      console.log(
-        `Deleting ${type} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
       await apiInstance.delete(`${deleteUrl}/${docId}`);
       setUploadedFiles((prev) => {
         const updated = { ...prev };
         delete updated[type];
         return updated;
       });
-      console.log(
-        `${type} deleted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
       Toast.fire({ icon: "success", title: `${type} deleted` });
     } catch (err) {
       const msg = err?.response?.data?.message || "Error deleting file.";
       setErrors((prev) => ({ ...prev, [type]: msg }));
-      console.error(
-        `Error deleting ${type}: ${msg} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
       Toast.fire({ icon: "error", title: msg });
     }
   };
@@ -369,9 +316,6 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(
-      `Continuing to next step at ${getCurrentDateTime()} by ${getCurrentUser()}`
-    );
     onContinue && onContinue();
   };
 
@@ -394,34 +338,30 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     >
       <h2 className="academic-docs-title">Academic Documents</h2>
 
+      {/* Application Status Display */}
       {applicationStatus && (
         <div
-          className={`application-status-indicator  ${getStatusText(
-            applicationStatus
-          )
+          className={`application-status ${getStatusText(applicationStatus)
             .toLowerCase()
             .replace(" ", "-")}`}
         >
-          Status: <strong>{getStatusText(applicationStatus)}</strong>
-          {!canEdit && (
-            <span className="status-note">
-              (Documents cannot be modified in this status)
-            </span>
-          )}
+          <p>
+            Current Application Status:{" "}
+            <strong>{getStatusText(applicationStatus)}</strong>
+          </p>
         </div>
       )}
 
       <div className="academic-docs-desc">
-        Click a drop-down to upload/view the document.
-        {/*
         {!canEdit && (
-          <div className="edit-disabled-notice">
-            <strong>Note:</strong> Document editing is disabled because your
-            application status is "{getStatusText(applicationStatus)}". Only
-            applications with status "Pending" or "Rejected" can be edited.
+          <div className="alert alert-primary mb-2 mt-0 p-2">
+            <p>
+              <strong>Notice:</strong> Your application cannot be edited at this
+              time.
+            </p>
           </div>
         )}
-          */}
+        Click a drop-down to upload/view the document.
       </div>
       <div className="divider" />
 
