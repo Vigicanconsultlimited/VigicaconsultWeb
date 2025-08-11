@@ -187,7 +187,6 @@ const ApplicationStatus = () => {
               url: details[viewKey] || details[nameKey],
               status: statusClass,
               statusText: statusText,
-              statusCode: statusCode,
               documentId: docId,
               createdAt: details.createdAt,
               updatedAt: details.updatedAt,
