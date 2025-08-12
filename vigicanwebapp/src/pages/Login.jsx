@@ -6,7 +6,8 @@ import Swal from "sweetalert2";
 
 import "../styles/Login.css";
 import registerImage from "../assets/images/img/vigica-img6.jpg";
-import vigicaLogo from "../assets/images/vigica.png";
+//import vigicaLogo from "../assets/images/vigica.png";
+import vigicaLogo from "../assets/images/vigicaV2.png";
 
 // SweetAlert Toast
 const Toast = Swal.mixin({
@@ -161,8 +162,9 @@ function Login() {
                   <img
                     src={vigicaLogo}
                     alt="Vigica Logo"
-                    style={{ width: 48, height: 48 }}
+                    style={{ width: "200px", height: "auto" }}
                   />
+                  {/*
                   <div>
                     <span
                       className="d-block fs-3 fw-extrabold mb-0"
@@ -186,6 +188,7 @@ function Login() {
                       CONSULT LIMITED
                     </div>
                   </div>
+                  */}
                 </div>
                 <h2
                   className="text-center"
