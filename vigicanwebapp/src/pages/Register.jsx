@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
 import "../styles/Register.css";
 import registerImage from "../assets/images/visa-apply.jpg";
-import vigicaLogo from "../assets/images/vigica.png";
+import vigicaLogo from "../assets/images/vigicaV2.png";
 import { FaGoogle, FaApple, FaEnvelope, FaLock } from "react-icons/fa";
 
 function Register() {
@@ -75,8 +75,9 @@ function Register() {
                 <img
                   src={vigicaLogo}
                   alt="Vigica Logo"
-                  style={{ width: 48, height: 48 }}
+                  style={{ width: "200px", height: "auto" }}
                 />
+                {/*
                 <div>
                   <span
                     className="d-block fs-3 fw-extrabold mb-0"
@@ -100,6 +101,7 @@ function Register() {
                     CONSULT LIMITED
                   </div>
                 </div>
+                */}
               </div>
               <h2
                 className="text-center"
