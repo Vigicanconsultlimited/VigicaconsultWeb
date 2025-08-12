@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../../styles/Navbar.css";
 import logo from "../../assets/images/vigica.png";
+import logo2 from "../../assets/images/vigicaV2.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,19 +12,20 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg bg-white shadow-sm py-3">
+    <nav className="navbar navbar-expand-lg bg-white shadow-sm py-0">
       <div className="container">
         {/* Brand/Logo */}
         <Link className="navbar-brand d-flex align-items-center" to="/">
           {/* Logo Image - adjust width/height as needed */}
           <img
-            src={logo}
+            src={logo2}
             alt="Vigica Consult Ltd"
             className="me-2"
-            style={{ width: "60px", height: "auto" }}
+            style={{ width: "200px", height: "auto" }}
           />
 
           {/* Company Name Text */}
+          {/*}
           <div>
             <span
               className="d-block fs-3 fw-extrabold"
@@ -41,6 +43,7 @@ const Navbar = () => {
               Limited
             </span>
           </div>
+          */}
         </Link>
 
         {/* Mobile Toggle Button */}
@@ -86,7 +89,7 @@ const Navbar = () => {
             </li>
             <li className="nav-item mx-2">
               <Link className="nav-link" to="/hotel-services">
-                Hotel services
+                Accommodation Services
               </Link>
             </li>
           </ul>
