@@ -32,7 +32,7 @@ const ContactBar = () => {
                 className="text-white text-decoration-none d-inline-flex align-items-center contact-item"
               >
                 <FaPhone className="me-2" />
-                <span>+234 818 648 2048</span>
+                <span>+234 901 445 6659</span>
               </a>
 
               <a
