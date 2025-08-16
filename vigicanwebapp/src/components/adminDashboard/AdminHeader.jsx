@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/auth";
 //import apiInstance from "../../utils/axios";
 import { Link } from "react-router-dom";
-import logo from "../../assets/images/vigica.png";
+//import logo from "../../assets/images/vigica.png";
+import logo from "../../assets/images/vigica-vertical-w.png";
 import profile from "../../assets/images/default-profile.jpg";
 import { ChevronDown, Menu } from "lucide-react";
 import "./styles/AdminHeader.css";
@@ -75,14 +76,9 @@ export default function AdminHeader({ toggleSidebar }) {
         <div className="admin-header-mobile-logo">
           <img
             src={logo}
-            alt="Vigica Logo"
-            className="mobile-logo-img"
-            height={32}
+            className="mobile-logo-img me-2"
+            alt="Vigica Consult Ltd"
           />
-          <div>
-            <div className="sidebar-brand">VIGICA</div>
-            <div className="sidebar-subbrand">CONSULT LIMITED</div>
-          </div>
         </div>
         <div className="admin-name-container">
           <div className="sidebar-brand">
