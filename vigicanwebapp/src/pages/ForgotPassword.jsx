@@ -19,14 +19,13 @@ const Toast = Swal.mixin({
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [submittedEmail, setSubmittedEmail] = useState(""); // <-- store email used for last request
+  const [submittedEmail, setSubmittedEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
   const resetForm = () => {
     setEmail("");
-    // do NOT clear submittedEmail here; we want to keep it for resend/display
   };
 
   // single reusable function to call API
