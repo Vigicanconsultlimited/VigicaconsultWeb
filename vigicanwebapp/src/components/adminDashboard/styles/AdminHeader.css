@@ -60,8 +60,10 @@
 }
 .mobile-logo-img {
   display: block;
-  max-height: 32px;
+  max-height: auto;
+  width: 50px;
   margin-bottom: 2px;
+  padding-top: 20px;
 }
 .sidebar-brand {
   font-size: 1.03rem;

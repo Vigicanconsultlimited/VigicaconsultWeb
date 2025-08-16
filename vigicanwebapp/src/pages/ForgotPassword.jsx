@@ -5,7 +5,8 @@ import Swal from "sweetalert2";
 
 import "../styles/Login.css";
 import registerImage from "../assets/images/img/vigica-img6.jpg";
-import vigicaLogo from "../assets/images/vigica.png";
+//import vigicaLogo from "../assets/images/vigica.png";
+import vigicaLogo from "../assets/images/vigicaV2.png";
 
 // SweetAlert Toast
 const Toast = Swal.mixin({
@@ -18,70 +19,83 @@ const Toast = Swal.mixin({
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
+  const [submittedEmail, setSubmittedEmail] = useState(""); // <-- store email used for last request
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
   const resetForm = () => {
     setEmail("");
+    // do NOT clear submittedEmail here; we want to keep it for resend/display
+  };
+
+  // single reusable function to call API
+  const sendResetLink = async (emailToSend) => {
+    if (!emailToSend) {
+      throw new Error("Missing email");
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailToSend)) {
+      const err = new Error("Please enter a valid email address");
+      err.isValidation = true;
+      throw err;
+    }
+
+    const response = await apiInstance.post(
+      `User/forgotpasswordrequest?email=${encodeURIComponent(emailToSend)}`
+    );
+
+    // normalize success detection
+    if (
+      response?.data?.statusCode === 200 ||
+      response?.data?.statusCode === 201
+    ) {
+      return response.data;
+    }
+
+    throw new Error(response?.data?.message || "Failed to send reset link");
   };
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
 
-    // Form validation
-    if (!email.trim()) {
-      Toast.fire({
-        icon: "error",
-        title: "Please enter your email address",
-      });
-      return;
-    }
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Toast.fire({
-        icon: "error",
-        title: "Please enter a valid email address",
-      });
+    const emailTrimmed = email.trim();
+    if (!emailTrimmed) {
+      Toast.fire({ icon: "error", title: "Please enter your email address" });
       return;
     }
 
     setIsLoading(true);
-
     try {
-      const response = await apiInstance.post(
-        `User/forgotpasswordrequest?email=${encodeURIComponent(email)}`
-      );
+      await sendResetLink(emailTrimmed);
 
-      if (response?.data?.statusCode === 200) {
-        setIsSuccess(true);
-        Toast.fire({
-          icon: "success",
-          title: "Password reset link sent successfully!",
-        });
+      // save the email used for the request so resend uses it
+      setSubmittedEmail(emailTrimmed);
+      setIsSuccess(true);
+      Toast.fire({
+        icon: "success",
+        title: "Password reset link sent successfully!",
+      });
 
-        // Reset form after success
-        resetForm();
-      } else {
-        throw new Error(response?.data?.message || "Failed to send reset link");
-      }
+      // clear the input (optional) but keep submittedEmail for resend
+      resetForm();
     } catch (error) {
       let errorMessage = "An unexpected error occurred. Please try again.";
-
-      if (error.response?.status === 404) {
+      if (error.isValidation) {
+        errorMessage = error.message;
+      } else if (error.response?.status === 404) {
         errorMessage = "Email address not found in our system.";
       } else if (error.response?.status === 400) {
         errorMessage = "Invalid email address format.";
       } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
 
-      Toast.fire({
-        icon: "error",
-        title: errorMessage,
-      });
+      Toast.fire({ icon: "error", title: errorMessage });
     } finally {
       setIsLoading(false);
     }
@@ -91,14 +105,39 @@ function ForgotPassword() {
     navigate("/login");
   };
 
-  const handleResendLink = () => {
-    if (email.trim()) {
-      handleForgotPassword({ preventDefault: () => {} });
-    } else {
+  // Resend uses submittedEmail (the last email that was used to request)
+  const handleResendLink = async () => {
+    const emailToResend = submittedEmail || email || "";
+    if (!emailToResend.trim()) {
       Toast.fire({
         icon: "warning",
         title: "Please enter your email address first",
       });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await sendResetLink(emailToResend.trim());
+      // keep submittedEmail as the address used for resends
+      setSubmittedEmail(emailToResend.trim());
+      setIsSuccess(true);
+      Toast.fire({
+        icon: "success",
+        title: "Password reset link resent successfully!",
+      });
+    } catch (error) {
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      if (error.isValidation) {
+        errorMessage = error.message;
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      Toast.fire({ icon: "error", title: errorMessage });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -136,32 +175,10 @@ function ForgotPassword() {
                   {/* Logo */}
                   <img
                     src={vigicaLogo}
-                    alt="Vigica Logo"
-                    style={{ width: 48, height: 48 }}
+                    alt="Vigica Consult Ltd"
+                    className="me-2"
+                    style={{ width: "200px", height: "auto" }}
                   />
-                  <div>
-                    <span
-                      className="d-block fs-3 fw-extrabold mb-0"
-                      style={{
-                        fontFamily: "Bricolage Grotesque', sans-serif",
-                        color: "#444",
-                        fontWeight: 700,
-                        fontSize: 20,
-                        marginBottom: 0,
-                      }}
-                    >
-                      VIGICA
-                    </span>
-                    <div
-                      className="d-block fs-4 mt-0 p-0"
-                      style={{
-                        fontFamily: "'Poppins', sans-serif",
-                        color: "#2135b0",
-                      }}
-                    >
-                      CONSULT LIMITED
-                    </div>
-                  </div>
                 </div>
 
                 {!isSuccess ? (
@@ -298,7 +315,7 @@ function ForgotPassword() {
                         style={{ fontSize: 14, lineHeight: 1.6 }}
                       >
                         We've sent a password reset link to{" "}
-                        <strong>{email}</strong>
+                        <strong>{submittedEmail || email}</strong>
                         <br />
                         Please check your email and follow the instructions to
                         reset your password.

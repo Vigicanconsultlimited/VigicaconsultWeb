@@ -23,13 +23,13 @@
 }
 
 .dashboard-navbar-brand {
-  color: #fff;
+  color: black;
   font-weight: 700;
 }
 
 .dashboard-navbar-sub {
   font-size: 10px;
-  color: #e5e7eb;
+  color: #2135b0;
 }
 
 .dashboard-navbar-search {

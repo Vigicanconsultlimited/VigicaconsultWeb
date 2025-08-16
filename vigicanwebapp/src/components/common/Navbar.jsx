@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../../styles/Navbar.css";
-import logo from "../../assets/images/vigica.png";
+//import logo from "../../assets/images/vigica.png";
 import logo2 from "../../assets/images/vigicaV2.png";
 
 const Navbar = () => {
