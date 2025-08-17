@@ -37,10 +37,27 @@ function ResetPassword() {
   const passwordMinLength = 8;
 
   // Extract email and token from URL query parameters
+  // Extract email and token from URL query parameters
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const emailParam = queryParams.get("email");
-    const tokenParam = queryParams.get("token");
+    // Get the raw query string instead of using URLSearchParams
+    const queryString = location.search.substring(1); // Remove leading '?'
+
+    // Split the query string by '&' to get individual parameters
+    const params = queryString.split("&");
+    let emailParam = "";
+    let tokenParam = "";
+
+    // Manually parse parameters without URL decoding yet
+    for (const param of params) {
+      const [key, value] = param.split("=");
+      if (key === "email") {
+        emailParam = decodeURIComponent(value);
+      }
+      if (key === "token") {
+        // For token, we need to replace spaces back to '+' before decoding
+        tokenParam = value.replace(/ /g, "+");
+      }
+    }
 
     if (emailParam) {
       setEmail(emailParam);
