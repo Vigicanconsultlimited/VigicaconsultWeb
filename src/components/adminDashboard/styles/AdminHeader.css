@@ -10,11 +10,7 @@
   top: 0;
   left: 0;
   right: 0;
-<<<<<<< HEAD
-  z-index: 1300;
-=======
   z-index: 30;
->>>>>>> main
   margin: 0 0 12px 0 !important;
 }
 
@@ -64,15 +60,10 @@
 }
 .mobile-logo-img {
   display: block;
-<<<<<<< HEAD
-  max-height: 32px;
-  margin-bottom: 2px;
-=======
   max-height: auto;
   width: 50px;
   margin-bottom: 2px;
   padding-top: 20px;
->>>>>>> main
 }
 .sidebar-brand {
   font-size: 1.03rem;

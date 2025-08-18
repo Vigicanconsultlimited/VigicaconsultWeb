@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-<<<<<<< HEAD
-import logo from "../../assets/images/vigica.png";
-=======
 //import logo from "../../assets/images/vigica.png";
 import logo from "../../assets/images/vigica-vertical-w.png";
->>>>>>> main
 import {
   BarChart3,
   FileText,

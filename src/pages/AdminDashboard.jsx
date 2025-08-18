@@ -28,11 +28,8 @@ export default function AdminDashboard() {
         return <UserManagement />;
       case "uploaded-files":
         return <UploadedFiles />;
-<<<<<<< HEAD
-=======
       case "creation-center":
         return <CreationCenter />;
->>>>>>> main
       case "question-center":
         return <QuestionCenter />;
       case "inbox":

@@ -2,12 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/auth";
 //import apiInstance from "../../utils/axios";
 import { Link } from "react-router-dom";
-<<<<<<< HEAD
-import logo from "../../assets/images/vigica.png";
-=======
 //import logo from "../../assets/images/vigica.png";
 import logo from "../../assets/images/vigica-vertical-w.png";
->>>>>>> main
 import profile from "../../assets/images/default-profile.jpg";
 import { ChevronDown, Menu } from "lucide-react";
 import "./styles/AdminHeader.css";
@@ -55,11 +51,7 @@ export default function AdminHeader({ toggleSidebar }) {
         setAdminRole("");
         setAdminEmail("");
         setAdminName("Admin");
-<<<<<<< HEAD
-        console.warn("Failed to fetch admin info:", error);
-=======
         //console.warn("Failed to fetch admin info:", error);
->>>>>>> main
       }
     };
 
