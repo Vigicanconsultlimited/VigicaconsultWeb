@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BarChart2, ChevronDown, MoreHorizontal, Star } from "lucide-react";
 import apiInstance from "../../../utils/axios";
-<<<<<<< HEAD
-import "../styles/StatsOverview.css";
-=======
 import "../styles/Overview.css";
->>>>>>> main
 
 // Static (mocked) data for non-API sections
 const breakdownData = [
@@ -59,11 +55,6 @@ const analytics = [
   },
 ];
 
-<<<<<<< HEAD
-const genderData = { male: 2324, female: 1893 };
-
-export default function Overview() {
-=======
 export default function Overview() {
   // Current date/time and user as specified
   const getCurrentDateTime = () => {
@@ -74,7 +65,6 @@ export default function Overview() {
     return "NeduStack";
   };
 
->>>>>>> main
   // States for API-driven stats
   const [statCards, setStatCards] = useState([
     {
@@ -107,8 +97,6 @@ export default function Overview() {
     },
   ]);
 
-<<<<<<< HEAD
-=======
   const [genderData, setGenderData] = useState({ male: 0, female: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -161,35 +149,10 @@ export default function Overview() {
     ];
   };
 
->>>>>>> main
   // Fetch applications summary from API
   useEffect(() => {
     async function fetchApplicationStats() {
       try {
-<<<<<<< HEAD
-        const response = await apiInstance.get(
-          "StudentApplication/allapplications"
-        );
-        if (response?.data?.statusCode === 200 && response?.data?.result) {
-          const {
-            totalNumOfApplications,
-            approvedApplications,
-            rejectedApplications,
-            pendingApplications,
-          } = response.data.result;
-
-          // Compute change and changePercent
-          // For demo, we use 0% and 0. Use your own logic if you have previous stats or trends.
-          setStatCards([
-            {
-              title: "Total Applications",
-              value:
-                typeof totalNumOfApplications === "number"
-                  ? totalNumOfApplications.toLocaleString()
-                  : "--",
-              change: "+12% Inc",
-              changePercent: 0,
-=======
         setLoading(true);
         //console.log(
         //`Overview: Fetching application statistics at ${getCurrentDateTime()} by ${getCurrentUser()}`
@@ -236,77 +199,28 @@ export default function Overview() {
                 totalChange >= 0 ? "Inc" : "Dec"
               }`,
               changePercent: Math.min(Math.abs(totalChange), 100),
->>>>>>> main
               color: "blue",
             },
             {
               title: "Approved Applications",
-<<<<<<< HEAD
-              value:
-                typeof approvedApplications === "number"
-                  ? approvedApplications.toLocaleString()
-                  : "--",
-              change: "+8% Inc",
-              changePercent: 0,
-=======
               value: approvedApplications.toLocaleString(),
               change: `${approvedChange >= 0 ? "+" : ""}${approvedChange}% ${
                 approvedChange >= 0 ? "Inc" : "Dec"
               }`,
               changePercent: Math.min(Math.abs(approvedChange), 100),
->>>>>>> main
               color: "green",
             },
             {
               title: "Rejected Applications",
-<<<<<<< HEAD
-              value:
-                typeof rejectedApplications === "number"
-                  ? rejectedApplications.toLocaleString()
-                  : "--",
-              change: "+5% Dec",
-              changePercent: 0,
-=======
               value: rejectedApplications.toLocaleString(),
               change: `${rejectedChange >= 0 ? "+" : ""}${rejectedChange}% ${
                 rejectedChange >= 0 ? "Inc" : "Dec"
               }`,
               changePercent: Math.min(Math.abs(rejectedChange), 100),
->>>>>>> main
               color: "red",
             },
             {
               title: "Pending Applications",
-<<<<<<< HEAD
-              value:
-                typeof pendingApplications === "number"
-                  ? pendingApplications.toLocaleString()
-                  : "--",
-              change: "+10% Dec",
-              changePercent: 0,
-              color: "gray",
-            },
-          ]);
-        }
-      } catch (error) {
-        // Optionally show an error, otherwise leave stat cards at defaults
-        // You may set error state here if you want
-      }
-    }
-    fetchApplicationStats();
-  }, []);
-
-  return (
-    <div className="overview-main">
-      {/* Stat Cards */}
-      <h1
-        className="section-title mb-2"
-        style={{ color: "#264de4", fontSize: "1.5rem" }}
-      >
-        Application Overview
-      </h1>
-
-=======
               value: pendingApplications.toLocaleString(),
               change: `${pendingChange >= 0 ? "+" : ""}${pendingChange}% ${
                 pendingChange >= 0 ? "Inc" : "Dec"
@@ -381,74 +295,11 @@ export default function Overview() {
       </div>
 
       {/* Stat Cards */}
->>>>>>> main
       <div className="stat-cards-row">
         {statCards.map((stat, i) => (
           <div key={stat.title} className={`stat-card ${stat.color}`}>
             <div className="stat-card-header">
               <span>{stat.title}</span>
-<<<<<<< HEAD
-              <MoreHorizontal size={18} />
-            </div>
-            <div className="stat-card-value">{stat.value}</div>
-            <div className="stat-card-progress">
-              {["blue", "green", "red"].includes(stat.color) ? (
-                <svg width={54} height={54}>
-                  <circle
-                    cx={27}
-                    cy={27}
-                    r={24}
-                    fill="none"
-                    stroke="#eee"
-                    strokeWidth={5}
-                  />
-                  <circle
-                    cx={27}
-                    cy={27}
-                    r={24}
-                    fill="none"
-                    stroke={
-                      stat.color === "blue"
-                        ? "#264de4"
-                        : stat.color === "green"
-                        ? "#43a047"
-                        : "#e53935"
-                    }
-                    strokeWidth={5}
-                    strokeDasharray={`${stat.changePercent * 1.5} ${
-                      150 - stat.changePercent * 1.5
-                    }`}
-                    strokeLinecap="round"
-                    style={{ transition: "stroke-dasharray 0.3s" }}
-                  />
-                </svg>
-              ) : (
-                <svg width={54} height={54}>
-                  <circle
-                    cx={27}
-                    cy={27}
-                    r={24}
-                    fill="none"
-                    stroke="#eee"
-                    strokeWidth={5}
-                  />
-                  <circle
-                    cx={27}
-                    cy={27}
-                    r={24}
-                    fill="none"
-                    stroke="#bdbdbd"
-                    strokeWidth={5}
-                    strokeDasharray={`${stat.changePercent * 1.5} ${
-                      150 - stat.changePercent * 1.5
-                    }`}
-                    strokeLinecap="round"
-                    style={{ transition: "stroke-dasharray 0.3s" }}
-                  />
-                </svg>
-              )}
-            </div>
-=======
               <MoreHorizontal size={16} />
             </div>
 
@@ -490,7 +341,6 @@ export default function Overview() {
               </svg>
             </div>
 
->>>>>>> main
             <div className="stat-card-change">{stat.change}</div>
           </div>
         ))}
@@ -498,25 +348,15 @@ export default function Overview() {
 
       {/* Application Insights Section */}
       <h2 className="overview-section-title">Application Insights</h2>
-<<<<<<< HEAD
-=======
-
->>>>>>> main
       <div className="insights-cards-row">
         {/* Active Applications Breakdown */}
         <div className="insights-card breakdown">
           <div className="insights-card-header">
             <span>Statistics of Active Applications</span>
             <div className="insights-card-switch">
-<<<<<<< HEAD
-              <BarChart2 size={18} className="text-blue-700" />
-              <span className="font-semibold text-blue-700">Week</span>
-              <ChevronDown size={16} />
-=======
               <BarChart2 size={14} />
               <span className="font-semibold">Week</span>
               <ChevronDown size={12} />
->>>>>>> main
             </div>
           </div>
           <div className="breakdown-chart">
@@ -532,27 +372,6 @@ export default function Overview() {
                           height: `${(d.application / max) * 100}%`,
                         }}
                       ></div>
-<<<<<<< HEAD
-                      <div
-                        className="breakdown-bar-approved"
-                        style={{
-                          height: `${(d.approved / max) * 100}%`,
-                        }}
-                      ></div>
-                      <div
-                        className="breakdown-bar-rejected"
-                        style={{
-                          height: `${(d.rejected / max) * 100}%`,
-                        }}
-                      ></div>
-                      <div
-                        className="breakdown-bar-pending"
-                        style={{
-                          height: `${(d.pending / max) * 100}%`,
-                        }}
-                      ></div>
-=======
->>>>>>> main
                     </div>
                     <span className="breakdown-bar-label">{d.day}</span>
                   </div>
@@ -563,32 +382,6 @@ export default function Overview() {
               <div>
                 <span className="legend-dot app"></span> Application
               </div>
-<<<<<<< HEAD
-              <div>
-                <span className="legend-dot approved"></span> Approved
-              </div>
-              <div>
-                <span className="legend-dot rejected"></span> Rejected
-              </div>
-              <div>
-                <span className="legend-dot pending"></span> Pending
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Acquisitions */}
-        <div className="insights-card acquisitions">
-          <div className="insights-card-header">
-            <span>Acquisitions</span>
-            <div className="insights-card-switch">
-              <BarChart2 size={18} className="text-blue-700" />
-              <span className="font-semibold text-blue-700">Month</span>
-              <ChevronDown size={16} />
-            </div>
-          </div>
-          <div className="acquisitions-list">
-            {acquisitionsData.map((a) => (
-=======
             </div>
           </div>
         </div>
@@ -605,7 +398,6 @@ export default function Overview() {
           </div>
           <div className="acquisitions-list">
             {currentAcquisitionsData.map((a) => (
->>>>>>> main
               <div key={a.label} className="acq-row">
                 <span className="acq-label">{a.label}</span>
                 <div className={`acq-bar ${a.color}`}>
@@ -619,10 +411,6 @@ export default function Overview() {
             ))}
           </div>
         </div>
-<<<<<<< HEAD
-=======
-
->>>>>>> main
         {/* Audience Satisfaction */}
         <div className="insights-card satisfaction">
           <div className="insights-card-header">
@@ -680,71 +468,11 @@ export default function Overview() {
 
       {/* Site Analytics */}
       <h2 className="overview-section-title">Site Analytics</h2>
-<<<<<<< HEAD
-=======
-
->>>>>>> main
       <div className="analytics-cards-row">
         {analytics.map((a) => (
           <div key={a.title} className="analytics-card">
             <div className="analytics-card-header">
               <span>{a.title}</span>
-<<<<<<< HEAD
-              <MoreHorizontal size={18} />
-            </div>
-            <div className="analytics-card-value">{a.value}</div>
-            <div className="analytics-card-progress">
-              {a.icon === "up" ? (
-                <svg width={34} height={34}>
-                  <circle
-                    cx={17}
-                    cy={17}
-                    r={15}
-                    fill="none"
-                    stroke="#eee"
-                    strokeWidth={5}
-                  />
-                  <path
-                    d="M17 2 A15 15 0 1 1 16.99 2"
-                    fill="none"
-                    stroke="#1976d2"
-                    strokeWidth={5}
-                  />
-                </svg>
-              ) : (
-                <svg width={34} height={34}>
-                  <circle
-                    cx={17}
-                    cy={17}
-                    r={15}
-                    fill="none"
-                    stroke="#eee"
-                    strokeWidth={5}
-                  />
-                  <circle
-                    cx={17}
-                    cy={17}
-                    r={15}
-                    fill="none"
-                    stroke="#1976d2"
-                    strokeWidth={5}
-                    strokeDasharray={`${a.percent * 1.5} ${
-                      47 - a.percent * 1.5
-                    }`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-              )}
-            </div>
-            <div className="analytics-card-change">{a.change}</div>
-          </div>
-        ))}
-        <div className="analytics-card gender">
-          <div className="analytics-card-header">
-            <span>Applicants by Gender</span>
-            <MoreHorizontal size={18} />
-          </div>
-=======
               <MoreHorizontal size={14} />
             </div>
 
@@ -788,17 +516,12 @@ export default function Overview() {
             <MoreHorizontal size={14} />
           </div>
 
->>>>>>> main
           <div className="gender-bar-chart">
             <div className="gender-bar-col">
               <div
                 className="gender-bar-male"
                 style={{
                   height: `${
-<<<<<<< HEAD
-                    (genderData.male / (genderData.male + genderData.female)) *
-                    70
-=======
                     genderData.male + genderData.female > 0
                       ? Math.max(
                           (genderData.male /
@@ -807,27 +530,17 @@ export default function Overview() {
                           2
                         )
                       : 2
->>>>>>> main
                   }px`,
                 }}
               ></div>
               <div className="gender-label">Male</div>
               <div className="gender-value">{genderData.male}</div>
             </div>
-<<<<<<< HEAD
-=======
-
->>>>>>> main
             <div className="gender-bar-col">
               <div
                 className="gender-bar-female"
                 style={{
                   height: `${
-<<<<<<< HEAD
-                    (genderData.female /
-                      (genderData.male + genderData.female)) *
-                    70
-=======
                     genderData.male + genderData.female > 0
                       ? Math.max(
                           (genderData.female /
@@ -836,19 +549,12 @@ export default function Overview() {
                           2
                         )
                       : 2
->>>>>>> main
                   }px`,
                 }}
               ></div>
               <div className="gender-label">Female</div>
               <div className="gender-value">{genderData.female}</div>
             </div>
-<<<<<<< HEAD
-            <div className="gender-bar-legend">
-              <span className="legend-dot male"></span> Male
-              <span className="legend-dot female"></span> Female
-            </div>
-=======
           </div>
 
           <div className="gender-bar-legend">
@@ -858,7 +564,6 @@ export default function Overview() {
             <span>
               <span className="legend-dot female"></span> Female
             </span>
->>>>>>> main
           </div>
         </div>
       </div>

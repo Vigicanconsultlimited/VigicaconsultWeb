@@ -1,16 +1,9 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-import Modal from "../../shared/Modal";
-import LoadingSpinner from "../../shared/LoadingSpinner";
-import profile from "../../../assets/images/default-profile.jpg";
-=======
 import React, { useState, useEffect } from "react";
 import Modal from "../../shared/Modal";
 import LoadingSpinner from "../../shared/LoadingSpinner";
 import profile from "../../../assets/images/default-profile.jpg";
 import apiInstance from "../../../utils/axios";
 import Swal from "sweetalert2";
->>>>>>> main
 
 import {
   Search,
@@ -26,123 +19,6 @@ import {
   XCircle,
   Edit,
   MessageSquare,
-<<<<<<< HEAD
-} from "lucide-react";
-import "../styles/UploadedFiles.css";
-
-// Short file names for demo
-const fileNames = [
-  "Degree Certificate",
-  "Statement of Purpose",
-  "Academic Reference",
-  "International Passport",
-  "Transcript",
-  "Resume",
-];
-
-const initialFiles = [
-  {
-    id: 1,
-    name: "Degree Certificate",
-    type: "pdf",
-    size: "2.4 MB",
-    uploadedBy: "Fizy Edward",
-    uploadDate: "2024-01-15",
-    category: "Academic Documents",
-    status: "approved",
-    ownerAvatar: profile,
-  },
-  {
-    id: 2,
-    name: "Statement of Purpose",
-    type: "pdf",
-    size: "1.8 MB",
-    uploadedBy: "ANC Charles",
-    uploadDate: "2024-01-14",
-    category: "Statements",
-    status: "pending",
-    ownerAvatar: profile,
-  },
-  {
-    id: 3,
-    name: "Academic Reference",
-    type: "document",
-    size: "0.9 MB",
-    uploadedBy: "Mike Johnson",
-    uploadDate: "2024-01-13",
-    category: "References",
-    status: "rejected",
-    ownerAvatar: "/api/placeholder/22/22",
-  },
-  {
-    id: 4,
-    name: "International Passport",
-    type: "image",
-    size: "1.2 MB",
-    uploadedBy: "Sarah Wilson",
-    uploadDate: "2024-01-12",
-    category: "Certificates",
-    status: "approved",
-    ownerAvatar: "/api/placeholder/22/22",
-  },
-];
-
-const studentDetailsMap = {
-  "John Smith": {
-    name: "John Smith",
-    avatar: "/api/placeholder/38/38",
-    phone: "+234 801 111 1111",
-    address: "No. 2 Main Street, City, State",
-    postCode: "90021",
-    language: "English",
-    dateOfBirth: "16th May, 2000",
-    joined: "4th March, 2025",
-    documents: [
-      { name: "Degree Certificate", status: "approved" },
-      { name: "Transcript", status: "pending" },
-    ],
-  },
-  "Jane Doe": {
-    name: "Jane Doe",
-    avatar: "/api/placeholder/38/38",
-    phone: "+234 802 222 2222",
-    address: "No. 3 Main Street, City, State",
-    postCode: "90022",
-    language: "English",
-    dateOfBirth: "1st Jan, 1999",
-    joined: "12th March, 2025",
-    documents: [
-      { name: "Statement of Purpose", status: "pending" },
-      { name: "Resume", status: "approved" },
-    ],
-  },
-  "Mike Johnson": {
-    name: "Mike Johnson",
-    avatar: "/api/placeholder/38/38",
-    phone: "+234 803 333 3333",
-    address: "No. 4 Main Street, City, State",
-    postCode: "90023",
-    language: "English",
-    dateOfBirth: "23rd Feb, 2001",
-    joined: "22nd March, 2025",
-    documents: [{ name: "Academic Reference", status: "rejected" }],
-  },
-  "Sarah Wilson": {
-    name: "Sarah Wilson",
-    avatar: "/api/placeholder/38/38",
-    phone: "+234 804 444 4444",
-    address: "No. 5 Main Street, City, State",
-    postCode: "90024",
-    language: "English",
-    dateOfBirth: "10th May, 2002",
-    joined: "1st April, 2025",
-    documents: [{ name: "International Passport", status: "approved" }],
-  },
-};
-
-export default function UploadedFiles() {
-  const [files, setFiles] = useState(initialFiles);
-=======
   RefreshCw,
   User,
   Mail,
@@ -267,17 +143,13 @@ export default function UploadedFiles() {
 
   const [files, setFiles] = useState([]);
   const [students, setStudents] = useState([]);
->>>>>>> main
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-<<<<<<< HEAD
-=======
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
->>>>>>> main
   const [studentModal, setStudentModal] = useState({
     open: false,
     student: null,
@@ -290,17 +162,12 @@ export default function UploadedFiles() {
 
   const categories = [
     "Academic Documents",
-<<<<<<< HEAD
-=======
     "Professional Documents",
->>>>>>> main
     "Certificates",
     "References",
     "Statements",
   ];
 
-<<<<<<< HEAD
-=======
   // Get JWT token from cookies
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
@@ -482,7 +349,6 @@ export default function UploadedFiles() {
     });
   };
 
->>>>>>> main
   const getFileIcon = (type) => {
     switch (type) {
       case "pdf":
@@ -502,12 +368,9 @@ export default function UploadedFiles() {
       case "rejected":
         return "status-badge rejected";
       case "pending":
-<<<<<<< HEAD
-=======
       case "uploaded":
         return "status-badge pending";
       case "under review":
->>>>>>> main
         return "status-badge pending";
       default:
         return "status-badge";
@@ -524,14 +387,6 @@ export default function UploadedFiles() {
   });
 
   const handleDownload = (file) => {
-<<<<<<< HEAD
-    window.alert(`Downloading ${file.name}`);
-  };
-
-  const handleDelete = (fileId) => {
-    if (window.confirm("Are you sure you want to delete this file?")) {
-      setFiles(files.filter((f) => f.id !== fileId));
-=======
     if (file.downloadUrl) {
       // Open download URL in new tab
       window.open(file.downloadUrl, "_blank");
@@ -622,7 +477,6 @@ export default function UploadedFiles() {
         icon: "error",
         title: "Failed to delete document",
       });
->>>>>>> main
     }
   };
 
@@ -630,22 +484,6 @@ export default function UploadedFiles() {
     const uploadedFiles = Array.from(event.target.files);
     setIsUploading(true);
 
-<<<<<<< HEAD
-    setTimeout(() => {
-      const newFiles = uploadedFiles.map((file, index) => ({
-        id: Math.max(...files.map((f) => f.id)) + index + 1,
-        name: fileNames[index % fileNames.length],
-        type: file.type.includes("image") ? "image" : "document",
-        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-        uploadedBy: "Admin",
-        uploadDate: new Date().toISOString().split("T")[0],
-        category: "Admin Uploads",
-        status: "approved",
-        ownerAvatar: "/api/placeholder/22/22",
-      }));
-
-      setFiles([...newFiles, ...files]);
-=======
     // This is a placeholder for upload functionality
     // You would implement actual upload logic here
     setTimeout(() => {
@@ -653,19 +491,11 @@ export default function UploadedFiles() {
         icon: "info",
         title: "Upload functionality to be implemented",
       });
->>>>>>> main
       setIsUploading(false);
       setIsUploadModalOpen(false);
     }, 2000);
   };
 
-<<<<<<< HEAD
-  const handleStudentClick = (uploadedBy) => {
-    setStudentModal({
-      open: true,
-      student: studentDetailsMap[uploadedBy],
-    });
-=======
   const handleStudentClick = (uploadedById) => {
     const student = students.find((s) => s.id === uploadedById);
     if (student) {
@@ -674,7 +504,6 @@ export default function UploadedFiles() {
         student: student,
       });
     }
->>>>>>> main
   };
 
   const handleDocReviewToggle = (type) => {
@@ -682,8 +511,6 @@ export default function UploadedFiles() {
       ...prev,
       [type]: !prev[type],
     }));
-<<<<<<< HEAD
-=======
 
     // Placeholder for review action
     Toast.fire({
@@ -704,7 +531,6 @@ export default function UploadedFiles() {
     } catch {
       return dateString;
     }
->>>>>>> main
   };
 
   return (
@@ -714,8 +540,6 @@ export default function UploadedFiles() {
           <h1 className="section-title">Uploaded Files</h1>
           <div className="header-actions">
             <button
-<<<<<<< HEAD
-=======
               onClick={handleRefresh}
               disabled={refreshing || loadingFiles || loadingStudents}
               className="btn filter-btn"
@@ -728,7 +552,6 @@ export default function UploadedFiles() {
               {refreshing ? "Refreshing..." : "Refresh"}
             </button>
             <button
->>>>>>> main
               className="btn primary"
               onClick={() => setIsUploadModalOpen(true)}
             >
@@ -745,11 +568,7 @@ export default function UploadedFiles() {
           <div className="search-input-container">
             <input
               type="text"
-<<<<<<< HEAD
-              placeholder="Search files..."
-=======
               placeholder="Search files or users..."
->>>>>>> main
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -778,90 +597,6 @@ export default function UploadedFiles() {
 
       {/* Files Table */}
       <div className="files-table-container">
-<<<<<<< HEAD
-        <table className="files-table">
-          <thead>
-            <tr>
-              <th>File Name</th>
-              <th>Owner</th>
-              <th>Date Created</th>
-              <th>Type</th>
-              <th>Size</th>
-              <th>Category</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredFiles.map((file) => (
-              <tr key={file.id}>
-                <td>
-                  <span className="file-table-icon">
-                    {getFileIcon(file.type)}
-                  </span>
-                  {file.name}
-                </td>
-                <td>
-                  <span
-                    className="owner-cell"
-                    onClick={() => handleStudentClick(file.uploadedBy)}
-                    title={`View ${file.uploadedBy}'s details`}
-                  >
-                    <img
-                      src={file.ownerAvatar}
-                      alt={file.uploadedBy}
-                      className="owner-avatar"
-                    />
-                    {file.uploadedBy}
-                  </span>
-                </td>
-                <td>{file.uploadDate}</td>
-                <td>{file.type}</td>
-                <td>{file.size}</td>
-                <td>{file.category}</td>
-                <td>
-                  <span className={getStatusClass(file.status)}>
-                    {file.status.charAt(0).toUpperCase() + file.status.slice(1)}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className="action-btn"
-                    onClick={() => handleDownload(file)}
-                    title="Download"
-                  >
-                    <Download size={16} />
-                  </button>
-                  <button
-                    className="action-btn"
-                    title="View"
-                    onClick={() => handleStudentClick(file.uploadedBy)}
-                  >
-                    <Eye size={16} />
-                  </button>
-                  <button
-                    className="action-btn delete-btn"
-                    onClick={() => handleDelete(file.id)}
-                    title="Delete"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {filteredFiles.length === 0 && (
-              <tr>
-                <td
-                  colSpan={8}
-                  style={{ textAlign: "center", color: "#607d8b" }}
-                >
-                  No files found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-=======
         {loadingFiles || loadingStudents ? (
           <div className="loading-state">
             <LoadingSpinner size="lg" />
@@ -958,7 +693,6 @@ export default function UploadedFiles() {
             </tbody>
           </table>
         )}
->>>>>>> main
       </div>
 
       {/* Upload Modal */}
@@ -982,11 +716,7 @@ export default function UploadedFiles() {
               {isUploading ? (
                 <div className="uploading-state">
                   <LoadingSpinner size="lg" />
-<<<<<<< HEAD
-                  <p>Uploading files...</p>
-=======
                   <p>Processing upload...</p>
->>>>>>> main
                 </div>
               ) : (
                 <div className="upload-placeholder">
@@ -1003,11 +733,7 @@ export default function UploadedFiles() {
         </div>
       </Modal>
 
-<<<<<<< HEAD
-      {/* Student Details Modal */}
-=======
       {/* Enhanced Student Details Modal */}
->>>>>>> main
       <Modal
         isOpen={studentModal.open}
         onClose={() => setStudentModal({ open: false, student: null })}
@@ -1016,11 +742,7 @@ export default function UploadedFiles() {
             ? `Student: ${studentModal.student.name}`
             : ""
         }
-<<<<<<< HEAD
-        size="md"
-=======
         size="lg"
->>>>>>> main
       >
         {studentModal.student && (
           <div className="student-modal-content">
@@ -1034,16 +756,6 @@ export default function UploadedFiles() {
                 {studentModal.student.name}
               </h3>
             </div>
-<<<<<<< HEAD
-            <div className="details-info">
-              <p>Phone: {studentModal.student.phone}</p>
-              <p>Address: {studentModal.student.address}</p>
-              <p>Post Code: {studentModal.student.postCode}</p>
-              <p>Preferred Language: {studentModal.student.language}</p>
-              <p>Date of Birth: {studentModal.student.dateOfBirth}</p>
-              <p>Joined: {studentModal.student.joined}</p>
-            </div>
-=======
 
             {/* Enhanced Personal Information */}
             <div className="enhanced-details-grid">
@@ -1132,7 +844,6 @@ export default function UploadedFiles() {
               </div>
             </div>
 
->>>>>>> main
             <div className="student-review-actions">
               <button
                 className={`toggle-btn ${
@@ -1166,10 +877,6 @@ export default function UploadedFiles() {
                 Edit
               </button>
             </div>
-<<<<<<< HEAD
-=======
-
->>>>>>> main
             <div className="uploaded-documents-card student-files-list">
               <div className="uploaded-documents-header">
                 <span>Uploaded Documents</span>
@@ -1182,10 +889,7 @@ export default function UploadedFiles() {
                   <tr>
                     <th>Document</th>
                     <th>Status</th>
-<<<<<<< HEAD
-=======
                     <th>Date</th>
->>>>>>> main
                   </tr>
                 </thead>
                 <tbody>
@@ -1198,10 +902,6 @@ export default function UploadedFiles() {
                             doc.status.slice(1)}
                         </span>
                       </td>
-<<<<<<< HEAD
-                    </tr>
-                  ))}
-=======
                       <td>{doc.uploadDate}</td>
                     </tr>
                   ))}
@@ -1215,7 +915,6 @@ export default function UploadedFiles() {
                       </td>
                     </tr>
                   )}
->>>>>>> main
                 </tbody>
               </table>
             </div>

@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-import React, { useEffect, useState } from "react";
-import profile from "../../../assets/images/default-profile.jpg";
-import { Eye, Trash2, CheckCircle, XCircle, MessageSquare } from "lucide-react";
-import apiInstance from "../../../utils/axios";
-import "../styles/DocumentReview.css";
-=======
 import React, { useEffect, useState, useRef } from "react";
 import profile from "../../../assets/images/default-profile.jpg";
 import {
@@ -44,7 +37,6 @@ const Toast = Swal.mixin({
   timer: 1500,
   timerProgressBar: true,
 });
->>>>>>> main
 
 // Application status mapping
 const statusMap = {
@@ -55,29 +47,6 @@ const statusMap = {
   5: "approved",
 };
 
-<<<<<<< HEAD
-// Document fields and their pretty names
-const docFields = [
-  { key: "degreeCertificateurl", label: "Degree Certificate" },
-  { key: "officialTranscripturl", label: "Official Transcript" },
-  { key: "cvOrResumeurl", label: "CV/Resume" },
-  { key: "academicReferenceurl", label: "Academic Reference" },
-  { key: "professionalReferenceurl", label: "Professional Reference" },
-  { key: "waecOrNecoCertificateurl", label: "WAEC/NECO Certificate" },
-  { key: "personalStatementurl", label: "Personal Statement" },
-  { key: "englishProficiencyProofurl", label: "English Proficiency Proof" },
-  { key: "workExperienceurl", label: "Work Experience" },
-  { key: "internationalPassporturl", label: "International Passport" },
-];
-
-export default function DocumentReview() {
-  const [studentList, setStudentList] = useState([]);
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [selectedDocument, setSelectedDocument] = useState(null);
-  const [toggleStates, setToggleStates] = useState({
-    approve: false,
-    reject: false,
-=======
 // Application Status enum for API calls
 const ApplicationStatus = {
   Submitted: 1,
@@ -204,14 +173,11 @@ export default function DocumentReview() {
     approve: false,
     reject: false,
     underReview: false,
->>>>>>> main
     comment: false,
   });
   const [docToggleStates, setDocToggleStates] = useState({
     approve: false,
     reject: false,
-<<<<<<< HEAD
-=======
     underReview: false,
     comment: false,
   });
@@ -219,53 +185,10 @@ export default function DocumentReview() {
     approve: false,
     reject: false,
     underReview: false,
->>>>>>> main
     comment: false,
   });
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
-<<<<<<< HEAD
-
-  // Fetch all students on mount
-  useEffect(() => {
-    async function fetchStudents() {
-      setLoadingStudents(true);
-      try {
-        const res = await apiInstance.get("StudentPersonalInfo");
-        if (res?.data?.statusCode === 200 && Array.isArray(res.data.result)) {
-          // Map to UI format, default avatar if missing
-          const students = res.data.result.map((student) => ({
-            id: student.id,
-            name:
-              `${student.firstName || ""} ${student.lastName || ""}`.trim() ||
-              student.email ||
-              "Unnamed",
-            avatar: profile,
-            documents: [],
-            email: student.email,
-            phone: student.phoneNumber,
-            address: student.address,
-            postCode: student.postalCode,
-            language: student.preferredLanguage,
-            dateOfBirth: student.dateOfBirth,
-            joined: student.dateCreated
-              ? new Date(student.dateCreated).toLocaleDateString()
-              : "",
-            applicationStatus: "pending",
-          }));
-          setStudentList(students);
-          setSelectedStudent(students[0] || null);
-        }
-      } catch (e) {
-        setStudentList([]);
-      }
-      setLoadingStudents(false);
-    }
-    fetchStudents();
-  }, []);
-
-  // Fetch selected student's application & docs
-=======
   const [updatingDocument, setUpdatingDocument] = useState(false);
   const [updatingApplication, setUpdatingApplication] = useState(false);
   const [refreshingStatuses, setRefreshingStatuses] = useState(false);
@@ -529,13 +452,10 @@ export default function DocumentReview() {
   };
 
   // Fetch selected student's application & docs and academic info
->>>>>>> main
   useEffect(() => {
     async function fetchStudentApplication() {
       if (!selectedStudent) return;
       setLoadingDetails(true);
-<<<<<<< HEAD
-=======
 
       // Reset dropdowns when switching students
       setAcademicDropdownOpen(false);
@@ -545,25 +465,10 @@ export default function DocumentReview() {
       // Fetch academic information
       await fetchAcademicInfo(selectedStudent.id);
 
->>>>>>> main
       try {
         const res = await apiInstance.get(
           `StudentApplication/application?StudentPersonalInformationId=${selectedStudent.id}`
         );
-<<<<<<< HEAD
-        const result = res?.data?.result;
-        if (result) {
-          // Documents: parse all *_url fields that are present
-          const documents = docFields
-            .filter((doc) => result[doc.key])
-            .map((doc) => ({
-              name: doc.label,
-              url: result[doc.key],
-              status: statusMap[result.applicationStatus] || "pending",
-            }));
-
-          // Use nested personalInformation for details if available, otherwise fallback to list
-=======
 
         const result = res?.data?.result;
 
@@ -630,7 +535,6 @@ export default function DocumentReview() {
           //  `Loaded ${documents.length} documents for student ${selectedStudent.name}`
           //);
 
->>>>>>> main
           const p = result.personalInformation || selectedStudent;
           setSelectedStudent((prev) =>
             prev
@@ -648,14 +552,6 @@ export default function DocumentReview() {
                   dateOfBirth: p.dob || prev.dateOfBirth,
                   joined: prev.joined,
                   documents,
-<<<<<<< HEAD
-                  applicationStatus:
-                    statusMap[result.applicationStatus] || "pending",
-                }
-              : prev
-          );
-        } else {
-=======
                   applicationStatus: mappedApplicationStatus,
                   applicationStatusCode: applicationStatusCode,
                   fullApplicationData: result,
@@ -676,20 +572,15 @@ export default function DocumentReview() {
           );
         } else {
           //console.warn("No application data found for student");
->>>>>>> main
           setSelectedStudent((prev) =>
             prev
               ? { ...prev, documents: [], applicationStatus: "pending" }
               : prev
           );
         }
-<<<<<<< HEAD
-      } catch (e) {
-=======
       } catch (error) {
         //console.error(`Error fetching application details: ${error.message}`);
         //console.error("Full error:", error);
->>>>>>> main
         setSelectedStudent((prev) =>
           prev ? { ...prev, documents: [], applicationStatus: "pending" } : prev
         );
@@ -697,12 +588,6 @@ export default function DocumentReview() {
       setSelectedDocument(null);
       setLoadingDetails(false);
     }
-<<<<<<< HEAD
-    if (selectedStudent) fetchStudentApplication();
-    // eslint-disable-next-line
-  }, [selectedStudent?.id]);
-
-=======
 
     if (selectedStudent) fetchStudentApplication();
   }, [selectedStudent?.id]);
@@ -997,7 +882,6 @@ export default function DocumentReview() {
     }
   };
 
->>>>>>> main
   const getStatusClass = (status) => {
     switch (status) {
       case "approved":
@@ -1007,53 +891,25 @@ export default function DocumentReview() {
       case "rejected":
         return "status-badge rejected";
       case "under review":
-<<<<<<< HEAD
-        return "status-badge pending";
-      case "submitted":
-        return "status-badge pending";
-=======
         return "status-badge under-review";
       case "submitted":
         return "status-badge submitted";
       case "uploaded":
         return "status-badge uploaded";
->>>>>>> main
       default:
         return "status-badge";
     }
   };
 
-<<<<<<< HEAD
-  // Derive main status using applicationStatus if available
-  const deriveStatus = (student) => {
-    if (student && student.applicationStatus) return student.applicationStatus;
-    if (!student.documents || !student.documents.length) return "pending";
-    if (student.documents.some((d) => d.status === "approved"))
-      return "approved";
-    if (student.documents.every((d) => d.status === "rejected"))
-      return "rejected";
-=======
   const deriveStatus = (student) => {
     if (student && student.applicationStatus) {
       return student.applicationStatus;
     }
->>>>>>> main
     return "pending";
   };
 
   const handleDeleteStudent = async (id) => {
     try {
-<<<<<<< HEAD
-      await apiInstance.delete(`StudentPersonalInfo/delete/${id}`);
-      const filtered = studentList.filter((s) => s.id !== id);
-      setStudentList(filtered);
-      if (selectedStudent && selectedStudent.id === id) {
-        setSelectedStudent(filtered[0] || null);
-        setSelectedDocument(null);
-      }
-    } catch (e) {
-      // handle error as needed
-=======
       const result = await Swal.fire({
         title: "Delete Student",
         text: "Are you sure you want to delete this student? This action cannot be undone.",
@@ -1120,17 +976,11 @@ export default function DocumentReview() {
           title: "Comment functionality to be implemented",
         });
       }
->>>>>>> main
     }
   };
 
   const handleToggle = (type) => {
     setToggleStates((prev) => ({
-<<<<<<< HEAD
-      ...prev,
-      [type]: !prev[type],
-    }));
-=======
       approve: false,
       reject: false,
       underReview: false,
@@ -1175,29 +1025,10 @@ export default function DocumentReview() {
 
     // Close dropdown after action
     setBulkActionsOpen(false);
->>>>>>> main
   };
 
   const handleDocToggle = (type) => {
     setDocToggleStates((prev) => ({
-<<<<<<< HEAD
-      ...prev,
-      [type]: !prev[type],
-    }));
-  };
-
-  // Remove document from UI only (no API, as per original)
-  const handleDeleteDocument = (idx) => {
-    if (!selectedStudent) return;
-    const updatedDocs = selectedStudent.documents.filter((_, i) => i !== idx);
-    const updatedStudent = { ...selectedStudent, documents: updatedDocs };
-    const newList = studentList.map((s) =>
-      s.id === selectedStudent.id ? updatedStudent : s
-    );
-    setStudentList(newList);
-    setSelectedStudent(updatedStudent);
-    setSelectedDocument(null);
-=======
       approve: false,
       reject: false,
       underReview: false,
@@ -1229,27 +1060,10 @@ export default function DocumentReview() {
     e.stopPropagation();
     //console.log("Dropdown clicked, current state:", bulkActionsOpen);
     setBulkActionsOpen(!bulkActionsOpen);
->>>>>>> main
   };
 
   return (
     <>
-<<<<<<< HEAD
-      <h1
-        className="section-title mb-2"
-        style={{
-          color: "#264de4",
-          fontSize: "1.5rem",
-          marginBottom: "1rem",
-          marginTop: 0,
-          textAlign: "left",
-          display: "inline-block",
-          fontWeight: 700,
-        }}
-      >
-        Document Review
-      </h1>
-=======
       <div className="header-section">
         <h1 className="section-title">Document Review</h1>
         <button
@@ -1266,18 +1080,13 @@ export default function DocumentReview() {
         </button>
       </div>
 
->>>>>>> main
       <div className="document-review-section">
         {/* Left: Students List */}
         <div className="documents-table-container">
           <div className="table-wrapper">
             {loadingStudents ? (
-<<<<<<< HEAD
-              <div style={{ textAlign: "center", padding: "2rem" }}>
-=======
               <div className="loading-container">
                 <div className="loading-spinner"></div>
->>>>>>> main
                 Loading students...
               </div>
             ) : (
@@ -1299,16 +1108,11 @@ export default function DocumentReview() {
                       onClick={() => {
                         setSelectedStudent(student);
                         setSelectedDocument(null);
-<<<<<<< HEAD
-                      }}
-                      style={{ cursor: "pointer" }}
-=======
                         setAcademicInfo(null);
                         setAcademicDropdownOpen(false);
                         setPersonalDropdownOpen(true);
                         setApplicationDropdownOpen(true);
                       }}
->>>>>>> main
                     >
                       <td className="student-name">
                         <img
@@ -1340,11 +1144,7 @@ export default function DocumentReview() {
                   ))}
                   {studentList.length === 0 && (
                     <tr>
-<<<<<<< HEAD
-                      <td colSpan={3} style={{ textAlign: "center" }}>
-=======
                       <td colSpan={3} className="empty-state">
->>>>>>> main
                         No students found
                       </td>
                     </tr>
@@ -1358,147 +1158,12 @@ export default function DocumentReview() {
         {/* Middle: Student Info & Documents, Review Actions */}
         <div className="review-details-panel">
           {loadingDetails ? (
-<<<<<<< HEAD
-            <div style={{ textAlign: "center", marginTop: "2rem" }}>
-=======
             <div className="loading-container">
               <div className="loading-spinner"></div>
->>>>>>> main
               Loading student details...
             </div>
           ) : selectedStudent ? (
             <>
-<<<<<<< HEAD
-              <img
-                src={selectedStudent.avatar}
-                className="profile-avatar-large"
-                alt={selectedStudent.name}
-              />
-              <div className="details-info">
-                <h3 className="applicant-details-name">
-                  {selectedStudent.name}
-                </h3>
-                <p>Email: {selectedStudent.email}</p>
-                <p>Phone: {selectedStudent.phone}</p>
-                <p>Address: {selectedStudent.address}</p>
-                <p>Post Code: {selectedStudent.postCode}</p>
-                <p>Preferred Language: {selectedStudent.language}</p>
-                <p>Date of Birth: {selectedStudent.dateOfBirth}</p>
-                <p>Joined: {selectedStudent.joined}</p>
-                <p>
-                  Application Status:{" "}
-                  <span
-                    className={getStatusClass(deriveStatus(selectedStudent))}
-                  >
-                    {selectedStudent.applicationStatus
-                      ? selectedStudent.applicationStatus
-                          .charAt(0)
-                          .toUpperCase() +
-                        selectedStudent.applicationStatus.slice(1)
-                      : deriveStatus(selectedStudent).charAt(0).toUpperCase() +
-                        deriveStatus(selectedStudent).slice(1)}
-                  </span>
-                </p>
-              </div>
-              <div
-                className="document-preview-actions"
-                style={{ marginTop: "0.7rem", marginBottom: "0.5rem" }}
-              >
-                <button
-                  className={`toggle-btn ${
-                    toggleStates.approve ? "active" : ""
-                  }`}
-                  onClick={() => handleToggle("approve")}
-                >
-                  <CheckCircle size={14} />
-                  Approve
-                </button>
-                <button
-                  className={`toggle-btn ${
-                    toggleStates.reject ? "active" : ""
-                  }`}
-                  onClick={() => handleToggle("reject")}
-                >
-                  <XCircle size={14} />
-                  Reject
-                </button>
-                <button
-                  className={`toggle-btn ${
-                    toggleStates.comment ? "active" : ""
-                  }`}
-                  onClick={() => handleToggle("comment")}
-                >
-                  <MessageSquare size={14} />
-                  Comment
-                </button>
-              </div>
-              <div className="uploaded-documents-card">
-                <div className="uploaded-documents-header">
-                  <span>Uploaded Documents</span>
-                  <span className="document-count">
-                    {selectedStudent.documents
-                      ? selectedStudent.documents.length
-                      : 0}
-                  </span>
-                </div>
-                <table className="uploaded-documents-table">
-                  <thead>
-                    <tr>
-                      <th>Document</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedStudent.documents &&
-                    selectedStudent.documents.length > 0 ? (
-                      selectedStudent.documents.map((doc, idx) => (
-                        <tr key={idx}>
-                          <td>{doc.name}</td>
-                          <td>
-                            <span className={getStatusClass(doc.status)}>
-                              {doc.status.charAt(0).toUpperCase() +
-                                doc.status.slice(1)}
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              className="action-btn view-btn"
-                              title="View"
-                              onClick={() => setSelectedDocument(doc)}
-                            >
-                              <Eye size={14} />
-                              {/* <span className="action-label">View</span> */}
-                            </button>
-                            <button
-                              className="action-btn delete-btn"
-                              title="Delete Document"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteDocument(idx);
-                              }}
-                            >
-                              <Trash2 size={14} />
-                              {/*<span className="action-label">Delete</span> */}
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={3} style={{ textAlign: "center" }}>
-                          No documents found
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          ) : (
-            <div style={{ textAlign: "center", marginTop: "2rem" }}>
-              Select a student to view details
-=======
               {/* Enhanced Profile Header */}
               <div className="enhanced-profile-header">
                 <div className="profile-avatar-section">
@@ -2075,7 +1740,6 @@ export default function DocumentReview() {
                   documents
                 </p>
               </div>
->>>>>>> main
             </div>
           )}
         </div>
@@ -2084,10 +1748,6 @@ export default function DocumentReview() {
         <div className="document-preview-panel">
           {selectedDocument ? (
             <>
-<<<<<<< HEAD
-              <div className="document-preview-header">
-                <span className="document-preview-title">Document Preview</span>
-=======
               <div className="document-preview-header enhanced">
                 <h4 className="document-preview-title">Document Preview</h4>
                 <span
@@ -2098,26 +1758,12 @@ export default function DocumentReview() {
                   {selectedDocument.status.charAt(0).toUpperCase() +
                     selectedDocument.status.slice(1)}
                 </span>
->>>>>>> main
               </div>
               <div className="document-preview-content">
                 <div className="pdf-preview-image">
                   <iframe
                     title="Document Preview"
                     src={selectedDocument.url}
-<<<<<<< HEAD
-                    style={{ width: "100%", height: "320px", border: "none" }}
-                  />
-                </div>
-                <div className="document-preview-info">
-                  <div className="doc-meta">
-                    <div>
-                      <span>File name:</span> {selectedDocument.name}
-                    </div>
-                    <div>
-                      <span>Status:</span>
-                      <span className={getStatusClass(selectedDocument.status)}>
-=======
                     className="document-iframe"
                   />
                 </div>
@@ -2136,60 +1782,16 @@ export default function DocumentReview() {
                           selectedDocument.status
                         )}`}
                       >
->>>>>>> main
                         {selectedDocument.status.charAt(0).toUpperCase() +
                           selectedDocument.status.slice(1)}
                       </span>
                     </div>
-<<<<<<< HEAD
-                    <div className="download-link">
-=======
                     <div className="download-section">
->>>>>>> main
                       <a
                         href={selectedDocument.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         download
-<<<<<<< HEAD
-                      >
-                        Click to download file
-                      </a>
-                    </div>
-                  </div>
-                  {/* Document Review Actions */}
-                  <div
-                    className="document-preview-actions"
-                    style={{ marginTop: "0.7rem", marginBottom: "0.5rem" }}
-                  >
-                    <button
-                      className={`toggle-btn ${
-                        docToggleStates.approve ? "active" : ""
-                      }`}
-                      onClick={() => handleDocToggle("approve")}
-                    >
-                      <CheckCircle size={14} />
-                      Approve
-                    </button>
-                    <button
-                      className={`toggle-btn ${
-                        docToggleStates.reject ? "active" : ""
-                      }`}
-                      onClick={() => handleDocToggle("reject")}
-                    >
-                      <XCircle size={14} />
-                      Reject
-                    </button>
-                    <button
-                      className={`toggle-btn ${
-                        docToggleStates.comment ? "active" : ""
-                      }`}
-                      onClick={() => handleDocToggle("comment")}
-                    >
-                      <MessageSquare size={14} />
-                      Comment
-                    </button>
-=======
                         className="download-btn enhanced"
                       >
                         <Download size={16} />
@@ -2251,25 +1853,17 @@ export default function DocumentReview() {
                         <span>Add Comment</span>
                       </button>
                     </div>
->>>>>>> main
                   </div>
                 </div>
               </div>
             </>
           ) : (
-<<<<<<< HEAD
-            <div className="document-preview-header">
-              <span className="document-preview-title">
-                Select a document to preview
-              </span>
-=======
             <div className="document-preview-header enhanced">
               <div className="no-document-selected">
                 <Eye size={48} />
                 <h4>No Document Selected</h4>
                 <p>Select a document from the list to preview it here</p>
               </div>
->>>>>>> main
             </div>
           )}
         </div>
