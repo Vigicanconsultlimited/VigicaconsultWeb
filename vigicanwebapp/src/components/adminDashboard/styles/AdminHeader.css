@@ -1,0 +1,283 @@
+.admin-header-redesign {
+  width: 100%;
+  background: #2654db;
+  box-sizing: border-box;
+  padding: 0;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1300;
+  margin: 0 0 12px 0 !important;
+}
+
+.admin-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 60px;
+  width: 100%;
+  padding: 0 0.6rem;
+  box-sizing: border-box;
+  position: relative;
+  gap: 0;
+}
+
+.header-hamburger-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.35rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-right: 0.2rem;
+  font-size: 1.7rem;
+  display: flex;
+  align-items: center;
+}
+.header-hamburger-btn:hover,
+.header-hamburger-btn:focus {
+  background: rgba(255, 255, 255, 0.13);
+  outline: none;
+}
+
+/* ===== Mobile Logo & Brand ===== */
+.admin-header-mobile-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding-bottom: 10px;
+}
+.mobile-logo-img {
+  display: block;
+  max-height: 32px;
+  margin-bottom: 2px;
+}
+.sidebar-brand {
+  font-size: 1.03rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  text-align: center;
+}
+.sidebar-subbrand {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #e4e9fc;
+  letter-spacing: 0.7px;
+  line-height: 1.08;
+  margin-top: -1.5px;
+}
+
+/* ===== Desktop Profile/Dropdown ===== */
+.admin-header-desktop-profile {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 0.7rem;
+  position: relative;
+}
+.profile-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f3f3f3;
+}
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0.4rem;
+}
+.admin-name {
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.11rem;
+}
+.admin-email {
+  font-size: 0.98rem;
+  color: #e4e9fc;
+  font-weight: 500;
+}
+.header-action-btn.arrow.desktop {
+  background: #3463e8;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 0 6px;
+  border: none;
+  cursor: pointer;
+}
+.header-action-btn.arrow.desktop:focus,
+.header-action-btn.arrow.desktop:hover {
+  background: #2654db;
+}
+.admin-header-desktop-dropdown-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  box-shadow: 0 3px 16px rgba(44, 62, 80, 0.17);
+  border-radius: 7px;
+  min-width: 140px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem 0;
+}
+.dropdown-item {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.45rem 1rem;
+  color: #2654db;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-radius: 5px;
+}
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: #e5ecfa;
+  color: #153181;
+}
+
+/* ===== MOBILE HEADER ===== */
+.admin-header-mobile {
+  display: none;
+  align-items: center;
+  flex: 1;
+  justify-content: flex-end;
+  gap: 1.2rem;
+}
+.admin-header-mobile-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 0.28rem;
+}
+.admin-header-mobile-profile .profile-avatar {
+  width: 32px;
+  height: 32px;
+}
+.admin-header-mobile-profile .admin-name {
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 2px;
+}
+.admin-header-mobile-dropdown {
+  position: relative;
+  margin-left: 0.11rem;
+}
+.header-action-btn.arrow {
+  background: #3463e8;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+.header-action-btn.arrow:focus,
+.header-action-btn.arrow:hover {
+  background: #2654db;
+}
+.admin-header-mobile-dropdown-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  box-shadow: 0 3px 16px rgba(44, 62, 80, 0.17);
+  border-radius: 7px;
+  min-width: 120px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem 0;
+}
+
+/* ===== RESPONSIVE VISIBILITY SWITCHING ===== */
+@media (max-width: 991px) {
+  .admin-header-desktop-profile,
+  .admin-name-container {
+    display: none !important;
+  }
+  .admin-header-mobile {
+    display: flex !important;
+  }
+  .admin-header-mobile-logo {
+    display: flex !important;
+  }
+  .profile-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .admin-header-bar {
+    min-height: 50px;
+    padding: 0 0.6rem;
+  }
+}
+@media (min-width: 992px) {
+  .admin-header-mobile,
+  .admin-header-mobile-profile,
+  .admin-header-mobile-dropdown,
+  .admin-header-mobile-logo {
+    display: none !important;
+  }
+  .admin-header-desktop-profile {
+    display: flex !important;
+  }
+  .header-hamburger-btn {
+    display: none !important;
+  }
+  .admin-header-redesign {
+    width: calc(100% - 260px);
+    left: 260px;
+    margin: 0 0 12px 0 !important;
+    min-height: 50px;
+    box-shadow: 0 2px 12px 0 rgba(38, 84, 219, 0.08);
+    padding: 0;
+  }
+  .admin-header-bar {
+    padding: 0.6rem 1.1rem;
+    min-height: 50px;
+    gap: 0.5rem;
+  }
+  .admin-header-mobile-logo {
+    display: none !important;
+  }
+}
+
+/* Only show mobile logo on mobile */
+.admin-header-mobile-logo {
+  display: none;
+}
+
+/* Optional: prevent dropdown menu from being cut off on tiny screens */
+@media (max-width: 350px) {
+  .admin-header-mobile-dropdown-menu,
+  .admin-header-desktop-dropdown-menu {
+    min-width: 80px;
+    font-size: 0.93rem;
+    right: -10px;
+  }
+}

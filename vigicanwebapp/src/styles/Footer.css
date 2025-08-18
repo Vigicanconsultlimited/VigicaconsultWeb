@@ -17,16 +17,6 @@
   gap: 1rem;
 }
 
-.logo-icon-variant2 {
-  width: 54px;
-  height: 54px;
-  background: none;
-  color: #284ad6;
-  border-radius: 50%;
-  font-size: 2rem;
-  margin-right: 12px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-}
 .logo-text-variant2 strong {
   font-family: "Bricolage Grotesque", Arial, sans-serif;
   font-weight: 800;

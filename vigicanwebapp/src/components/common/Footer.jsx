@@ -17,17 +17,31 @@ const Footer = () => (
           </div>
         </div>
         <div className="footer-social-icons mt-1">
-          <a href="#" className="footer-social-btn">
+          <a href="http://t.me/vigica_1" className="footer-social-btn">
             <i className="fa-brands fa-telegram"></i>
           </a>
-          <a href="#" className="footer-social-btn">
+          <a
+            href="https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true"
+            className="footer-social-btn"
+          >
             <i className="fa-brands fa-linkedin-in"></i>
           </a>
-          <a href="#" className="footer-social-btn">
+          <a
+            href="https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09"
+            className="footer-social-btn"
+          >
             <i className="fa-brands fa-twitter"></i>
           </a>
+          {/*}
           <a href="#" className="footer-social-btn">
             <i className="fa-brands fa-facebook-f"></i>
+          </a>
+          */}
+          <a
+            href="https://www.instagram.com/vigicaconsult/"
+            className="footer-social-btn"
+          >
+            <i className="fa-brands fa-instagram"></i>
           </a>
         </div>
       </div>

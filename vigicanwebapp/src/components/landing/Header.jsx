@@ -9,6 +9,7 @@ import {
   FaEnvelope,
   FaClock,
   FaInstagram,
+  FaTelegramPlane,
   FaTwitter,
   FaFacebook,
   FaLinkedin,
@@ -138,29 +139,38 @@ function Header() {
 
               <div className="flex gap-3">
                 <a
-                  href="#"
+                  href="http://t.me/vigica_1"
                   className="text-white hover:text-blue-200 transition-colors"
                 >
-                  <FaInstagram />
+                  <FaTelegramPlane />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true"
+                  className="text-white hover:text-blue-200 transition-colors"
+                >
+                  <FaLinkedin />
+                </a>
+                <a
+                  href="https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09"
                   className="text-white hover:text-blue-200 transition-colors"
                 >
                   <FaTwitter />
                 </a>
+                <a
+                  href="https://www.instagram.com/vigicaconsult/"
+                  className="text-white hover:text-blue-200 transition-colors"
+                >
+                  <FaInstagram />
+                </a>
+
+                {/*
                 <a
                   href="#"
                   className="text-white hover:text-blue-200 transition-colors"
                 >
                   <FaFacebook />
                 </a>
-                <a
-                  href="#"
-                  className="text-white hover:text-blue-200 transition-colors"
-                >
-                  <FaLinkedin />
-                </a>
+                */}
               </div>
             </div>
           </div>

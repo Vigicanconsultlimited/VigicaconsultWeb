@@ -1,0 +1,14 @@
+@media (max-width: 768px) {
+  .register-img-section {
+    display: none !important;
+  }
+
+  .form-control {
+    font-size: 16px !important;
+    padding: 12px !important;
+  }
+
+  .btn {
+    font-size: 16px !important;
+  }
+}

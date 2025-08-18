@@ -5,6 +5,7 @@ import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import testimonialImage from "../../assets/images/img/vigica-img6.jpg";
 import {
   GraduationCap,
   FileCheck,
@@ -24,11 +25,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "./Header";
 
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-18 13:10:32
-// Current User's Login: NeduStack
-
 const statsData = [
-  { number: "350+", label: "Documents Reviewed", icon: FileCheck },
+  { number: "850+", label: "Documents Reviewed", icon: FileCheck },
   { number: "96%", label: "Successful Visa Process Rate", icon: CheckCircle },
   { number: "48hrs", label: "Application Approval Time", icon: Clock3 },
 ];
@@ -97,10 +95,9 @@ const countriesData = [
 
 const testimonials = [
   {
-    name: "Sarah Johnson",
-    university: "University of Melbourne",
-    image:
-      "https://images.unsplash.com/photo-1494790108755-2616c15a5e27?w=150&h=150&fit=crop",
+    name: "Precious Nweze",
+    university: "University of Greater Manchester",
+    image: testimonialImage,
     text: "Vigica Consult made my study abroad journey seamless. From visa application to accommodation, their support was invaluable.",
     rating: 5,
   },
