@@ -11,9 +11,9 @@ import lolo from "../../assets/images/lolo.webp";
 import kelvin from "../../assets/images/Kelvin.png";
 import john from "../../assets/images/john.jpg";
 import RentalHouse from "../../assets/images/houserental.jpg";
-import OrlandoExternal from "../../assets/images/OrlandoVillageExternal.webp";
 import OrlandoSilver from "../../assets/images/OrlandoSilverRooms.WEBP";
-import OrlandoBronze from "../../assets/images/OrlandoVillageBronzePlus.WEBP";
+//import OrlandoBronze from "../../assets/images/OrlandoVillageBronzePlus.WEBP";
+import OrlandoExternal from "../../assets/images/OrlandoVillageBronzePlus.WEBP";
 import {
   GraduationCap,
   FileCheck,
