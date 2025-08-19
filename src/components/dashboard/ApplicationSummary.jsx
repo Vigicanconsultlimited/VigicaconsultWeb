@@ -4,6 +4,14 @@ import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import Swal from "sweetalert2";
 
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top",
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+});
+
 function ApplicationSummary({ setCurrentStep }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -16,7 +24,7 @@ function ApplicationSummary({ setCurrentStep }) {
 
   // Get current datetime - using the format you specified
   const getCurrentDateTime = () => {
-    return "2025-08-11 18:13:32";
+    return "2025-08-19 17:17:36";
   };
 
   // Get current user login as specified
@@ -72,8 +80,12 @@ function ApplicationSummary({ setCurrentStep }) {
                   }
 
                   // If status is already Submitted (1) or higher, show the success view
-                  if (status >= 1) {
+                  // BUT make an exception for Rejected (4) and Pending (2) status
+                  if (status >= 1 && status !== 4 && status !== 2) {
                     setIsSubmitted(true);
+                  } else if (status === 4 || status === 2) {
+                    // For Rejected or Pending, show the submission form
+                    setIsSubmitted(false);
                   }
                 }
               } catch (err) {
@@ -132,7 +144,7 @@ function ApplicationSummary({ setCurrentStep }) {
           message:
             "You have completed all the necessary steps for your application. Please review your information before final submission.",
           instructions: [
-            "You will not be able to make further changes after submission",
+            "You will not be able to make changes after submission",
             "Our team will begin reviewing your application immediately",
             "You will receive email notifications for any status updates",
           ],
@@ -255,13 +267,13 @@ function ApplicationSummary({ setCurrentStep }) {
           Swal.close();
           setApplicationStatus(1); // Update to Submitted status
           setSubmissionDate(getCurrentDateTime());
+          setIsSubmitted(true); // Show submitted view after successful submission
 
           // Success message
-          Swal.fire({
+          Toast.fire({
             title: "Success!",
             text: "Document successfully re-submitted. Your application will be reviewed again.",
             icon: "success",
-            confirmButtonText: "OK",
           });
         } catch (error) {
           console.error(
@@ -365,7 +377,7 @@ function ApplicationSummary({ setCurrentStep }) {
           setSubmissionDate(getCurrentDateTime());
 
           // Success message
-          Swal.fire({
+          Toast.fire({
             title: "Success!",
             text: isResubmission
               ? "Document successfully re-submitted. Your application will be reviewed again."
@@ -382,7 +394,7 @@ function ApplicationSummary({ setCurrentStep }) {
           Swal.close();
 
           // Show error message
-          Swal.fire({
+          Toast.fire({
             title: `${isResubmission ? "Resubmission" : "Submission"} Failed`,
             text:
               error.response?.data?.message ||
@@ -419,9 +431,14 @@ function ApplicationSummary({ setCurrentStep }) {
   // Get current status content
   const statusContent = getStatusContent(applicationStatus);
 
+  // Determine if we should show the submission form or the submitted view
+  // Now, explicitly check if status is 2 (Pending) or 4 (Rejected) to show the form
+  const shouldShowSubmissionForm =
+    !isSubmitted || applicationStatus === 2 || applicationStatus === 4;
+
   return (
     <div className="application-summary-container">
-      {!isSubmitted ? (
+      {shouldShowSubmissionForm ? (
         <>
           <h2 className="application-summary-title">Review & Submit</h2>
 
@@ -490,31 +507,31 @@ function ApplicationSummary({ setCurrentStep }) {
                 </button>
               )}
 
-              <button
-                onClick={handleFinalSubmit}
-                className="btn btn-primary application-summary-button submit-button"
-                disabled={
-                  isSubmitting ||
-                  (applicationStatus && ![2, 4].includes(applicationStatus))
-                }
-              >
-                {isSubmitting ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    {applicationStatus === 4
-                      ? "Resubmitting..."
-                      : "Submitting..."}
-                  </>
-                ) : applicationStatus === 4 ? (
-                  "Resubmit Application 🔄"
-                ) : (
-                  "Submit Application 🚀"
-                )}
-              </button>
+              {/* Always show submit button for Pending (2) or Rejected (4) status */}
+              {(applicationStatus === 2 || applicationStatus === 4) && (
+                <button
+                  onClick={handleFinalSubmit}
+                  className="btn btn-primary application-summary-button submit-button"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      {applicationStatus === 4
+                        ? "Resubmitting..."
+                        : "Submitting..."}
+                    </>
+                  ) : applicationStatus === 4 ? (
+                    "Resubmit Application 🔄"
+                  ) : (
+                    "Submit Application 🚀"
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </>

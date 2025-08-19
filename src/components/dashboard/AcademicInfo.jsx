@@ -22,7 +22,7 @@ export default function AcademicInfo({
   const authData = useAuthStore((state) => state.allUserData);
 
   const [formData, setFormData] = useState({
-    Id: "", // Added Id field for updates
+    Id: "",
     PersonalInformationId: "",
     SchoolId: "",
     AcademicProgramId: "",
@@ -38,6 +38,9 @@ export default function AcademicInfo({
   const [submitting, setSubmitting] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState(null);
   const [academicInfoId, setAcademicInfoId] = useState("");
+
+  // State to track if selected program is PhD level
+  const [isPhDProgram, setIsPhDProgram] = useState(false);
 
   // Check if application status allows editing (only Pending or Rejected)
   const canEdit =
@@ -215,6 +218,19 @@ export default function AcademicInfo({
               AcademicProgramId: programId,
               CourseOfInterestId: courseId,
             }));
+
+            // Check if selected program is PhD level
+            if (programId) {
+              const selectedProgram = programs.find((p) => p.id === programId);
+              if (selectedProgram && selectedProgram.programLevel === 2) {
+                // PhD level is 2
+                setIsPhDProgram(true);
+                // Store PhD program info in localStorage for document component
+                localStorage.setItem("isPhDProgram", "true");
+              } else {
+                localStorage.setItem("isPhDProgram", "false");
+              }
+            }
           }
         } catch (error) {
           console.warn(`Error mapping academic data: ${error.message}`);
@@ -230,6 +246,23 @@ export default function AcademicInfo({
     courses.length,
     academicInfoId,
   ]);
+
+  // Effect to check if selected program is PhD level
+  useEffect(() => {
+    if (formData.AcademicProgramId && programs.length > 0) {
+      const selectedProgram = programs.find(
+        (p) => p.id === formData.AcademicProgramId
+      );
+      const isPhdLevel = selectedProgram && selectedProgram.programLevel === 2;
+      setIsPhDProgram(isPhdLevel);
+
+      // Store PhD program info in localStorage for document component
+      localStorage.setItem("isPhDProgram", isPhdLevel ? "true" : "false");
+    } else {
+      setIsPhDProgram(false);
+      localStorage.setItem("isPhDProgram", "false");
+    }
+  }, [formData.AcademicProgramId, programs]);
 
   // Get school name by ID
   const getSchoolName = (schoolId) => {
@@ -546,6 +579,15 @@ export default function AcademicInfo({
         </div>
       </div>
 
+      {/* PhD Program Info Alert */}
+      {isPhDProgram && (
+        <div className="alert alert-info mb-4">
+          <i className="fas fa-info-circle me-2"></i>
+          <strong>PhD Program Selected:</strong> You will need to upload a
+          Research Proposal document in the next step.
+        </div>
+      )}
+
       {/* Course of Interest Selection */}
       <div className="row g-3 pb-3">
         <div className="col-12">
@@ -614,6 +656,16 @@ export default function AcademicInfo({
                     </span>
                   </div>
                 )}
+                {/* 
+                {program.programLevel === 2 && ( // PhD level
+                  <div className="program-info-row">
+                    <span className="info-label">Research Proposal:</span>
+                    <span className="info-value">
+                      <strong>Required</strong> (Upload in next step)
+                    </span>
+                  </div>
+                )}
+                */}
               </div>
             ))}
         </div>

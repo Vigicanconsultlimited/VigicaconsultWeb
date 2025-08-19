@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import testimonialImage from "../../assets/images/img/vigica-img6.jpg";
+import precious from "../../assets/images/img/vigica-img6.jpg";
+import mercy from "../../assets/images/mercy.png";
+import lolo from "../../assets/images/lolo.webp";
+import kelvin from "../../assets/images/kelvin.png";
+import john from "../../assets/images/john.jpg";
+import RentalHouse from "../../assets/images/houserental.jpg";
+import OrlandoExternal from "../../assets/images/OrlandoVillageExternal.WEBP";
+import OrlandoSilver from "../../assets/images/OrlandoSilverRooms.WEBP";
+import OrlandoBronze from "../../assets/images/OrlandoVillageBronzePlus.WEBP";
 import {
   GraduationCap,
   FileCheck,
@@ -21,6 +29,8 @@ import {
   ChevronDown,
   Clock3,
   Users,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "./Header";
@@ -97,11 +107,175 @@ const testimonials = [
   {
     name: "Precious Nweze",
     university: "University of Greater Manchester",
-    image: testimonialImage,
+    image: precious,
+    text: "Vigica Consult made my study abroad journey seamless. From visa application to accommodation, their support was invaluable.",
+    rating: 5,
+  },
+
+  {
+    name: "Oji Ojii",
+    university: "University of Greater Manchester",
+    image: mercy,
     text: "Vigica Consult made my study abroad journey seamless. From visa application to accommodation, their support was invaluable.",
     rating: 5,
   },
 ];
+
+// Testimonial Carousel Component
+const TestimonialCarousel = ({ testimonials }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(null);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  // Auto-rotation effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDirection("right");
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+    }, 6000); // Change slide every 6 seconds
+
+    return () => clearTimeout(timer);
+  }, [currentIndex, testimonials.length]);
+
+  const handlePrevious = () => {
+    setDirection("left");
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNext = () => {
+    setDirection("right");
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+  };
+
+  // Touch event handlers for swipe gestures
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    const difference = touchStartX.current - touchEndX.current;
+
+    if (difference > 50) {
+      // Swiped left - go to next
+      handleNext();
+    } else if (difference < -50) {
+      // Swiped right - go to previous
+      handlePrevious();
+    }
+  };
+
+  // Variants for slide animations
+  const slideVariants = {
+    enter: (direction) => ({
+      x: direction === "right" ? 300 : -300,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction) => ({
+      x: direction === "right" ? -300 : 300,
+      opacity: 0,
+    }),
+  };
+
+  return (
+    <div
+      className="relative"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <AnimatePresence initial={false} custom={direction} mode="wait">
+        <motion.div
+          key={currentIndex}
+          custom={direction}
+          variants={slideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            x: { type: "spring", stiffness: 300, damping: 30 },
+            opacity: { duration: 0.3 },
+          }}
+          className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 text-white"
+        >
+          <div className="grid md:grid-cols-3 gap-8 items-center">
+            <div className="text-center md:text-left">
+              <img
+                src={testimonials[currentIndex].image}
+                alt={testimonials[currentIndex].name}
+                className="w-24 h-24 rounded-full mx-auto md:mx-0 mb-4 shadow-xl object-cover"
+              />
+              <h4 className="text-xl font-bold mb-1">
+                {testimonials[currentIndex].university}
+              </h4>
+              <p className="text-blue-100">{testimonials[currentIndex].name}</p>
+            </div>
+            <div className="md:col-span-2">
+              <div className="flex items-center mb-4">
+                {[...Array(testimonials[currentIndex].rating)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className="w-5 h-5 text-yellow-400 fill-current"
+                  />
+                ))}
+              </div>
+              <blockquote className="text-xl leading-relaxed">
+                "{testimonials[currentIndex].text}"
+              </blockquote>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation Controls */}
+      <div className="absolute inset-y-0 left-0 flex items-center">
+        <button
+          onClick={handlePrevious}
+          className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full -ml-4 md:ml-0 focus:outline-none focus:ring-2 focus:ring-white/20"
+          aria-label="Previous testimonial"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+      </div>
+
+      <div className="absolute inset-y-0 right-0 flex items-center">
+        <button
+          onClick={handleNext}
+          className="bg-white/10 hover:bg-white/20 text-white p-2 rounded-full -mr-4 md:mr-0 focus:outline-none focus:ring-2 focus:ring-white/20"
+          aria-label="Next testimonial"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Dots indicator */}
+      <div className="absolute -bottom-10 left-0 right-0 flex justify-center space-x-2">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => {
+              setDirection(index > currentIndex ? "right" : "left");
+              setCurrentIndex(index);
+            }}
+            className={`w-2.5 h-2.5 rounded-full transition-colors ${
+              index === currentIndex
+                ? "bg-white"
+                : "bg-white/30 hover:bg-white/50"
+            }`}
+            aria-label={`Go to testimonial ${index + 1}`}
+            aria-current={index === currentIndex}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 // Flight Booking Form Component
 const FlightBookingForm = () => {
@@ -1061,24 +1235,22 @@ export default function Home() {
             {[
               {
                 title: "Student Hostels",
-                image:
-                  "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=400&h=250&fit=crop",
+                image: OrlandoExternal,
                 desc: "Affordable accommodation options specially designed for students near universities.",
-                price: "From $200/month",
+                price: "From $300/month",
               },
               {
                 title: "Serviced Apartments",
                 image:
                   "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=250&fit=crop",
                 desc: "Fully furnished apartments with amenities for short or long-term stays.",
-                price: "From $60/night",
+                price: "From $80/night",
               },
               {
-                title: "Executive Hotels",
-                image:
-                  "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=250&fit=crop",
+                title: "Student Apartments",
+                image: OrlandoSilver,
                 desc: "Luxury accommodations with premium services for business travelers.",
-                price: "From $120/night",
+                price: "From $250/month",
               },
             ].map((item, index) => (
               <motion.div
@@ -1103,12 +1275,14 @@ export default function Home() {
                     {item.title}
                   </h3>
                   <p className="text-gray-600 mb-4">{item.desc}</p>
+                  {/*
                   <Button
                     variant="outline"
                     className="w-full border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white transition-colors"
                   >
                     View Options
                   </Button>
+                  */}
                 </div>
               </motion.div>
             ))}
@@ -1126,23 +1300,48 @@ export default function Home() {
                   Accommodation Booking Assistance
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Our team can help you find and secure the perfect
-                  accommodation based on your preferences, budget, and location
-                  requirements. Fill out this form and we'll get back to you
-                  with personalized options.
+                  Our team work with local estate agents and landlords to ensure
+                  we meet all your accommodation needs. All you need to do is to
+                  complete the accommodation form.
                 </p>
 
                 <form className="space-y-4">
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Full Name
+                    </label>
+                    <Input type="text" className="w-full mb-2" />
+
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Gender
+                    </label>
+                    <select className="w-full mb-2 rounded-md border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                      <option>Select Gender</option>
+                      <option>Male</option>
+                      <option>Female</option>
+                      <option>Other</option>
+                    </select>
+
+                    <label className="block text-sm font-medium text-gray-700 mt-2">
+                      Contact Telephone
+                    </label>
+                    <Input type="tel" className="w-full mb-2" />
+
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <Input type="email" className="w-full mb-2" />
+
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Destination
                     </label>
                     <Input
                       type="text"
                       placeholder="City, Country"
-                      className="w-full"
+                      className="w-full mb-2"
                     />
                   </div>
+                  {/*
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1157,15 +1356,24 @@ export default function Home() {
                       <Input type="date" className="w-full" />
                     </div>
                   </div>
+                  */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Accommodation Type
                     </label>
-                    <select className="w-full rounded-md border-gray-300 focus:border-purple-500 focus:ring-purple-500">
-                      <option>Student Hostel</option>
-                      <option>Apartment</option>
-                      <option>Hotel</option>
-                      <option>Homestay</option>
+                    <select className="w-full mb-2 rounded-md border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                      <option>Select Accommodation Type</option>
+                      <option>Student Hostel (10 months) tenor</option>
+                      <option>
+                        1-Bedroom apartment (6 months) assured tenancy (AST)
+                      </option>
+                      <option>
+                        2-Bedroom apartments (6 months) assured tenancy (AST)
+                      </option>
+                      <option>
+                        3-Bedroom apartments (6 months) assured tenancy (AST)
+                      </option>
+                      <option>Service accommodation (short stay)</option>
                     </select>
                   </div>
                   <div>
@@ -1186,7 +1394,7 @@ export default function Home() {
 
               <div className="relative hidden md:block">
                 <img
-                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=800&fit=crop"
+                  src={RentalHouse}
                   alt="Accommodation"
                   className="h-full w-full object-cover"
                 />
@@ -1208,10 +1416,10 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-indigo-700">
+      <section className="py-20 bg-gradient-to-br from-blue-600 to-indigo-700 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-12"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -1219,7 +1427,7 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-white mb-6">
               Trusted by Hundreds of Students
             </h2>
-            <div className="flex items-center justify-center space-x-1 mb-8">
+            <div className="flex items-center justify-center space-x-1 mb-4">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
@@ -1228,44 +1436,37 @@ export default function Home() {
               ))}
               <span className="text-white ml-2 text-lg">4.9/5 Rating</span>
             </div>
+
+            {/* User and Date Info - Exactly as specified */}
+            <div className="text-blue-100 text-sm mb-8">
+              <span>Current User's Login: NeduStack | </span>
+              <span>
+                Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted):
+                2025-08-19 18:57:58
+              </span>
+            </div>
           </motion.div>
 
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 md:p-12 text-white"
-            >
-              <div className="grid md:grid-cols-3 gap-8 items-center">
-                <div className="text-center md:text-left">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-24 h-24 rounded-full mx-auto md:mx-0 mb-4 shadow-xl"
-                  />
-                  <h4 className="text-xl font-bold mb-1">
-                    {testimonial.university}
-                  </h4>
-                  <p className="text-blue-100">{testimonial.name}</p>
-                </div>
-                <div className="md:col-span-2">
-                  <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="w-5 h-5 text-yellow-400 fill-current"
-                      />
-                    ))}
-                  </div>
-                  <blockquote className="text-xl leading-relaxed">
-                    "{testimonial.text}"
-                  </blockquote>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+          {/* Testimonial Carousel */}
+          <TestimonialCarousel
+            testimonials={[
+              ...testimonials,
+              {
+                name: "Ede Kelvin",
+                university: "University of Salford",
+                image: kelvin,
+                text: "The support I received from Vigica Consult was outstanding. Their knowledge of the visa process saved me time and stress.",
+                rating: 5,
+              },
+              {
+                name: "John Idenyi",
+                university: "Leeds Beckett University",
+                image: john,
+                text: "From application to arrival, Vigica provided exceptional guidance. Their accommodation services helped me find the perfect place to live.",
+                rating: 4,
+              },
+            ]}
+          />
         </div>
       </section>
 

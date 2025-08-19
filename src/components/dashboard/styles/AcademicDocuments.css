@@ -442,6 +442,44 @@
   font-weight: 500;
 }
 
+/* Add these styles to your existing CSS file */
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+}
+
+.required-asterisk {
+  color: #dc3545;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+/* Add these styles to your existing CSS file */
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.document-type-text {
+  display: flex;
+  align-items: center;
+}
+
+.required-asterisk {
+  color: #dc3545;
+  font-weight: bold;
+  margin-left: 0;
+}
+
 /* Responsive Design for Status */
 @media (max-width: 768px) {
   .application-status {
