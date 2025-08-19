@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GraduationCap, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "../ui/button";
 import vigicaLogo from "../../assets/images/vigicaV2.png";
 import { Link } from "react-router-dom";
@@ -11,10 +11,13 @@ import {
   FaInstagram,
   FaTelegramPlane,
   FaTwitter,
+  FaTiktok,
   FaFacebook,
   FaLinkedin,
+  FaUserCircle,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuthStore } from "../../store/auth"; // Import the auth store
 
 const navItems = [
   { id: "home", label: "Home" },
@@ -31,6 +34,47 @@ function Header() {
   const [currentSection, setCurrentSection] = useState("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [displayName, setDisplayName] = useState("");
+
+  // Use the same auth store as in DashboardNavbar
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const user = useAuthStore((state) => state.allUserData);
+
+  // Get user ID and email from auth store
+  const email =
+    user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+  const userId = user?.uid;
+
+  // Fetch user's name when component mounts if user is logged in
+  useEffect(() => {
+    const fetchName = async () => {
+      if (!userId) return;
+
+      try {
+        const apiInstance = (await import("../../utils/axios")).default;
+        const personalRes = await apiInstance.get(
+          `StudentPersonalInfo/user/${userId}`
+        );
+        const personalInfoId = personalRes?.data?.result?.id;
+
+        if (personalInfoId) {
+          const submittedAppRes = await apiInstance.get(
+            `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+          );
+          const personalData =
+            submittedAppRes?.data?.result?.personalInformation;
+
+          if (personalData?.firstName) {
+            setDisplayName(`${personalData.firstName}`);
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to fetch display name:", error);
+      }
+    };
+
+    if (userId) fetchName();
+  }, [userId]);
 
   // Handle scrolling effect for the fixed header
   useEffect(() => {
@@ -90,6 +134,49 @@ function Header() {
 
       setCurrentSection(sectionId);
       setIsMenuOpen(false);
+    }
+  };
+
+  // Render Auth Button based on authentication status
+  const renderAuthButton = () => {
+    if (isLoggedIn && isLoggedIn()) {
+      return (
+        <Link to="/dashboard" className="text-decoration-none">
+          <Button className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white px-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex items-center gap-2">
+            <FaUserCircle className="text-lg" />
+            Dashboard
+          </Button>
+        </Link>
+      );
+    } else {
+      return (
+        <Link to="/register" className="text-decoration-none">
+          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            Get Started
+          </Button>
+        </Link>
+      );
+    }
+  };
+
+  // Render Mobile Auth Button based on authentication status
+  const renderMobileAuthButton = () => {
+    if (isLoggedIn && isLoggedIn()) {
+      return (
+        <Link to="/dashboard" className="block w-full">
+          <Button className="w-full mt-3 bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg flex items-center justify-center gap-2">
+            <FaUserCircle /> Dashboard
+          </Button>
+        </Link>
+      );
+    } else {
+      return (
+        <Link to="/register" className="block w-full">
+          <Button className="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
+            Get Started
+          </Button>
+        </Link>
+      );
     }
   };
 
@@ -163,14 +250,18 @@ function Header() {
                   <FaInstagram />
                 </a>
 
-                {/*
                 <a
-                  href="#"
+                  href="https://www.facebook.com/profile.php?id=61579196807381"
                   className="text-white hover:text-blue-200 transition-colors"
                 >
                   <FaFacebook />
                 </a>
-                */}
+                <a
+                  href="http://tiktok.com/@vigicaconsult"
+                  className="text-white hover:text-blue-200 transition-colors"
+                >
+                  <FaTiktok />
+                </a>
               </div>
             </div>
           </div>
@@ -192,14 +283,6 @@ function Header() {
                 animate={{ opacity: 1, x: 0 }}
                 className="flex items-center space-x-2"
               >
-                {/*}
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <GraduationCap className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  VIGICA CONSULT
-                </span>
-                */}
                 <img
                   src={vigicaLogo}
                   alt="Vigica Consult Logo"
@@ -229,13 +312,9 @@ function Header() {
               </div>
             </div>
 
-            {/* Get Started Button */}
+            {/* Auth Button - Changes based on authentication status */}
             <div className="hidden md:flex items-center justify-end w-48">
-              <Link to="/register" className="text-decoration-none">
-                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                  Get Started
-                </Button>
-              </Link>
+              {renderAuthButton()}
             </div>
 
             {/* Mobile menu button - always visible on small screens */}
@@ -277,12 +356,8 @@ function Header() {
                     {item.label}
                   </button>
                 ))}
-                <Button
-                  className="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
-                  onClick={() => scrollToSection("contact")}
-                >
-                  Get Started
-                </Button>
+                {/* Mobile Auth Button - Changes based on authentication status */}
+                {renderMobileAuthButton()}
               </div>
             </motion.div>
           )}
