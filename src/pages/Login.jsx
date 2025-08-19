@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 
 import "../styles/Login.css";
 import registerImage from "../assets/images/img/vigica-img6.jpg";
-//import vigicaLogo from "../assets/images/vigica.png";
 import vigicaLogo from "../assets/images/vigicaV2.png";
 
 // SweetAlert Toast
@@ -76,21 +75,14 @@ function Login() {
     setIsLoading(true);
 
     try {
-      //console.log(`Login attempt at 2025-08-11 11:18:43 by ${email}`);
-
       const { error, userRole } = await login(email, password);
 
       if (error) {
-        //console.error(
-        //  `Login failed at 2025-08-11 11:18:43 for ${email}:`,
-        //  error
-        //);
         Toast.fire({
           icon: "error",
           title: error,
         });
         setIsLoading(false);
-        //navigate("/verify-otp", { state: { email } });
       } else {
         Toast.fire({
           icon: "success",
@@ -109,7 +101,6 @@ function Login() {
         }, 1000); // Small delay to show success message
       }
     } catch (error) {
-      //console.error(`Login error at 2025-08-11 11:18:43:`, error);
       Toast.fire({
         icon: "error",
         title: "An unexpected error occurred. Please try again.",
@@ -126,193 +117,133 @@ function Login() {
   };
 
   return (
-    <>
-      <section>
-        <main className="" style={{ marginBottom: 100, marginTop: 50 }}>
-          <div className="container-fluid vh-100 d-flex flex-column flex-md-row p-0">
-            {/* Left Image Section */}
-            <div className="col-12 col-md-6 d-flex align-items-end justify-content-center register-img-section p-0">
-              <div className="w-100 h-100 position-relative">
-                <img
-                  src={registerImage}
-                  alt="Library Student"
-                  className="img-fluid w-100 h-100 object-fit-cover register-main-img"
-                  style={{
-                    borderTopLeftRadius: "0.75rem",
-                    borderBottomLeftRadius: "0.75rem",
-                  }}
-                />
-                <div className="register-img-overlay px-3 py-2 rounded">
-                  <p className="mb-0 text-white" style={{ fontWeight: 400 }}>
-                    Welcome to Vigica Consult Limited. Please sign in to
-                    continue exploring our services.
-                  </p>
-                </div>
-              </div>
+    <div className="login-container d-flex justify-content-center align-items-center min-vh-100 p-3">
+      <div
+        className="login-card shadow-sm rounded-lg bg-white w-100"
+        style={{ maxWidth: "420px" }}
+      >
+        <div className="card-body p-4 p-md-5 ">
+          <Link to="/">
+            <div className="d-flex justify-content-center mb-4">
+              <img
+                src={vigicaLogo}
+                alt="Vigica Logo"
+                className="img-fluid"
+                style={{ maxWidth: "200px" }}
+              />
             </div>
-            {/* Right Form Section */}
-            <div className="col-12 col-md-6 d-flex flex-column align-items-center justify-content-center px-4 px-md-5 py-4 bg-white">
-              <div className="w-100" style={{ maxWidth: 380 }}>
-                <div className="d-flex align-items-center justify-content-center mb-3 gap-2">
-                  {/* Logo - Replace src with your logo */}
-                  <img
-                    src={vigicaLogo}
-                    alt="Vigica Logo"
-                    style={{ width: "200px", height: "auto" }}
-                  />
-                  {/*
-                  <div>
-                    <span
-                      className="d-block fs-3 fw-extrabold mb-0"
-                      style={{
-                        fontFamily: "Bricolage Grotesque', sans-serif",
-                        color: "#444",
-                        fontWeight: 700,
-                        fontSize: 20,
-                        marginBottom: 0,
-                      }}
-                    >
-                      VIGICA
-                    </span>
-                    <div
-                      className="d-block fs-4 mt-0 p-0"
-                      style={{
-                        fontFamily: "'Poppins', sans-serif",
-                        color: "#2135b0",
-                      }}
-                    >
-                      CONSULT LIMITED
-                    </div>
-                  </div>
-                  */}
-                </div>
-                <h2
-                  className="text-center"
-                  style={{ color: "#2135b0", fontWeight: 700, fontSize: 26 }}
-                >
-                  Sign-In
-                </h2>
+          </Link>
 
-                <form
-                  onSubmit={handleLogin}
-                  className="mt-4"
-                  autoComplete="off"
-                >
-                  <div className="mb-3 position-relative">
-                    <input
-                      type="email"
-                      className="form-control py-2"
-                      placeholder="Email"
-                      required
-                      id="username"
-                      name="username"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      style={{ fontWeight: 400, fontSize: 16 }}
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="mb-3 position-relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      className="form-control py-2 pe-5"
-                      placeholder="Password"
-                      required
-                      id="password"
-                      name="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      style={{
-                        fontWeight: 400,
-                        fontSize: 16,
-                      }}
-                      disabled={isLoading}
-                    />
-                    <span
-                      className="position-absolute"
-                      style={{
-                        right: 10,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        cursor: isLoading ? "not-allowed" : "pointer",
-                        opacity: isLoading ? 0.5 : 1,
-                      }}
-                      onClick={() =>
-                        !isLoading && setShowPassword(!showPassword)
-                      }
-                    >
-                      {showPassword ? (
-                        <i className="fas fa-eye-slash" />
-                      ) : (
-                        <i className="fas fa-eye" />
-                      )}
-                    </span>
-                  </div>
+          <h2
+            className="text-center mb-4"
+            style={{ color: "#2135b0", fontWeight: 700, fontSize: "26px" }}
+          >
+            Sign-In
+          </h2>
 
-                  {isLoading === true ? (
-                    <button
-                      disabled
-                      className="btn w-100"
-                      style={{
-                        background: "#2135b0",
-                        color: "#fff",
-                        fontWeight: 600,
-                        fontSize: 17,
-                        borderRadius: 6,
-                        opacity: 0.8,
-                      }}
-                      type="submit"
-                    >
-                      <span className="mr-2">Signing In</span>
-                      <i className="fas fa-spinner fa-spin" />
-                    </button>
-                  ) : (
-                    <button
-                      className="btn w-100"
-                      style={{
-                        background: "#2135b0",
-                        color: "#fff",
-                        fontWeight: 600,
-                        fontSize: 17,
-                        borderRadius: 6,
-                      }}
-                      type="submit"
-                    >
-                      <span className="mr-2">Sign In</span>
-                      <i className="fas fa-sign-in-alt" />
-                    </button>
-                  )}
-                  <div className="d-flex align-items-center my-3">
-                    <div className="flex-grow-1 border-top" />
-                    <span
-                      className="mx-2 text-muted"
-                      style={{ fontWeight: 500 }}
-                    >
-                      Or
-                    </span>
-                    <div className="flex-grow-1 border-top" />
-                  </div>
-                  <div className="text-center">
-                    <p className="mt-4">
-                      Don't have an account?{" "}
-                      <Link to="/register">Register</Link>
-                    </p>
-                    <p className="mt-0">
-                      <Link
-                        to="/forgot-password"
-                        className="text-decoration-none text-danger"
-                      >
-                        Forgot Password?
-                      </Link>
-                    </p>
-                  </div>
-                </form>
-              </div>
+          <form onSubmit={handleLogin} autoComplete="off">
+            <div className="mb-3 position-relative">
+              <input
+                type="email"
+                className="form-control py-2"
+                placeholder="Email"
+                required
+                id="username"
+                name="username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{ fontWeight: 400, fontSize: "16px" }}
+                disabled={isLoading}
+              />
             </div>
-          </div>
-        </main>
-      </section>
-    </>
+
+            <div className="mb-3 position-relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="form-control py-2 pe-5"
+                placeholder="Password"
+                required
+                id="password"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{ fontWeight: 400, fontSize: "16px" }}
+                disabled={isLoading}
+              />
+              <span
+                className="position-absolute eye-toggle"
+                onClick={() => !isLoading && setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <i className="fas fa-eye-slash" />
+                ) : (
+                  <i className="fas fa-eye" />
+                )}
+              </span>
+            </div>
+
+            {isLoading ? (
+              <button
+                disabled
+                className="btn w-100 py-2"
+                style={{
+                  background: "#2135b0",
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: "17px",
+                  borderRadius: "6px",
+                  opacity: 0.8,
+                }}
+                type="submit"
+              >
+                <span className="mr-2">Signing In</span>
+                <i className="fas fa-spinner fa-spin" />
+              </button>
+            ) : (
+              <button
+                className="btn w-100 py-2"
+                style={{
+                  background: "#2135b0",
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: "17px",
+                  borderRadius: "6px",
+                }}
+                type="submit"
+              >
+                <span className="mr-2">Sign In</span>
+                <i className="fas fa-sign-in-alt" />
+              </button>
+            )}
+
+            <div className="d-flex align-items-center my-3">
+              <div className="flex-grow-1 border-top" />
+              <span className="mx-2 text-muted" style={{ fontWeight: 500 }}>
+                Or
+              </span>
+              <div className="flex-grow-1 border-top" />
+            </div>
+
+            <div className="text-center">
+              <p className="mt-3 mb-2">
+                Don't have an account?{" "}
+                <Link to="/register" className="text-primary">
+                  Register
+                </Link>
+              </p>
+              <p className="mb-0">
+                <Link
+                  to="/forgot-password"
+                  className="text-decoration-none text-danger"
+                >
+                  Forgot Password?
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
 
