@@ -11,7 +11,7 @@ import lolo from "../../assets/images/lolo.webp";
 import kelvin from "../../assets/images/Kelvin.png";
 import john from "../../assets/images/john.jpg";
 import RentalHouse from "../../assets/images/houserental.jpg";
-import OrlandoSilver from "../../assets/images/OrlandoSilverRooms.WEBP";
+import OrlandoSilver from "../../assets/images/OrlandoSilverRooms.webp";
 //import OrlandoBronze from "../../assets/images/OrlandoVillageBronzePlus.WEBP";
 import OrlandoExternal from "../../assets/images/OrlandoVillageBronzePlus.WEBP";
 import {
