@@ -490,6 +490,29 @@
   transform: scale(1.05);
 }
 
+/* Add these styles to your existing CSS file */
+
+.research-proposal-section {
+  border: 1px solid #d1e7ff;
+  border-radius: 8px;
+  background-color: #f8fcff;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.required-document {
+  background-color: #fff8e6;
+  border-left: 4px solid #ffc107;
+}
+
+.research-proposal-info {
+  color: #666;
+  font-style: italic;
+  background-color: #f9f9f9;
+  padding: 8px;
+  border-radius: 4px;
+}
+
 /* Responsive Design for Status */
 @media (max-width: 768px) {
   .application-status {
