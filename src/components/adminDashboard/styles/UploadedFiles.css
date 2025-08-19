@@ -478,9 +478,6 @@
   font-size: 0.98rem;
   letter-spacing: 0.01em;
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
 /* Additional CSS for enhanced UploadedFiles component */
 /* Updated: 2025-08-10 23:48:19 UTC by NeduStack */
@@ -605,9 +602,7 @@
     height: 28px;
   }
 }
->>>>>>> main
-=======
->>>>>>> 1748a5e68d38906a8dfe30d72ef9dec426031c60
+
 @media (max-width: 600px) {
   .search-input-container {
     min-width: 140px;
