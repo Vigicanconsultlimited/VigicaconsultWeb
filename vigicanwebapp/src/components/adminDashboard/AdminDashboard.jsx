@@ -9,6 +9,12 @@ import ProgressBar from "./ProgressBar";
 import apiInstance from "../../utils/axios";
 import { FileText } from "lucide-react";
 
+<<<<<<< HEAD
+//const API_URL = "https://vigica-001-site1.qtempurl.com/api/StudentPersonalInfo";
+//const personalRes = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
+
+=======
+>>>>>>> 1748a5e68d38906a8dfe30d72ef9dec426031c60
 export default function AdminDashboard() {
   const [currentStep, setCurrentStep] = useState("dashboard-home");
   const [sidebarOpen, setSidebarOpen] = useState(false);

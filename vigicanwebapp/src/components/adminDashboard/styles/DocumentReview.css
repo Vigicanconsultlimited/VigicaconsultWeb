@@ -108,7 +108,6 @@
   white-space: nowrap;
   vertical-align: middle;
 }
-
 .documents-table th {
   color: #2654db;
   font-size: 0.95rem;
@@ -136,7 +135,6 @@
   align-items: center;
   gap: 0.18rem;
 }
-
 .student-avatar {
   width: 22px;
   height: 22px;

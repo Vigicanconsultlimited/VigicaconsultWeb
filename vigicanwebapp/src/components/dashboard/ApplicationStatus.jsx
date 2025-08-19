@@ -3,9 +3,6 @@ import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import "./styles/ApplicationStatus.css";
 
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 19:06:18
-// Current User's Login: NeduStack
-
 const documentTypes = [
   "Degree Certificate",
   "WAEC Certificate",
@@ -131,10 +128,6 @@ const ApplicationStatus = () => {
         const userId = authData?.uid;
         const res = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
         const studentId = res.data?.result?.id;
-
-        console.log(
-          `Fetching documents for student ID: ${studentId} at 2025-08-11 19:06:18 by NeduStack`
-        );
 
         const docPromises = documentTypes.map(async (type) => {
           const { getUrl, statusUrl, viewKey, nameKey } = documentAPIMap[type];

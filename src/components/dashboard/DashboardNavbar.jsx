@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import logo from "../../assets/images/vigica.png";
+//import logo from "../../assets/images/vigica.png";
+import logo from "../../assets/images/vigica-vertical-w.png";
 import profile from "../../assets/images/default-profile.jpg";
 import "./styles/DashboardNavbar.css";
 import { useAuthStore } from "../../store/auth";
@@ -50,18 +51,10 @@ export default function DashboardNavbar() {
           <div className="d-flex d-lg-none flex-column text-center w-100">
             <img
               src={logo}
-              alt="Vigica Logo"
-              className="dashboard-navbar-logo mx-auto mb-1"
+              alt="Vigica Consult Ltd"
+              className="me-2"
+              style={{ width: "100px", height: "auto" }}
             />
-            <span className="dashboard-navbar-brand fw-bold text-white">
-              VIGICA
-            </span>
-            <div
-              className="dashboard-navbar-sub text-white-50"
-              style={{ fontSize: 10 }}
-            >
-              CONSULT LIMITED
-            </div>
           </div>
 
           {/* Desktop Left Logo */}
@@ -73,20 +66,10 @@ export default function DashboardNavbar() {
             >
               <img
                 src={logo}
-                alt="Vigica Logo"
-                className="dashboard-navbar-logo me-2"
+                alt="Vigica Consult Ltd"
+                className="me-2"
+                style={{ width: "100px", height: "auto" }}
               />
-              <div className="d-none d-md-block">
-                <span className="dashboard-navbar-brand fw-bold text-white">
-                  VIGICA
-                </span>
-                <div
-                  className="dashboard-navbar-sub text-white-50"
-                  style={{ fontSize: 10 }}
-                >
-                  CONSULT LIMITED
-                </div>
-              </div>
             </a>
           </div>
         </div>

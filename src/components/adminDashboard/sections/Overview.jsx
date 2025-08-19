@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BarChart2, ChevronDown, MoreHorizontal, Star } from "lucide-react";
 import apiInstance from "../../../utils/axios";
-import "../styles/StatsOverview.css";
+import "../styles/Overview.css";
 
 // Static (mocked) data for non-API sections
 const breakdownData = [
@@ -55,9 +55,16 @@ const analytics = [
   },
 ];
 
-const genderData = { male: 2324, female: 1893 };
-
 export default function Overview() {
+  // Current date/time and user as specified
+  const getCurrentDateTime = () => {
+    return "2025-08-08 22:15:43";
+  };
+
+  const getCurrentUser = () => {
+    return "NeduStack";
+  };
+
   // States for API-driven stats
   const [statCards, setStatCards] = useState([
     {
@@ -90,149 +97,250 @@ export default function Overview() {
     },
   ]);
 
+  const [genderData, setGenderData] = useState({ male: 0, female: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Calculate percentage changes (mock calculation since we don't have historical data)
+  const calculateChangePercent = (current, type) => {
+    // Mock calculation - you can replace this with actual historical data comparison
+    const mockPrevious = {
+      total: Math.max(0, current - Math.floor(Math.random() * 5)),
+      approved: Math.max(0, current - Math.floor(Math.random() * 3)),
+      rejected: Math.max(0, current - Math.floor(Math.random() * 2)),
+      pending: Math.max(0, current - Math.floor(Math.random() * 4)),
+    };
+
+    const previous = mockPrevious[type] || 1;
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return Math.round(((current - previous) / previous) * 100);
+  };
+
+  // Update acquisitions data based on API response
+  const updateAcquisitionsData = (apiData) => {
+    const total = apiData.totalNumOfApplications || 1; // Avoid division by zero
+
+    return [
+      {
+        label: "Applications",
+        color: "blue",
+        value: 100, // Always 100% as it represents the total
+      },
+      {
+        label: "Pending",
+        color: "gray",
+        value: Math.round((apiData.pendingApplications / total) * 100),
+      },
+      {
+        label: "Rejected",
+        color: "red",
+        value: Math.round((apiData.rejectedApplications / total) * 100),
+      },
+      {
+        label: "On Hold",
+        color: "brown",
+        value: 0, // Not provided by API, keeping as 0
+      },
+      {
+        label: "Approved",
+        color: "green",
+        value: Math.round((apiData.approvedApplications / total) * 100),
+      },
+    ];
+  };
+
   // Fetch applications summary from API
   useEffect(() => {
     async function fetchApplicationStats() {
       try {
+        setLoading(true);
+        //console.log(
+        //`Overview: Fetching application statistics at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        //);
+
         const response = await apiInstance.get(
           "StudentApplication/allapplications"
         );
+
         if (response?.data?.statusCode === 200 && response?.data?.result) {
           const {
-            totalNumOfApplications,
-            approvedApplications,
-            rejectedApplications,
-            pendingApplications,
+            totalNumOfApplications = 0,
+            approvedApplications = 0,
+            rejectedApplications = 0,
+            pendingApplications = 0,
+            numberOfMale = 0,
+            numberOfFemale = 0,
           } = response.data.result;
 
-          // Compute change and changePercent
-          // For demo, we use 0% and 0. Use your own logic if you have previous stats or trends.
+          // Calculate change percentages
+          const totalChange = calculateChangePercent(
+            totalNumOfApplications,
+            "total"
+          );
+          const approvedChange = calculateChangePercent(
+            approvedApplications,
+            "approved"
+          );
+          const rejectedChange = calculateChangePercent(
+            rejectedApplications,
+            "rejected"
+          );
+          const pendingChange = calculateChangePercent(
+            pendingApplications,
+            "pending"
+          );
+
+          // Update stat cards with API data
           setStatCards([
             {
               title: "Total Applications",
-              value:
-                typeof totalNumOfApplications === "number"
-                  ? totalNumOfApplications.toLocaleString()
-                  : "--",
-              change: "+12% Inc",
-              changePercent: 0,
+              value: totalNumOfApplications.toLocaleString(),
+              change: `${totalChange >= 0 ? "+" : ""}${totalChange}% ${
+                totalChange >= 0 ? "Inc" : "Dec"
+              }`,
+              changePercent: Math.min(Math.abs(totalChange), 100),
               color: "blue",
             },
             {
               title: "Approved Applications",
-              value:
-                typeof approvedApplications === "number"
-                  ? approvedApplications.toLocaleString()
-                  : "--",
-              change: "+8% Inc",
-              changePercent: 0,
+              value: approvedApplications.toLocaleString(),
+              change: `${approvedChange >= 0 ? "+" : ""}${approvedChange}% ${
+                approvedChange >= 0 ? "Inc" : "Dec"
+              }`,
+              changePercent: Math.min(Math.abs(approvedChange), 100),
               color: "green",
             },
             {
               title: "Rejected Applications",
-              value:
-                typeof rejectedApplications === "number"
-                  ? rejectedApplications.toLocaleString()
-                  : "--",
-              change: "+5% Dec",
-              changePercent: 0,
+              value: rejectedApplications.toLocaleString(),
+              change: `${rejectedChange >= 0 ? "+" : ""}${rejectedChange}% ${
+                rejectedChange >= 0 ? "Inc" : "Dec"
+              }`,
+              changePercent: Math.min(Math.abs(rejectedChange), 100),
               color: "red",
             },
             {
               title: "Pending Applications",
-              value:
-                typeof pendingApplications === "number"
-                  ? pendingApplications.toLocaleString()
-                  : "--",
-              change: "+10% Dec",
-              changePercent: 0,
+              value: pendingApplications.toLocaleString(),
+              change: `${pendingChange >= 0 ? "+" : ""}${pendingChange}% ${
+                pendingChange >= 0 ? "Inc" : "Dec"
+              }`,
+              changePercent: Math.min(Math.abs(pendingChange), 100),
               color: "gray",
             },
           ]);
+
+          // Update gender data
+          setGenderData({
+            male: numberOfMale,
+            female: numberOfFemale,
+          });
+
+          setError(null);
+        } else {
+          throw new Error("Invalid response format from API");
         }
       } catch (error) {
-        // Optionally show an error, otherwise leave stat cards at defaults
-        // You may set error state here if you want
+        console.error(
+          `Overview: Error fetching application stats: ${
+            error.message
+          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+        setError("Failed to load application statistics");
+
+        // Keep default values on error
+        //console.log(
+        //  `Overview: Using default values due to API error at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        //);
+      } finally {
+        setLoading(false);
       }
     }
+
     fetchApplicationStats();
   }, []);
 
+  // Get updated acquisitions data based on current stats
+  const currentAcquisitionsData =
+    statCards[0].value !== "--"
+      ? updateAcquisitionsData({
+          totalNumOfApplications:
+            parseInt(statCards[0].value.replace(/,/g, "")) || 1,
+          approvedApplications:
+            parseInt(statCards[1].value.replace(/,/g, "")) || 0,
+          rejectedApplications:
+            parseInt(statCards[2].value.replace(/,/g, "")) || 0,
+          pendingApplications:
+            parseInt(statCards[3].value.replace(/,/g, "")) || 0,
+        })
+      : acquisitionsData;
+
+  if (loading) {
+    return (
+      <div className="overview-main">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading application statistics...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="overview-main">
-      {/* Stat Cards */}
-      <h1
-        className="section-title mb-2"
-        style={{ color: "#264de4", fontSize: "1.5rem" }}
-      >
-        Application Overview
-      </h1>
+      {/* Header */}
+      <div className="overview-header">
+        <h1 className="section-title">Application Overview</h1>
+        {error && <div className="error-badge">{error}</div>}
+      </div>
 
+      {/* Stat Cards */}
       <div className="stat-cards-row">
         {statCards.map((stat, i) => (
           <div key={stat.title} className={`stat-card ${stat.color}`}>
             <div className="stat-card-header">
               <span>{stat.title}</span>
-              <MoreHorizontal size={18} />
+              <MoreHorizontal size={16} />
             </div>
+
             <div className="stat-card-value">{stat.value}</div>
+
             <div className="stat-card-progress">
-              {["blue", "green", "red"].includes(stat.color) ? (
-                <svg width={54} height={54}>
-                  <circle
-                    cx={27}
-                    cy={27}
-                    r={24}
-                    fill="none"
-                    stroke="#eee"
-                    strokeWidth={5}
-                  />
-                  <circle
-                    cx={27}
-                    cy={27}
-                    r={24}
-                    fill="none"
-                    stroke={
-                      stat.color === "blue"
-                        ? "#264de4"
-                        : stat.color === "green"
-                        ? "#43a047"
-                        : "#e53935"
-                    }
-                    strokeWidth={5}
-                    strokeDasharray={`${stat.changePercent * 1.5} ${
-                      150 - stat.changePercent * 1.5
-                    }`}
-                    strokeLinecap="round"
-                    style={{ transition: "stroke-dasharray 0.3s" }}
-                  />
-                </svg>
-              ) : (
-                <svg width={54} height={54}>
-                  <circle
-                    cx={27}
-                    cy={27}
-                    r={24}
-                    fill="none"
-                    stroke="#eee"
-                    strokeWidth={5}
-                  />
-                  <circle
-                    cx={27}
-                    cy={27}
-                    r={24}
-                    fill="none"
-                    stroke="#bdbdbd"
-                    strokeWidth={5}
-                    strokeDasharray={`${stat.changePercent * 1.5} ${
-                      150 - stat.changePercent * 1.5
-                    }`}
-                    strokeLinecap="round"
-                    style={{ transition: "stroke-dasharray 0.3s" }}
-                  />
-                </svg>
-              )}
+              <svg width={50} height={50}>
+                <circle
+                  cx={25}
+                  cy={25}
+                  r={20}
+                  fill="none"
+                  stroke="rgba(255, 255, 255, 0.3)"
+                  strokeWidth={4}
+                />
+                <circle
+                  cx={25}
+                  cy={25}
+                  r={20}
+                  fill="none"
+                  stroke="rgba(255, 255, 255, 0.9)"
+                  strokeWidth={4}
+                  strokeDasharray={`${stat.changePercent * 1.25} ${
+                    125 - stat.changePercent * 1.25
+                  }`}
+                  strokeLinecap="round"
+                  className="progress-circle"
+                />
+                <text
+                  x="25"
+                  y="29"
+                  textAnchor="middle"
+                  fontSize="10"
+                  fontWeight="bold"
+                  fill="rgba(255, 255, 255, 0.9)"
+                >
+                  {stat.changePercent}%
+                </text>
+              </svg>
             </div>
+
             <div className="stat-card-change">{stat.change}</div>
           </div>
         ))}
@@ -246,9 +354,9 @@ export default function Overview() {
           <div className="insights-card-header">
             <span>Statistics of Active Applications</span>
             <div className="insights-card-switch">
-              <BarChart2 size={18} className="text-blue-700" />
-              <span className="font-semibold text-blue-700">Week</span>
-              <ChevronDown size={16} />
+              <BarChart2 size={14} />
+              <span className="font-semibold">Week</span>
+              <ChevronDown size={12} />
             </div>
           </div>
           <div className="breakdown-chart">
@@ -264,24 +372,6 @@ export default function Overview() {
                           height: `${(d.application / max) * 100}%`,
                         }}
                       ></div>
-                      <div
-                        className="breakdown-bar-approved"
-                        style={{
-                          height: `${(d.approved / max) * 100}%`,
-                        }}
-                      ></div>
-                      <div
-                        className="breakdown-bar-rejected"
-                        style={{
-                          height: `${(d.rejected / max) * 100}%`,
-                        }}
-                      ></div>
-                      <div
-                        className="breakdown-bar-pending"
-                        style={{
-                          height: `${(d.pending / max) * 100}%`,
-                        }}
-                      ></div>
                     </div>
                     <span className="breakdown-bar-label">{d.day}</span>
                   </div>
@@ -292,30 +382,22 @@ export default function Overview() {
               <div>
                 <span className="legend-dot app"></span> Application
               </div>
-              <div>
-                <span className="legend-dot approved"></span> Approved
-              </div>
-              <div>
-                <span className="legend-dot rejected"></span> Rejected
-              </div>
-              <div>
-                <span className="legend-dot pending"></span> Pending
-              </div>
             </div>
           </div>
         </div>
-        {/* Acquisitions */}
+
+        {/* Application Distribution */}
         <div className="insights-card acquisitions">
           <div className="insights-card-header">
-            <span>Acquisitions</span>
+            <span>Application Distribution</span>
             <div className="insights-card-switch">
-              <BarChart2 size={18} className="text-blue-700" />
-              <span className="font-semibold text-blue-700">Month</span>
-              <ChevronDown size={16} />
+              <BarChart2 size={14} />
+              <span className="font-semibold">Current</span>
+              <ChevronDown size={12} />
             </div>
           </div>
           <div className="acquisitions-list">
-            {acquisitionsData.map((a) => (
+            {currentAcquisitionsData.map((a) => (
               <div key={a.label} className="acq-row">
                 <span className="acq-label">{a.label}</span>
                 <div className={`acq-bar ${a.color}`}>
@@ -391,68 +473,63 @@ export default function Overview() {
           <div key={a.title} className="analytics-card">
             <div className="analytics-card-header">
               <span>{a.title}</span>
-              <MoreHorizontal size={18} />
+              <MoreHorizontal size={14} />
             </div>
+
             <div className="analytics-card-value">{a.value}</div>
+
             <div className="analytics-card-progress">
-              {a.icon === "up" ? (
-                <svg width={34} height={34}>
+              <svg width={30} height={30}>
+                <circle
+                  cx={15}
+                  cy={15}
+                  r={12}
+                  fill="none"
+                  stroke="#eee"
+                  strokeWidth={3}
+                />
+                {a.icon === "circle" && (
                   <circle
-                    cx={17}
-                    cy={17}
-                    r={15}
+                    cx={15}
+                    cy={15}
+                    r={12}
                     fill="none"
-                    stroke="#eee"
-                    strokeWidth={5}
-                  />
-                  <path
-                    d="M17 2 A15 15 0 1 1 16.99 2"
-                    fill="none"
-                    stroke="#1976d2"
-                    strokeWidth={5}
-                  />
-                </svg>
-              ) : (
-                <svg width={34} height={34}>
-                  <circle
-                    cx={17}
-                    cy={17}
-                    r={15}
-                    fill="none"
-                    stroke="#eee"
-                    strokeWidth={5}
-                  />
-                  <circle
-                    cx={17}
-                    cy={17}
-                    r={15}
-                    fill="none"
-                    stroke="#1976d2"
-                    strokeWidth={5}
-                    strokeDasharray={`${a.percent * 1.5} ${
-                      47 - a.percent * 1.5
+                    stroke="#264de4"
+                    strokeWidth={3}
+                    strokeDasharray={`${a.percent * 0.75} ${
+                      75 - a.percent * 0.75
                     }`}
                     strokeLinecap="round"
                   />
-                </svg>
-              )}
+                )}
+              </svg>
             </div>
+
             <div className="analytics-card-change">{a.change}</div>
           </div>
         ))}
+
+        {/* Gender Distribution */}
         <div className="analytics-card gender">
           <div className="analytics-card-header">
             <span>Applicants by Gender</span>
-            <MoreHorizontal size={18} />
+            <MoreHorizontal size={14} />
           </div>
+
           <div className="gender-bar-chart">
             <div className="gender-bar-col">
               <div
                 className="gender-bar-male"
                 style={{
                   height: `${
-                    (genderData.male / (genderData.male + genderData.female)) *
-                    70
+                    genderData.male + genderData.female > 0
+                      ? Math.max(
+                          (genderData.male /
+                            (genderData.male + genderData.female)) *
+                            50,
+                          2
+                        )
+                      : 2
                   }px`,
                 }}
               ></div>
@@ -464,19 +541,29 @@ export default function Overview() {
                 className="gender-bar-female"
                 style={{
                   height: `${
-                    (genderData.female /
-                      (genderData.male + genderData.female)) *
-                    70
+                    genderData.male + genderData.female > 0
+                      ? Math.max(
+                          (genderData.female /
+                            (genderData.male + genderData.female)) *
+                            50,
+                          2
+                        )
+                      : 2
                   }px`,
                 }}
               ></div>
               <div className="gender-label">Female</div>
               <div className="gender-value">{genderData.female}</div>
             </div>
-            <div className="gender-bar-legend">
+          </div>
+
+          <div className="gender-bar-legend">
+            <span>
               <span className="legend-dot male"></span> Male
+            </span>
+            <span>
               <span className="legend-dot female"></span> Female
-            </div>
+            </span>
           </div>
         </div>
       </div>

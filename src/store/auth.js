@@ -65,7 +65,7 @@ export const useAuthStore = create(
           set({ loading: false });
           return true;
         } catch (error) {
-          console.error("Auth Store: Error decoding token:", error);
+          //console.error("Auth Store: Error decoding token:", error);
           get().clearUser();
           set({ loading: false });
           return false;
@@ -79,7 +79,7 @@ export const useAuthStore = create(
         //console.log("Auth Store: Rehydration started");
 
         if (error) {
-          console.error("Auth Store: Rehydration error:", error);
+          //console.error("Auth Store: Rehydration error:", error);
           // Handle rehydration error
           useAuthStore.getState().setLoading(false);
           return;

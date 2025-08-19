@@ -20,6 +20,8 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Logout from "./pages/Logout";
 import OtpverifyPage from "./pages/OtpVerifyPage";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // Component to redirect to appropriate dashboard based on role
 function DashboardRedirect() {
@@ -40,7 +42,7 @@ function App() {
     // Only run validation after store is hydrated
     if (hydrated) {
       //console.log(
-        //"App: Store hydrated, running validation - Time: 2025-07-28 12:36:28 UTC - User: NeduStack"
+      //"App: Store hydrated, running validation - Time: 2025-07-28 12:36:28 UTC - User: NeduStack"
       //);
       validateAuth();
     }
@@ -72,6 +74,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-otp" element={<OtpverifyPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/logout" element={<Logout />} />
 
         {/* Dashboard redirect route - redirects to appropriate dashboard based on role */}
