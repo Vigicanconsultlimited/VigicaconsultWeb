@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import apiInstance from "../utils/axios";
 import "../styles/OtpVerifyPage.css";
-import OtpVerifyImage from "../assets/images/img/vigica-img6.jpg";
+import vigicaLogo from "../assets/images/vigicaV2.png";
+import { Link } from "react-router-dom";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -101,21 +102,13 @@ export default function OtpverifyPage() {
     formData.append("otp", otp.join(""));
 
     try {
-      //console.log("Sending OTP validation request with:", {
-      //  Email: email,
-      //  otp: otp.join(""),
-      //});
-
       const response = await apiInstance.post("User/otpvalidation", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      //console.log("Full response:", response);
 
       if (response.data.result === true) {
-        //console.log("OTP validation successful:", response.data);
-
         Toast.fire({
           icon: "success",
           title: "Verification Successful",
@@ -127,7 +120,6 @@ export default function OtpverifyPage() {
         throw new Error(response.data.message || "OTP validation failed");
       }
     } catch (err) {
-      //console.error("OTP Validation Error:", err);
       Toast.fire({
         icon: "error",
         title: "Verification Failed",
@@ -179,108 +171,122 @@ export default function OtpverifyPage() {
     : "loading...";
 
   return (
-    <div className="otpverify-root d-flex flex-column flex-md-row align-items-stretch p-0">
-      {/* Left Image Section */}
-      <div className="otpverify-img-section col-12 col-md-6 d-flex align-items-end justify-content-center p-0">
-        <div className="w-100 h-100 position-relative">
-          <img
-            src={OtpVerifyImage}
-            alt="OTP Auth"
-            className="img-fluid w-100 h-100 otpverify-main-img"
-          />
-          <div className="otpverify-img-overlay px-3 py-2 rounded">
-            <p className="mb-0 otpverify-img-text">
-              Verify your email to continue using our services. Please enter the
-              OTP sent to your email.
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="otp-verify-container d-flex justify-content-center align-items-center min-vh-100 p-3 bg-light">
+      <div
+        className="otp-verify-card shadow-sm rounded-lg bg-white w-100"
+        style={{ maxWidth: "500px" }}
+      >
+        <div className="card-body p-4 p-md-5">
+          <Link to="/">
+            <div className="d-flex justify-content-center mb-4">
+              <img
+                src={vigicaLogo}
+                alt="Vigica Logo"
+                className="img-fluid"
+                style={{ maxWidth: "200px" }}
+              />
+            </div>
+          </Link>
 
-      {/* Right OTP Form Section */}
-      <div className="otpverify-form-section col-12 col-md-6 d-flex flex-column align-items-center justify-content-center px-3 px-md-5 py-4 bg-white">
-        <form
-          className="w-100"
-          style={{ maxWidth: 410 }}
-          onSubmit={handleSubmit}
-          autoComplete="off"
-        >
-          <h2 className="otpverify-title text-center mb-1">Enter the code</h2>
-          <div className="text-center otpverify-desc mb-4">
+          <h2
+            className="text-center mb-3"
+            style={{ color: "#2135b0", fontWeight: 700, fontSize: "26px" }}
+          >
+            Enter the code
+          </h2>
+
+          <p
+            className="text-center text-muted mb-4"
+            style={{ fontSize: "14px", lineHeight: 1.5 }}
+          >
             Enter the OTP code that we sent to your email{" "}
-            <span className="otpverify-email">{maskedEmail}</span>.<br />
-            <span className="otpverify-desc-muted">
+            <span className="fw-bold">{maskedEmail}</span>.<br />
+            <span className="text-muted">
               Be careful not to share the code with anyone.
             </span>
-          </div>
+          </p>
 
-          {/* OTP Inputs */}
-          <div
-            className="d-flex justify-content-center gap-2 mb-4 otpverify-inputs-wrap"
-            onPaste={handlePaste}
-          >
-            {[0, 1, 2, 3, 4, 5].map((idx) => (
-              <input
-                key={idx}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                className={`otpverify-input${
-                  otp[idx] && idx === otp.findIndex((d) => d === "")
-                    ? " otpverify-input-active"
-                    : ""
-                }`}
-                ref={(el) => (inputRefs.current[idx] = el)}
-                value={otp[idx]}
-                onChange={(e) => handleChange(e, idx)}
-                onKeyDown={(e) => handleKeyDown(e, idx)}
-                style={{ textAlign: "center" }}
-                aria-label={`OTP digit ${idx + 1}`}
-                autoFocus={idx === 0}
-                disabled={loading}
-              />
-            ))}
-          </div>
+          <form onSubmit={handleSubmit} autoComplete="off">
+            {/* OTP Inputs */}
+            <div
+              className="d-flex justify-content-center gap-2 mb-4"
+              onPaste={handlePaste}
+            >
+              {[0, 1, 2, 3, 4, 5].map((idx) => (
+                <input
+                  key={idx}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  className="form-control text-center py-2"
+                  style={{
+                    width: "45px",
+                    height: "50px",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                  }}
+                  ref={(el) => (inputRefs.current[idx] = el)}
+                  value={otp[idx]}
+                  onChange={(e) => handleChange(e, idx)}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
+                  aria-label={`OTP digit ${idx + 1}`}
+                  autoFocus={idx === 0}
+                  disabled={loading}
+                />
+              ))}
+            </div>
 
-          <button
-            className="otpverify-btn btn btn-primary w-100 py-2"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span
-                  className="spinner-border spinner-border-sm me-2"
-                  role="status"
-                  aria-hidden="true"
-                ></span>
-                Verifying...
-              </>
-            ) : (
-              "Verify Email"
-            )}
-          </button>
+            <button
+              className="btn w-100 py-2 mb-3"
+              style={{
+                background: "#2135b0",
+                color: "#fff",
+                fontWeight: 600,
+                fontSize: "16px",
+                borderRadius: "6px",
+              }}
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  Verifying...
+                </>
+              ) : (
+                "Verify Email"
+              )}
+            </button>
 
-          <div className="text-center mt-3">
-            {resendDisabled ? (
-              <span className="text-muted">
-                Resend OTP in {countdown} seconds
-              </span>
-            ) : (
-              <button
-                type="button"
-                className="btn btn-link p-0"
-                onClick={handleResendOTP}
-              >
-                Didn't receive code? Resend OTP
-              </button>
-            )}
-          </div>
+            <div className="text-center mt-3">
+              {resendDisabled ? (
+                <span className="text-muted">
+                  Resend OTP in {countdown} seconds
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-link p-0 text-decoration-none"
+                  onClick={handleResendOTP}
+                  style={{ color: "#2135b0" }}
+                >
+                  Didn't receive code? Resend OTP
+                </button>
+              )}
+            </div>
 
-          <div className="text-center mt-2 otpverify-footnote">
-            One more step to get started
-          </div>
-        </form>
+            <div
+              className="text-center mt-2 text-muted"
+              style={{ fontSize: "14px" }}
+            >
+              One more step to get started
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
