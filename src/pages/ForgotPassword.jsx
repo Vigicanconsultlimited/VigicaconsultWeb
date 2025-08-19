@@ -2,10 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import apiInstance from "../utils/axios";
 import Swal from "sweetalert2";
-
-import "../styles/Login.css";
-import registerImage from "../assets/images/img/vigica-img6.jpg";
-//import vigicaLogo from "../assets/images/vigica.png";
 import vigicaLogo from "../assets/images/vigicaV2.png";
 
 // SweetAlert Toast
@@ -141,268 +137,243 @@ function ForgotPassword() {
   };
 
   return (
-    <>
-      <section>
-        <main className="" style={{ marginBottom: 100, marginTop: 50 }}>
-          <div className="container-fluid vh-100 d-flex flex-column flex-md-row p-0">
-            {/* Left Image Section */}
-            <div className="col-12 col-md-6 d-flex align-items-end justify-content-center register-img-section p-0">
-              <div className="w-100 h-100 position-relative">
-                <img
-                  src={registerImage}
-                  alt="Library Student"
-                  className="img-fluid w-100 h-100 object-fit-cover register-main-img"
-                  style={{
-                    borderTopLeftRadius: "0.75rem",
-                    borderBottomLeftRadius: "0.75rem",
-                  }}
-                />
-                <div className="register-img-overlay px-3 py-2 rounded">
-                  <p className="mb-0 text-white" style={{ fontWeight: 400 }}>
-                    {isSuccess
-                      ? "Check your email for password reset instructions. Don't forget to check your spam folder."
-                      : "Forgot your password? No worries! Enter your email address and we'll send you a reset link."}
-                  </p>
-                </div>
-              </div>
+    <div className="forgot-password-container d-flex justify-content-center align-items-center min-vh-100 p-3 bg-light">
+      <div
+        className="forgot-password-card shadow-sm rounded-lg bg-white w-100"
+        style={{ maxWidth: "500px" }}
+      >
+        <div className="card-body p-4 p-md-5">
+          {/* Centered Logo */}
+          <Link to="/">
+            <div className="d-flex justify-content-center mb-4">
+              <img
+                src={vigicaLogo}
+                alt="Vigica Logo"
+                className="img-fluid"
+                style={{ maxWidth: "200px" }}
+              />
             </div>
+          </Link>
+          {!isSuccess ? (
+            <>
+              <h2
+                className="text-center mb-3"
+                style={{
+                  color: "#2135b0",
+                  fontWeight: 700,
+                  fontSize: "26px",
+                }}
+              >
+                Forgot Password
+              </h2>
+              <p
+                className="text-center text-muted mb-4"
+                style={{ fontSize: "14px", lineHeight: 1.5 }}
+              >
+                Enter your email address and we'll send you a link to reset your
+                password.
+              </p>
 
-            {/* Right Form Section */}
-            <div className="col-12 col-md-6 d-flex flex-column align-items-center justify-content-center px-4 px-md-5 py-4 bg-white">
-              <div className="w-100" style={{ maxWidth: 380 }}>
-                <div className="d-flex align-items-center justify-content-center mb-3 gap-2">
-                  {/* Logo */}
-                  <img
-                    src={vigicaLogo}
-                    alt="Vigica Consult Ltd"
-                    className="me-2"
-                    style={{ width: "200px", height: "auto" }}
+              <form
+                onSubmit={handleForgotPassword}
+                className="mt-4"
+                autoComplete="off"
+              >
+                <div className="mb-4">
+                  <input
+                    type="email"
+                    className="form-control py-2"
+                    placeholder="Enter your email address"
+                    required
+                    id="email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ fontWeight: 400, fontSize: "16px" }}
+                    disabled={isLoading}
                   />
                 </div>
 
-                {!isSuccess ? (
-                  <>
-                    <h2
-                      className="text-center"
-                      style={{
-                        color: "#2135b0",
-                        fontWeight: 700,
-                        fontSize: 26,
-                      }}
-                    >
-                      Forgot Password
-                    </h2>
-                    <p
-                      className="text-center text-muted mb-4"
-                      style={{ fontSize: 14, lineHeight: 1.5 }}
-                    >
-                      Enter your email address and we'll send you a link to
-                      reset your password.
-                    </p>
-
-                    <form
-                      onSubmit={handleForgotPassword}
-                      className="mt-4"
-                      autoComplete="off"
-                    >
-                      <div className="mb-4 position-relative">
-                        <input
-                          type="email"
-                          className="form-control py-2"
-                          placeholder="Enter your email address"
-                          required
-                          id="email"
-                          name="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          style={{ fontWeight: 400, fontSize: 16 }}
-                          disabled={isLoading}
-                        />
-                      </div>
-
-                      {isLoading ? (
-                        <button
-                          disabled
-                          className="btn w-100 mb-3"
-                          style={{
-                            background: "#2135b0",
-                            color: "#fff",
-                            fontWeight: 600,
-                            fontSize: 17,
-                            borderRadius: 6,
-                            opacity: 0.8,
-                          }}
-                          type="submit"
-                        >
-                          <span className="mr-2">Sending Reset Link</span>
-                          <i className="fas fa-spinner fa-spin" />
-                        </button>
-                      ) : (
-                        <button
-                          className="btn w-100 mb-3"
-                          style={{
-                            background: "#2135b0",
-                            color: "#fff",
-                            fontWeight: 600,
-                            fontSize: 17,
-                            borderRadius: 6,
-                          }}
-                          type="submit"
-                        >
-                          <span className="mr-2">Send Reset Link</span>
-                          <i className="fas fa-paper-plane" />
-                        </button>
-                      )}
-
-                      <button
-                        type="button"
-                        onClick={handleBackToLogin}
-                        className="btn w-100"
-                        style={{
-                          background: "transparent",
-                          color: "#2135b0",
-                          fontWeight: 600,
-                          fontSize: 16,
-                          borderRadius: 6,
-                          border: "2px solid #2135b0",
-                        }}
-                        disabled={isLoading}
-                      >
-                        <span className="mr-2">Back to Sign In</span>
-                        <i className="fas fa-arrow-left" />
-                      </button>
-                    </form>
-                  </>
+                {isLoading ? (
+                  <button
+                    disabled
+                    className="btn w-100 py-2 mb-3"
+                    style={{
+                      background: "#2135b0",
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: "17px",
+                      borderRadius: "6px",
+                      opacity: 0.8,
+                    }}
+                    type="submit"
+                  >
+                    <span className="me-2">Sending Reset Link</span>
+                    <i className="fas fa-spinner fa-spin" />
+                  </button>
                 ) : (
-                  <>
-                    <div className="text-center">
-                      <div
-                        className="mb-4"
-                        style={{
-                          width: 80,
-                          height: 80,
-                          background: "#dcfce7",
-                          borderRadius: "50%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          margin: "0 auto 2rem auto",
-                        }}
-                      >
-                        <i
-                          className="fas fa-check"
-                          style={{
-                            fontSize: 32,
-                            color: "#16a34a",
-                          }}
-                        />
-                      </div>
-
-                      <h2
-                        className="text-center mb-3"
-                        style={{
-                          color: "#2135b0",
-                          fontWeight: 700,
-                          fontSize: 26,
-                        }}
-                      >
-                        Check Your Email
-                      </h2>
-
-                      <p
-                        className="text-center text-muted mb-4"
-                        style={{ fontSize: 14, lineHeight: 1.6 }}
-                      >
-                        We've sent a password reset link to{" "}
-                        <strong>{submittedEmail || email}</strong>
-                        <br />
-                        Please check your email and follow the instructions to
-                        reset your password.
-                      </p>
-
-                      <div className="d-flex flex-column gap-3">
-                        <button
-                          onClick={handleResendLink}
-                          className="btn w-100"
-                          style={{
-                            background: "#2135b0",
-                            color: "#fff",
-                            fontWeight: 600,
-                            fontSize: 16,
-                            borderRadius: 6,
-                          }}
-                          disabled={isLoading}
-                        >
-                          <span className="mr-2">Resend Link</span>
-                          <i className="fas fa-redo" />
-                        </button>
-
-                        <button
-                          onClick={handleBackToLogin}
-                          className="btn w-100"
-                          style={{
-                            background: "transparent",
-                            color: "#2135b0",
-                            fontWeight: 600,
-                            fontSize: 16,
-                            borderRadius: 6,
-                            border: "2px solid #2135b0",
-                          }}
-                          disabled={isLoading}
-                        >
-                          <span className="mr-2">Back to Sign In</span>
-                          <i className="fas fa-arrow-left" />
-                        </button>
-                      </div>
-                    </div>
-                  </>
+                  <button
+                    className="btn w-100 py-2 mb-3"
+                    style={{
+                      background: "#2135b0",
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: "17px",
+                      borderRadius: "6px",
+                    }}
+                    type="submit"
+                  >
+                    <span className="me-2">Send Reset Link</span>
+                    <i className="fas fa-paper-plane" />
+                  </button>
                 )}
 
-                <div className="d-flex align-items-center my-4">
-                  <div className="flex-grow-1 border-top" />
-                  <span
-                    className="mx-2 text-muted"
-                    style={{ fontWeight: 500, fontSize: 12 }}
-                  >
-                    Need Help?
-                  </span>
-                  <div className="flex-grow-1 border-top" />
+                <button
+                  type="button"
+                  onClick={handleBackToLogin}
+                  className="btn w-100 py-2"
+                  style={{
+                    background: "transparent",
+                    color: "#2135b0",
+                    fontWeight: 600,
+                    fontSize: "16px",
+                    borderRadius: "6px",
+                    border: "2px solid #2135b0",
+                  }}
+                  disabled={isLoading}
+                >
+                  <span className="me-2">Back to Sign In</span>
+                  <i className="fas fa-arrow-left" />
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <div className="text-center">
+                <div
+                  className="mb-4"
+                  style={{
+                    width: 80,
+                    height: 80,
+                    background: "#dcfce7",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto 2rem auto",
+                  }}
+                >
+                  <i
+                    className="fas fa-check"
+                    style={{
+                      fontSize: 32,
+                      color: "#16a34a",
+                    }}
+                  />
                 </div>
 
-                <div className="text-center">
-                  <p className="mb-2" style={{ fontSize: 14 }}>
-                    Remember your password?{" "}
-                    <Link
-                      to="/login"
-                      style={{
-                        color: "#2135b0",
-                        textDecoration: "none",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Sign In
-                    </Link>
-                  </p>
-                  <p className="mb-0" style={{ fontSize: 14 }}>
-                    Don't have an account?{" "}
-                    <Link
-                      to="/register"
-                      style={{
-                        color: "#2135b0",
-                        textDecoration: "none",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Register
-                    </Link>
-                  </p>
+                <h2
+                  className="text-center mb-3"
+                  style={{
+                    color: "#2135b0",
+                    fontWeight: 700,
+                    fontSize: "26px",
+                  }}
+                >
+                  Check Your Email
+                </h2>
+
+                <p
+                  className="text-center text-muted mb-4"
+                  style={{ fontSize: "14px", lineHeight: 1.6 }}
+                >
+                  We've sent a password reset link to{" "}
+                  <strong>{submittedEmail || email}</strong>
+                  <br />
+                  Please check your email and follow the instructions to reset
+                  your password.
+                </p>
+
+                <div className="d-flex flex-column gap-3">
+                  <button
+                    onClick={handleResendLink}
+                    className="btn w-100 py-2"
+                    style={{
+                      background: "#2135b0",
+                      color: "#fff",
+                      fontWeight: 600,
+                      fontSize: "16px",
+                      borderRadius: "6px",
+                    }}
+                    disabled={isLoading}
+                  >
+                    <span className="me-2">Resend Link</span>
+                    <i className="fas fa-redo" />
+                  </button>
+
+                  <button
+                    onClick={handleBackToLogin}
+                    className="btn w-100 py-2"
+                    style={{
+                      background: "transparent",
+                      color: "#2135b0",
+                      fontWeight: 600,
+                      fontSize: "16px",
+                      borderRadius: "6px",
+                      border: "2px solid #2135b0",
+                    }}
+                    disabled={isLoading}
+                  >
+                    <span className="me-2">Back to Sign In</span>
+                    <i className="fas fa-arrow-left" />
+                  </button>
                 </div>
               </div>
-            </div>
+            </>
+          )}
+
+          <div className="d-flex align-items-center my-4">
+            <div className="flex-grow-1 border-top" />
+            <span
+              className="mx-2 text-muted"
+              style={{ fontWeight: 500, fontSize: "12px" }}
+            >
+              Need Help?
+            </span>
+            <div className="flex-grow-1 border-top" />
           </div>
-        </main>
-      </section>
-    </>
+
+          <div className="text-center">
+            <p className="mb-2" style={{ fontSize: "14px" }}>
+              Remember your password?{" "}
+              <Link
+                to="/login"
+                style={{
+                  color: "#2135b0",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Sign In
+              </Link>
+            </p>
+            <p className="mb-0" style={{ fontSize: "14px" }}>
+              Don't have an account?{" "}
+              <Link
+                to="/register"
+                style={{
+                  color: "#2135b0",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Register
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
