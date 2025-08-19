@@ -127,21 +127,7 @@
   opacity: 1;
   font-size: 0.97rem;
 }
-.newsletter-btn-variant2 {
-  border-radius: 0 22px 22px 0;
-  background: #fff;
-  color: #2135b0;
-  width: 48px;
-  height: 48px;
-  border: none;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: -1px;
-  box-shadow: 0 2px 8px rgba(33, 53, 176, 0.07);
-  transition: background 0.2s, color 0.2s;
-}
+
 .newsletter-btn-variant2:hover {
   background: #2135b0;
   color: #fff;
