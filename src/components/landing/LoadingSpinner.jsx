@@ -55,7 +55,7 @@ const LoadingSpinner = () => {
         </div>
 
         <h2 className="text-3xl font-bold text-white mb-4">
-          Loading your global opportunities...
+          Loading your global opportunities..
         </h2>
 
         <div className="flex justify-center items-center space-x-2 mb-8">
