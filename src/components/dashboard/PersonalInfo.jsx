@@ -42,17 +42,10 @@ export default function PersonalInfo({ onContinue, onBack }) {
     "She/Her",
     "They/Them",
     "Prefer not to say",
-    "Other",
   ];
 
   // Gender options
-  const genderOptions = [
-    "Male",
-    "Female",
-    "Non-binary",
-    "Prefer not to say",
-    "Other",
-  ];
+  const genderOptions = ["Male", "Female"];
 
   const getMappedValue = (label, options) => {
     const index = options.indexOf(label);
@@ -75,7 +68,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
     UserId: "",
     PreferredPronoun: "",
     FirstLanguage: "",
-    Gender: "", // Added gender field
+    Gender: "",
   });
 
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
@@ -210,6 +203,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
     const requiredFields = [
       "FirstName",
+      "MiddleName",
       "LastName",
       "Phone",
       "DOB",
@@ -217,7 +211,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
       "PostCode",
       "FirstLanguage",
       "PreferredPronoun",
-      "Gender", // Added gender as required field
+      "Gender",
     ];
     const isFormComplete = requiredFields.every(
       (field) => formData[field] && formData[field].trim() !== ""
@@ -394,7 +388,9 @@ export default function PersonalInfo({ onContinue, onBack }) {
           <div className="col-md-4 col-12" key={i}>
             <label className="form-label">
               {field.replace("Name", " Name")}
-              {(field === "FirstName" || field === "LastName") && (
+              {(field === "FirstName" ||
+                field === "MiddleName" ||
+                field === "LastName") && (
                 <span className="required-field">*</span>
               )}
             </label>

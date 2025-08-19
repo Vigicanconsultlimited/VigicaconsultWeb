@@ -4,7 +4,7 @@ import { useAuthStore } from "../../store/auth";
 import "./styles/AcademicDocuments.css";
 import Swal from "sweetalert2";
 
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 17:24:51
+// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-19 16:23:36
 // Current User's Login: NeduStack
 
 const Toast = Swal.mixin({
@@ -15,7 +15,8 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 });
 
-const documentTypes = [
+// Base document types list
+const baseDocumentTypes = [
   "Degree Certificate",
   "WAEC Certificate",
   "Official Transcript",
@@ -51,6 +52,13 @@ const documentAPIMap = {
     viewKey: "englishProficiencyProofDocumentgoogledocviewurl",
     downloadKey: "englishProficiencyProofDocumentdownloadurl",
   },
+  "Research Proposal": {
+    uploadUrl: "ResearchProposal",
+    statusUrl: "ResearchProposal/document",
+    deleteUrl: "ResearchProposal",
+    viewKey: "researchProposalgoogledocviewurl",
+    downloadKey: "researchProposaldownloadurl",
+  },
 };
 
 // Loading Spinner Component
@@ -72,6 +80,8 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   const [uploadProgress, setUploadProgress] = useState({});
   const [errors, setErrors] = useState({});
   const [applicationStatus, setApplicationStatus] = useState(null);
+  const [isPhDProgram, setIsPhDProgram] = useState(false);
+  const [documentTypes, setDocumentTypes] = useState([...baseDocumentTypes]);
   const dropRef = useRef(null);
 
   // Helper function to get status text
@@ -120,10 +130,51 @@ export default function AcademicDocuments({ onContinue, onBack }) {
             // If no application exists yet, it's effectively pending
             setApplicationStatus(2); // Pending
           }
+
+          // Check if the selected program is PhD
+          try {
+            const academicResponse = await apiInstance.get(
+              `Academic/StudentInformationId?PersonalInformationId=${studentId}`
+            );
+
+            if (academicResponse?.data?.result) {
+              const programData = academicResponse.data.result.program;
+              // Check if program level is PhD (level 2)
+              if (programData && programData.programLevel === 2) {
+                setIsPhDProgram(true);
+                // Add Research Proposal to document types if it's not already there
+                setDocumentTypes((prevTypes) => {
+                  if (!prevTypes.includes("Research Proposal")) {
+                    return [...prevTypes, "Research Proposal"];
+                  }
+                  return prevTypes;
+                });
+              }
+            }
+          } catch (err) {
+            console.warn(`Error checking program level: ${err.message}`);
+          }
+
+          // Also check localStorage as a fallback (in case direct API check fails)
+          if (!isPhDProgram) {
+            const storedPhDStatus = localStorage.getItem("isPhDProgram");
+            if (storedPhDStatus === "true") {
+              setIsPhDProgram(true);
+              setDocumentTypes((prevTypes) => {
+                if (!prevTypes.includes("Research Proposal")) {
+                  return [...prevTypes, "Research Proposal"];
+                }
+                return prevTypes;
+              });
+            }
+          }
         }
 
         // Create an array of promises for all document fetches
-        const documentPromises = documentTypes.map(async (type) => {
+        const documentPromises = [
+          ...baseDocumentTypes,
+          "Research Proposal",
+        ].map(async (type) => {
           const { uploadUrl, statusUrl, viewKey, downloadKey } =
             documentAPIMap[type];
           try {
@@ -173,7 +224,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     };
 
     fetchStudentInfo();
-  }, [authData]);
+  }, [authData, isPhDProgram]);
 
   const handleToggle = (type) => {
     setExpanded((prev) => (prev === type ? null : type));
@@ -198,6 +249,16 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     try {
       setErrors((prev) => ({ ...prev, [type]: null }));
 
+      // Show upload progress
+      Swal.fire({
+        title: `Uploading ${type}...`,
+        html: "Please wait",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const res = await apiInstance.post(uploadUrl, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (e) => {
@@ -205,6 +266,8 @@ export default function AcademicDocuments({ onContinue, onBack }) {
           setUploadProgress((prev) => ({ ...prev, [type]: percent }));
         },
       });
+
+      Swal.close();
 
       const result = res.data.result;
       setUploadedFiles((prev) => ({
@@ -220,6 +283,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
       Toast.fire({ icon: "success", title: `${type} uploaded successfully` });
     } catch (err) {
+      Swal.close();
       const msg = err?.response?.data?.message || "Upload failed.";
       setErrors((prev) => ({ ...prev, [type]: msg }));
       Toast.fire({ icon: "error", title: msg });
@@ -252,6 +316,11 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         ...prev,
         [type]: "Only PDF or DOCX files are allowed.",
       }));
+
+      Toast.fire({
+        icon: "error",
+        title: "Only PDF or DOCX files are allowed",
+      });
     }
   };
 
@@ -316,6 +385,18 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Check if Research Proposal is required but not uploaded
+    if (isPhDProgram && !uploadedFiles["Research Proposal"]) {
+      Swal.fire({
+        icon: "warning",
+        title: "Research Proposal Required",
+        text: "A Research Proposal document is required for PhD programs. Please upload it before continuing.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     onContinue && onContinue();
   };
 
@@ -361,6 +442,14 @@ export default function AcademicDocuments({ onContinue, onBack }) {
             </p>
           </div>
         )}
+        {isPhDProgram && (
+          <div className="alert alert-info mb-2 mt-2 p-2">
+            <p>
+              <strong>PhD Program:</strong> Research Proposal document is
+              required for your application.
+            </p>
+          </div>
+        )}
         Click a drop-down to upload/view the document.
       </div>
       <div className="divider" />
@@ -370,10 +459,19 @@ export default function AcademicDocuments({ onContinue, onBack }) {
           <div
             className={`accordion-header ${
               expanded === type ? "expanded" : ""
+            } ${
+              type === "Research Proposal" && isPhDProgram
+                ? "required-document"
+                : ""
             }`}
             onClick={() => handleToggle(type)}
           >
-            {type}
+            <div className="document-type-text">
+              {type}
+              {type === "Research Proposal" && isPhDProgram && (
+                <span className="required-asterisk">*</span>
+              )}
+            </div>
             <span className="chevron">{expanded === type ? "▲" : "▼"}</span>
           </div>
 
@@ -431,6 +529,16 @@ export default function AcademicDocuments({ onContinue, onBack }) {
                       ✖
                     </span>
                   )}
+                </div>
+              )}
+
+              {type === "Research Proposal" && isPhDProgram && (
+                <div className="mt-2 research-proposal-info">
+                  <small>
+                    Your research proposal should outline your research topic,
+                    methodology, objectives, and expected outcomes. PDF or DOCX
+                    formats only.
+                  </small>
                 </div>
               )}
             </div>
