@@ -1,0 +1,233 @@
+.hero-section-container {
+  width: 100%;
+  min-height: 550px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: "Poppins", Arial, sans-serif;
+  color: #fff;
+  padding-top: 3rem;
+  padding-bottom: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 0 !important;
+}
+
+.hero-content-box {
+  max-width: auto;
+  width: 100%;
+  padding: auto;
+  margin-left: 4rem;
+  background-color: transparent !important;
+  /*background: rgba(0, 0, 0, 0.33);*/
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+}
+
+.hero-headline {
+  font-family: "Bricolage Grotesque", "Poppins", Arial, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.3rem, 6vw, 2.5rem);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.hero-headline-strong {
+  font-family: "Bricolage Grotesque", "Poppins", Arial, sans-serif;
+  font-weight: 800;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  display: block;
+}
+
+.hero-headline-sub {
+  font-family: "Poppins", Arial, sans-serif;
+  font-weight: 600;
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  display: block;
+}
+
+.hero-paragraph {
+  font-size: clamp(0.95rem, 2vw, 1.06rem);
+  max-width: 440px;
+  line-height: 1.6;
+}
+
+.hero-button {
+  font-family: "Poppins", Arial, sans-serif;
+  font-weight: 600;
+  background-color: #2135b0;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(33, 53, 176, 0.2);
+}
+
+.hero-button:hover {
+  background-color: #1a2a8a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(33, 53, 176, 0.3);
+}
+
+.hero-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(33, 53, 176, 0.2);
+}
+
+.hero-button-icon {
+  font-size: 1.2em;
+  transition: transform 0.3s ease;
+}
+
+.hero-button:hover .hero-button-icon {
+  transform: scale(1.1);
+}
+
+.hero-scroll-text {
+  font-family: "Poppins", Arial, sans-serif;
+}
+
+.hero-scroll-icon {
+  font-size: 2rem;
+  animation: bounce 1.5s infinite ease-in-out;
+  display: inline-block;
+}
+
+/* ... keep all existing hero section styles ... */
+
+/* Stats Section */
+.stats-section {
+  background-color: #fff;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.row {
+  margin: 0 !important;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 30px 15px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.description-section {
+  background-color: #2135b0;
+  color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-family: "Bricolage Grotesque", Arial, sans-serif;
+  color: #2135b0;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: #2135b0;
+  font-family: "Poppins", Arial, sans-serif;
+  line-height: 1.4;
+}
+
+.service-title {
+  font-size: 1.5rem; /* Slightly smaller to fit */
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.service-description {
+  font-size: 0.9rem; /* Slightly smaller */
+  line-height: 1.6;
+}
+
+.hero-scroll-icon {
+  color: black; /* Forces dark color */
+}
+
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+@keyframes bounceV {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+@keyframes bounceArrow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+.hero-scroll-icon:hover {
+  transform: scale(1.1);
+}
+.hero-scroll-icon:hover path {
+  stroke: #3b82f6; /* Changes to blue on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .stat-item,
+  .description-section {
+    padding: 20px 10px;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .row > div {
+    margin-bottom: 1px; /* Small separator */
+  }
+
+  .description-section {
+    text-align: center;
+  }
+
+  .service-title {
+    font-size: 1.8rem;
+  }
+
+  .service-description {
+    font-size: 1rem;
+  }
+}

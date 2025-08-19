@@ -1,0 +1,571 @@
+.supporting-docs {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 750px;
+  margin: auto;
+  box-shadow: 0 2px 8px #dde3f9;
+  font-family: "Inter", sans-serif;
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1f3fd6;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #5b5e68;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.divider {
+  height: 2px;
+  background: #1f3fd6;
+  margin-bottom: 1rem;
+}
+
+.accordion-item {
+  margin-bottom: 12px;
+}
+
+.accordion-header {
+  background: #d6e3ff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #1f3fd6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.accordion-header:hover {
+  background: #bfd6ff;
+}
+
+.accordion-body {
+  background: #f4f8ff;
+  border: 2px dashed #c4d3f6;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.upload-box {
+  cursor: pointer;
+}
+
+.upload-placeholder {
+  color: #1f3fd6;
+  font-weight: 500;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.uploaded-file {
+  margin-top: 14px;
+  background: #edf3ff;
+  border: 1px solid #c1d2fa;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1f3fd6;
+  font-weight: 500;
+}
+
+.remove-file {
+  color: #d42785;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0 0;
+  margin-top: 30px;
+  border-top: 1px solid #e3e8fd;
+  background: #e3e8fd;
+  border-radius: 0 0 16px 16px;
+}
+
+.footer .btn {
+  padding: 10px 20px;
+  font-weight: 600;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back-btn {
+  background: #f0f4ff;
+  border: 1px solid #c5d4f6;
+  color: #1f3fd6;
+}
+
+.draft-btn {
+  background: #c6d7f9;
+  border: none;
+  color: #1f3fd6;
+}
+
+.continue-btn {
+  background: #1f3fd6;
+  border: none;
+  color: white;
+}
+
+/* Application status styles */
+/* Status indicator styles */
+.application-status-indicator {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.application-status-indicator.submitted {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.application-status-indicator.pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffc107;
+}
+
+.application-status-indicator.under-review {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border-left: 4px solid #17a2b8;
+}
+
+.application-status-indicator.rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.application-status-indicator.approved {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.status-note {
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 0.3rem;
+  font-style: italic;
+}
+
+/* Disabled upload box styling */
+.upload-box.disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.7;
+  border: 2px dashed #ced4da;
+}
+
+.upload-box.disabled .upload-placeholder {
+  color: #6c757d;
+}
+
+/* Edit disabled notice */
+.edit-disabled-notice {
+  background-color: #f8f9fa;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+  display: block;
+}
+
+/* Required field marker */
+.required-field {
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+/* Application Status Styling - Same as other components */
+.application-status {
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 15px 0;
+  border-left: 5px solid;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(248, 250, 252, 0.9) 100%
+  );
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  padding-left: 60px;
+}
+
+.application-status p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.application-status strong {
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  margin-left: 8px;
+  position: relative;
+}
+
+/* Status: Submitted (Status Code: 1) */
+.application-status.submitted {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left-color: #3b82f6;
+  border: 1px solid #93c5fd;
+}
+
+.application-status.submitted strong {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.application-status.submitted::before {
+  content: "📋";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Pending (Status Code: 2) */
+.application-status.pending {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left-color: #f59e0b;
+  border: 1px solid #fbbf24;
+}
+
+.application-status.pending strong {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.application-status.pending::before {
+  content: "⏳";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Under Review (Status Code: 3) */
+.application-status.under-review {
+  background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+  border-left-color: #0ea5e9;
+  border: 1px solid #38bdf8;
+}
+
+.application-status.under-review strong {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+}
+
+.application-status.under-review::before {
+  content: "🔍";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Rejected (Status Code: 4) */
+.application-status.rejected {
+  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+  border-left-color: #ef4444;
+  border: 1px solid #f87171;
+}
+
+.application-status.rejected strong {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.application-status.rejected::before {
+  content: "❌";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Approved (Status Code: 5) */
+.application-status.approved {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-left-color: #10b981;
+  border: 1px solid #34d399;
+}
+
+.application-status.approved strong {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.application-status.approved::before {
+  content: "✅";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Draft (Status Code: 0) */
+.application-status.draft {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-left-color: #64748b;
+  border: 1px solid #94a3b8;
+}
+
+.application-status.draft strong {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(100, 116, 139, 0.3);
+}
+
+.application-status.draft::before {
+  content: "📝";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Unknown Status Fallback */
+.application-status.unknown {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-left-color: #9ca3af;
+  border: 1px solid #d1d5db;
+}
+
+.application-status.unknown strong {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(156, 163, 175, 0.3);
+}
+
+.application-status.unknown::before {
+  content: "❓";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Hover Effects */
+.application-status:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.application-status strong:hover {
+  transform: scale(1.05);
+}
+
+/* Enhanced Edit Disabled Notice */
+.edit-disabled-notice {
+  display: inline-block;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  color: #92400e;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.edit-disabled-notice strong {
+  color: #78350f;
+  font-weight: 600;
+}
+
+/* Upload Box Disabled State Enhancement */
+.upload-box.disabled {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 2px dashed #9ca3af;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.upload-box.disabled .upload-placeholder {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Responsive Design for Status */
+@media (max-width: 768px) {
+  .application-status {
+    padding: 12px 16px 12px 50px;
+    margin: 12px 0;
+  }
+
+  .application-status p {
+    font-size: 14px;
+  }
+
+  .application-status strong {
+    font-size: 16px;
+    padding: 3px 8px;
+    margin-left: 4px;
+    display: block;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .application-status::before {
+    left: 15px;
+    font-size: 20px;
+  }
+
+  .edit-disabled-notice {
+    padding: 8px 10px;
+    font-size: 12px;
+    margin: 6px 0;
+  }
+}
+
+/* Animation for Status Changes */
+@keyframes statusPulse {
+  0% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.application-status.status-changed {
+  animation: statusPulse 2s ease-in-out;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .application-status {
+    background: linear-gradient(
+      135deg,
+      rgba(31, 41, 55, 0.9) 0%,
+      rgba(17, 24, 39, 0.9) 100%
+    );
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .application-status p {
+    color: #f9fafb;
+  }
+
+  .edit-disabled-notice {
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.2) 0%,
+      rgba(217, 119, 6, 0.2) 100%
+    );
+    color: #fbbf24;
+    border-color: #f59e0b;
+  }
+
+  .edit-disabled-notice strong {
+    color: #fde68a;
+  }
+
+  .upload-box.disabled {
+    background: linear-gradient(
+      135deg,
+      rgba(55, 65, 81, 0.9) 0%,
+      rgba(31, 41, 55, 0.9) 100%
+    );
+    border-color: #6b7280;
+    color: #9ca3af;
+  }
+
+  /* Adjust background colors for dark mode while keeping status colors vibrant */
+  .application-status.submitted {
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.2) 0%,
+      rgba(37, 99, 235, 0.2) 100%
+    );
+  }
+
+  .application-status.pending {
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.2) 0%,
+      rgba(217, 119, 6, 0.2) 100%
+    );
+  }
+
+  .application-status.under-review {
+    background: linear-gradient(
+      135deg,
+      rgba(14, 165, 233, 0.2) 0%,
+      rgba(2, 132, 199, 0.2) 100%
+    );
+  }
+
+  .application-status.rejected {
+    background: linear-gradient(
+      135deg,
+      rgba(239, 68, 68, 0.2) 0%,
+      rgba(220, 38, 38, 0.2) 100%
+    );
+  }
+
+  .application-status.approved {
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.2) 0%,
+      rgba(5, 150, 105, 0.2) 100%
+    );
+  }
+
+  .application-status.draft {
+    background: linear-gradient(
+      135deg,
+      rgba(100, 116, 139, 0.2) 0%,
+      rgba(71, 85, 105, 0.2) 100%
+    );
+  }
+}
