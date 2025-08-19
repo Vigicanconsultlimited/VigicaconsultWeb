@@ -1,0 +1,622 @@
+/* Overview.css - Mobile friendly version with gradient stat cards */
+
+.overview-main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  color: #264de4;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.error-badge {
+  color: #e53935;
+  background-color: #ffebee;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Loading Styles */
+.loading-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.loading-spinner {
+  margin: 0 auto 1rem;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #264de4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Stat Cards */
+.stat-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border: none;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.stat-card.blue {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.stat-card.green {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+}
+
+.stat-card.red {
+  background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+  color: white;
+}
+
+.stat-card.gray {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: #333;
+}
+
+/* Background decoration for cards */
+.stat-card::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-card-header span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.stat-card-value {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card-progress {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 2;
+}
+
+.progress-circle {
+  transition: stroke-dasharray 0.6s ease-in-out;
+  transform: rotate(-90deg);
+  transform-origin: 25px 25px;
+}
+
+.stat-card-change {
+  font-size: 0.875rem;
+  font-weight: 600;
+  position: relative;
+  z-index: 2;
+  opacity: 0.9;
+}
+
+/* Application Insights Section */
+.overview-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #333;
+  margin: 2rem 0 1rem 0;
+}
+
+.insights-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.insights-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  min-height: 300px;
+}
+
+.insights-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.insights-card-header span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.insights-card-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #264de4;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+/* Breakdown Chart */
+.breakdown-chart {
+  margin-top: 1rem;
+}
+
+.breakdown-chart-bars {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  height: 120px;
+  margin-bottom: 0.5rem;
+}
+
+.breakdown-chart-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.breakdown-chart-bar-stack {
+  height: 80px;
+  width: 20px;
+  display: flex;
+  flex-direction: column-reverse;
+  margin-bottom: 0.25rem;
+}
+
+.breakdown-bar-app {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 100%;
+  border-radius: 2px;
+}
+
+.breakdown-bar-label {
+  font-size: 0.625rem;
+  color: #666;
+}
+
+.breakdown-chart-legend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+.legend-dot.app {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.legend-dot.blue {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.legend-dot.green {
+  background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+}
+
+.legend-dot.red {
+  background: linear-gradient(90deg, #fc466b 0%, #3f5efb 100%);
+}
+
+.legend-dot.gray {
+  background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.legend-dot.brown {
+  background: linear-gradient(90deg, #8d6e63 0%, #d7ccc8 100%);
+}
+
+.legend-dot.male {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.legend-dot.female {
+  background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+}
+
+/* Acquisitions */
+.acquisitions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.acq-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.acq-label {
+  font-size: 0.75rem;
+  min-width: 70px;
+  color: #666;
+}
+
+.acq-bar {
+  flex: 1;
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.acq-bar-fill {
+  height: 100%;
+  transition: width 0.6s ease;
+  border-radius: 4px;
+}
+
+.acq-bar-fill.blue {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.acq-bar-fill.green {
+  background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+}
+
+.acq-bar-fill.red {
+  background: linear-gradient(90deg, #fc466b 0%, #3f5efb 100%);
+}
+
+.acq-bar-fill.gray {
+  background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+}
+
+.acq-bar-fill.brown {
+  background: linear-gradient(90deg, #8d6e63 0%, #d7ccc8 100%);
+}
+
+.acq-value {
+  font-size: 0.75rem;
+  min-width: 35px;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Audience Satisfaction */
+.audience-satisfaction-content {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.audience-arc {
+  width: 100%;
+  text-align: center;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.audience-arc-caption {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.audience-stars {
+  width: 100%;
+}
+
+.audience-stars-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.audience-star-label {
+  min-width: 50px;
+  font-weight: 500;
+}
+
+.star-yellow {
+  color: #fbc02d;
+}
+
+.audience-votes {
+  font-weight: 500;
+  color: #264de4;
+}
+
+/* Site Analytics */
+.analytics-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.analytics-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  text-align: center;
+  min-height: 120px;
+}
+
+.analytics-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.analytics-card-header span {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.analytics-card-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.analytics-card-progress {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.analytics-card-change {
+  font-size: 0.625rem;
+  color: #666;
+}
+
+/* Gender Distribution */
+.gender-bar-chart {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  align-items: end;
+  margin-top: 1rem;
+}
+
+.gender-bar-col {
+  text-align: center;
+  flex: 1;
+}
+
+.gender-bar-male {
+  width: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 0 auto 0.25rem;
+  border-radius: 2px;
+  min-height: 2px;
+}
+
+.gender-bar-female {
+  width: 20px;
+  background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+  margin: 0 auto 0.25rem;
+  border-radius: 2px;
+  min-height: 2px;
+}
+
+.gender-label {
+  font-size: 0.625rem;
+  color: #666;
+  margin-bottom: 0.125rem;
+}
+
+.gender-value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.gender-bar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.625rem;
+  color: #666;
+}
+
+.gender-bar-legend span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Debug Info */
+.debug-info {
+  font-size: 0.75rem;
+  color: #666;
+  background: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.debug-info p {
+  margin: 0.25rem 0;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .overview-main {
+    padding: 0.5rem;
+  }
+
+  .stat-cards-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+    min-height: 140px;
+  }
+
+  .stat-card-value {
+    font-size: 1.75rem;
+  }
+
+  .insights-cards-row {
+    grid-template-columns: 1fr;
+  }
+
+  .insights-card {
+    padding: 0.75rem;
+  }
+
+  .breakdown-chart-bars {
+    height: 80px;
+  }
+
+  .breakdown-chart-bar-stack {
+    width: 15px;
+    height: 60px;
+  }
+
+  .audience-arc svg {
+    width: 100px;
+    height: 50px;
+  }
+
+  .analytics-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analytics-card {
+    padding: 0.75rem;
+  }
+
+  .gender-bar-male,
+  .gender-bar-female {
+    width: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .overview-main {
+    padding: 0.25rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .overview-section-title {
+    font-size: 1rem;
+  }
+
+  .analytics-cards-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card,
+  .insights-card,
+  .analytics-card {
+    padding: 0.5rem;
+  }
+
+  .breakdown-chart-bars {
+    height: 60px;
+  }
+
+  .breakdown-chart-bar-stack {
+    width: 10px;
+    height: 40px;
+  }
+
+  .audience-stars-row {
+    font-size: 0.625rem;
+  }
+
+  .gender-bar-male,
+  .gender-bar-female {
+    width: 12px;
+  }
+}

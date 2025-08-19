@@ -11,11 +11,19 @@ import TestimonialsSection from "../components/landing/TestimonialsSection";
 import ConsultationSection from "../components/landing/ConsultationSection";
 import Footer from "../components/common/Footer";
 import TravelVisaSection from "../components/landing/TravelVisaSection";
+import LandingPageBody from "../components/landing/LandingPageBody";
+import ContactBar from "../components/common/Contactbar";
 
 // Ensure to load fonts in your index.html or via CSS-in-JS
 const LandingPage = () => (
   <main style={{ width: "100%", overflowX: "hidden", boxSizing: "border-box" }}>
+    {/* <Header /> */}
+    {/* <ContactBar /> 
     <Header />
+    */}
+    <LandingPageBody />
+
+    {/*
     <HeroSection />
     <AboutSection />
     <ServiceCategoriesSection />
@@ -26,6 +34,7 @@ const LandingPage = () => (
     <AboutUsSection />
     <TestimonialsSection />
     <ConsultationSection />
+    */}
     <Footer />
   </main>
 );

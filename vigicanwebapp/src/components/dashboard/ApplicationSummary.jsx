@@ -1,3 +1,23 @@
+<<<<<<< HEAD
+import React from "react";
+import "./styles/ApplicationSummary.css";
+
+function ApplicationSummary({ setCurrentStep }) {
+  return (
+    <div className="application-summary-container">
+      <h2 className="application-summary-title">
+        🎉 Thank You for Submitting!
+      </h2>
+      <p className="application-summary-text">
+        Your documents have been uploaded successfully and are now under review.
+      </p>
+      <button
+        onClick={() => setCurrentStep("dashboard-home")}
+        className="btn btn-primary application-summary-button"
+      >
+        ⬅ Back to Dashboard
+      </button>
+=======
 import React, { useState, useEffect } from "react";
 import "./styles/ApplicationSummary.css";
 import apiInstance from "../../utils/axios";
@@ -627,6 +647,7 @@ function ApplicationSummary({ setCurrentStep }) {
           </div>
         </>
       )}
+>>>>>>> 1748a5e68d38906a8dfe30d72ef9dec426031c60
     </div>
   );
 }

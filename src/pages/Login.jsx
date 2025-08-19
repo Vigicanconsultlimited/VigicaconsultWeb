@@ -2,10 +2,21 @@ import { useState, useEffect } from "react";
 import { login } from "../utils/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
+import Swal from "sweetalert2";
 
 import "../styles/Login.css";
 import registerImage from "../assets/images/img/vigica-img6.jpg";
-import vigicaLogo from "../assets/images/vigica.png";
+//import vigicaLogo from "../assets/images/vigica.png";
+import vigicaLogo from "../assets/images/vigicaV2.png";
+
+// SweetAlert Toast
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top",
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+});
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -34,22 +45,88 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // Form validation
+    if (!email.trim()) {
+      Toast.fire({
+        icon: "error",
+        title: "Please enter your email address",
+      });
+      return;
+    }
+
+    if (!password.trim()) {
+      Toast.fire({
+        icon: "error",
+        title: "Please enter your password",
+      });
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Toast.fire({
+        icon: "error",
+        title: "Please enter a valid email address",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
-    const { error, userRole } = await login(email, password);
-    if (error) {
-      alert(error);
-      setIsLoading(false);
-    } else {
-      // Navigate based on user role
-      if (userRole === "Admin") {
-        navigate("/admin-dashboard");
+    try {
+      //console.log(`Login attempt at 2025-08-11 11:18:43 by ${email}`);
+
+      const { error, userRole } = await login(email, password);
+
+      if (error) {
+        //console.error(
+        //  `Login failed at 2025-08-11 11:18:43 for ${email}:`,
+        //  error
+        //);
+        Toast.fire({
+          icon: "error",
+          title: error,
+        });
+        setIsLoading(false);
+        navigate("/verify-otp", { state: { email } });
       } else {
-        navigate("/dashboard");
+        //console.log(
+        //  `Login successful at 2025-08-11 11:18:43 for ${email} with role: ${userRole}`
+        //);
+
+        Toast.fire({
+          icon: "success",
+          title: "Login successful!",
+        });
+
+        // Navigate based on user role
+        setTimeout(() => {
+          if (userRole === "Admin") {
+            navigate("/admin-dashboard");
+          } else {
+            navigate("/dashboard");
+          }
+          resetForm();
+          setIsLoading(false);
+        }, 1000); // Small delay to show success message
       }
-      resetForm();
+    } catch (error) {
+      //console.error(`Login error at 2025-08-11 11:18:43:`, error);
+      Toast.fire({
+        icon: "error",
+        title: "An unexpected error occurred. Please try again.",
+      });
       setIsLoading(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    Toast.fire({
+      icon: "info",
+      title: "Password reset functionality will be available soon",
+    });
   };
 
   return (
@@ -71,8 +148,8 @@ function Login() {
                 />
                 <div className="register-img-overlay px-3 py-2 rounded">
                   <p className="mb-0 text-white" style={{ fontWeight: 400 }}>
-                    Welcome to Vigica Consult Limited. Please sign to continue
-                    exploring our services.
+                    Welcome to Vigica Consult Limited. Please sign in to
+                    continue exploring our services.
                   </p>
                 </div>
               </div>
@@ -85,8 +162,9 @@ function Login() {
                   <img
                     src={vigicaLogo}
                     alt="Vigica Logo"
-                    style={{ width: 48, height: 48 }}
+                    style={{ width: "200px", height: "auto" }}
                   />
+                  {/*
                   <div>
                     <span
                       className="d-block fs-3 fw-extrabold mb-0"
@@ -110,6 +188,7 @@ function Login() {
                       CONSULT LIMITED
                     </div>
                   </div>
+                  */}
                 </div>
                 <h2
                   className="text-center"
@@ -134,11 +213,11 @@ function Login() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       style={{ fontWeight: 400, fontSize: 16 }}
+                      disabled={isLoading}
                     />
                   </div>
                   <div className="mb-3 position-relative">
                     <input
-                      //type="password"
                       type={showPassword ? "text" : "password"}
                       className="form-control py-2 pe-5"
                       placeholder="Password"
@@ -151,6 +230,7 @@ function Login() {
                         fontWeight: 400,
                         fontSize: 16,
                       }}
+                      disabled={isLoading}
                     />
                     <span
                       className="position-absolute"
@@ -158,9 +238,12 @@ function Login() {
                         right: 10,
                         top: "50%",
                         transform: "translateY(-50%)",
-                        cursor: "pointer",
+                        cursor: isLoading ? "not-allowed" : "pointer",
+                        opacity: isLoading ? 0.5 : 1,
                       }}
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() =>
+                        !isLoading && setShowPassword(!showPassword)
+                      }
                     >
                       {showPassword ? (
                         <i className="fas fa-eye-slash" />
@@ -180,10 +263,11 @@ function Login() {
                         fontWeight: 600,
                         fontSize: 17,
                         borderRadius: 6,
+                        opacity: 0.8,
                       }}
                       type="submit"
                     >
-                      <span className="mr-2">Processing</span>
+                      <span className="mr-2">Signing In</span>
                       <i className="fas fa-spinner fa-spin" />
                     </button>
                   ) : (
@@ -218,7 +302,10 @@ function Login() {
                       <Link to="/register">Register</Link>
                     </p>
                     <p className="mt-0">
-                      <Link to="/forgot-password/" className="text-danger">
+                      <Link
+                        to="/forgot-password"
+                        className="text-decoration-none text-danger"
+                      >
                         Forgot Password?
                       </Link>
                     </p>

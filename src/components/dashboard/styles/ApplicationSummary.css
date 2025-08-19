@@ -1,3 +1,4 @@
+/* ===== BASE CONTAINER ===== */
 .application-summary-container {
   background: #ffffff;
   border-radius: 16px;
@@ -9,6 +10,7 @@
   margin: 0 auto;
 }
 
+/* ===== TYPOGRAPHY ===== */
 .application-summary-title {
   color: #1b2ebf;
   font-weight: 700;
@@ -85,6 +87,230 @@
   padding-bottom: 0.5rem;
 }
 
+/* ===== APPLICATION STATUS STYLING ===== */
+.application-status {
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 15px 0;
+  border-left: 5px solid;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(248, 250, 252, 0.9) 100%
+  );
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  padding-left: 60px;
+}
+
+.application-status p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.application-status strong {
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  margin-left: 8px;
+}
+
+/* Status Colors */
+.application-status.submitted {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left-color: #3b82f6;
+  border: 1px solid #93c5fd;
+}
+
+.application-status.submitted strong {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.application-status.submitted::before {
+  content: "📋";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+.application-status.pending {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left-color: #f59e0b;
+  border: 1px solid #fbbf24;
+}
+
+.application-status.pending strong {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.application-status.pending::before {
+  content: "⏳";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+.application-status.under-review {
+  background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+  border-left-color: #0ea5e9;
+  border: 1px solid #38bdf8;
+}
+
+.application-status.under-review strong {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+}
+
+.application-status.under-review::before {
+  content: "🔍";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+.application-status.rejected {
+  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+  border-left-color: #ef4444;
+  border: 1px solid #f87171;
+}
+
+.application-status.rejected strong {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.application-status.rejected::before {
+  content: "❌";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+.application-status.approved {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-left-color: #10b981;
+  border: 1px solid #34d399;
+}
+
+.application-status.approved strong {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.application-status.approved::before {
+  content: "✅";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* ===== STATUS-SPECIFIC NOTES ===== */
+.status-specific-note {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin: 15px 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.status-specific-note.pending {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+  color: #92400e;
+}
+
+.status-specific-note.submitted {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border: 1px solid #3b82f6;
+  color: #1e40af;
+}
+
+.status-specific-note.under-review {
+  background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+  border: 1px solid #0ea5e9;
+  color: #0369a1;
+}
+
+.status-specific-note.rejected {
+  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  position: relative;
+  padding-left: 45px;
+}
+
+.status-specific-note.rejected::before {
+  content: "⚠️";
+  position: absolute;
+  left: 15px;
+  top: 12px;
+  font-size: 20px;
+}
+
+.status-specific-note.approved {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border: 1px solid #10b981;
+  color: #065f46;
+}
+
+.status-specific-note strong {
+  font-weight: 600;
+}
+
+/* ===== SUMMARY SECTIONS ===== */
+.summary-message {
+  margin: 1.5rem 0;
+}
+
+.summary-instructions {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px 0;
+}
+
+.summary-instructions p {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+.summary-instructions ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.summary-instructions li {
+  margin-bottom: 8px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
 .summary-list {
   padding-left: 1.5rem;
   color: #5c6fb2;
@@ -95,22 +321,80 @@
   line-height: 1.5;
 }
 
-.button-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
-  gap: 1rem;
+.next-steps-section {
+  background: #f0f9ff;
+  border: 1px solid #0ea5e9;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
 }
 
+.next-steps-section h3 {
+  color: #0369a1;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.next-steps-section ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.next-steps-section li {
+  margin-bottom: 10px;
+  color: #1e40af;
+  line-height: 1.6;
+}
+
+/* ===== SUBMISSION DETAILS ===== */
+.submission-details {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px 0;
+}
+
+.submission-details p {
+  margin: 8px 0;
+  color: #0369a1;
+  font-weight: 500;
+}
+
+.submission-details strong {
+  color: #1e40af;
+}
+
+.submission-details.rejected {
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  border-color: #f87171;
+}
+
+.submission-details.rejected p {
+  color: #991b1b;
+}
+
+.submission-details.rejected strong {
+  color: #7f1d1d;
+}
+
+/* ===== BUTTONS ===== */
 .btn {
   border-radius: 8px;
-  padding: 0.8rem 1.5rem;
+  padding: 12px 20px;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  border: none;
+  min-width: 160px;
 }
 
+/* Button styling from both versions merged */
 .btn-outline-secondary {
   background: transparent;
   border: 2px solid #5c6fb2;
@@ -119,6 +403,9 @@
 
 .btn-outline-secondary:hover:not(:disabled) {
   background-color: #f0f3ff;
+  border-color: #4b5563;
+  color: #374151;
+  transform: translateY(-1px);
 }
 
 .btn-success {
@@ -132,14 +419,108 @@
 }
 
 .btn:disabled {
-  opacity: 0.65;
+  opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
 }
 
+/* Additional button styles from first version */
+.btn-outline-primary {
+  background: transparent;
+  border: 2px solid #1b2ebf;
+  color: #1b2ebf;
+}
+
+.btn-outline-primary:hover:not(:disabled) {
+  background-color: #f0f3ff;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1b2ebf 0%, #14239d 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #14239d 0%, #0f1a7a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(27, 46, 191, 0.3);
+}
+
+/* Resubmit Button */
+.resubmit-button {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
+}
+
+.resubmit-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(245, 158, 11, 0.4);
+}
+
+.resubmit-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+/* Submit button styling from second version */
 .submit-button {
   min-width: 200px;
 }
 
+/* ===== BUTTON CONTAINERS ===== */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.submitted-action-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Status-specific button container styling */
+.button-group.rejected,
+.submitted-action-buttons.rejected {
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  border-color: #fca5a5;
+}
+
+.button-group.pending {
+  background: linear-gradient(135deg, #fefbf2 0%, #fef3c7 100%);
+  border-color: #fde68a;
+}
+
+/* ===== LOADING STATES ===== */
 .spinner-border-sm {
   width: 1rem;
   height: 1rem;
@@ -180,7 +561,34 @@
   }
 }
 
-/* Mobile responsiveness */
+@keyframes resubmitPulse {
+  0% {
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3),
+      0 0 0 4px rgba(245, 158, 11, 0.2);
+  }
+  100% {
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
+  }
+}
+
+.resubmit-button:focus {
+  animation: resubmitPulse 2s infinite;
+  outline: none;
+}
+
+.application-status:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.application-status strong:hover {
+  transform: scale(1.05);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
   .application-summary-container {
     padding: 1.5rem;
@@ -190,6 +598,65 @@
     font-size: 1.5rem;
   }
 
+  .application-status {
+    padding: 12px 16px 12px 50px;
+    margin: 12px 0;
+  }
+
+  .application-status p {
+    font-size: 14px;
+  }
+
+  .application-status strong {
+    font-size: 16px;
+    padding: 3px 8px;
+    margin-left: 4px;
+    display: block;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .application-status::before {
+    left: 15px;
+    font-size: 20px;
+  }
+
+  /* Button container responsiveness from both versions */
+  .button-group,
+  .submitted-action-buttons,
+  .button-container {
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px;
+    margin-top: 20px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .application-summary-button,
+  .resubmit-button,
+  .btn {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0.8rem;
+  }
+
+  .status-specific-note {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .summary-instructions,
+  .next-steps-section {
+    padding: 12px;
+    margin: 15px 0;
+  }
+
+  /* Responsive styles from the second version */
   .application-status-card {
     flex-direction: column;
     text-align: center;
@@ -199,13 +666,82 @@
     margin-right: 0;
     margin-bottom: 1rem;
   }
+}
 
-  .button-container {
-    flex-direction: column;
+@media (max-width: 480px) {
+  .application-summary-container {
+    padding: 15px;
   }
 
-  .btn {
-    width: 100%;
-    margin-bottom: 0.8rem;
+  .action-buttons {
+    gap: 6px;
+  }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+  .application-status {
+    background: linear-gradient(
+      135deg,
+      rgba(31, 41, 55, 0.9) 0%,
+      rgba(17, 24, 39, 0.9) 100%
+    );
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .application-status p {
+    color: #f9fafb;
+  }
+
+  .summary-instructions {
+    background: rgba(31, 41, 55, 0.5);
+    border-color: #4b5563;
+  }
+
+  .summary-instructions p {
+    color: #f9fafb;
+  }
+
+  .summary-instructions li {
+    color: #d1d5db;
+  }
+
+  .next-steps-section {
+    background: rgba(31, 41, 55, 0.5);
+    border-color: #4b5563;
+  }
+
+  .button-group,
+  .submitted-action-buttons {
+    background: linear-gradient(
+      135deg,
+      rgba(31, 41, 55, 0.9) 0%,
+      rgba(17, 24, 39, 0.9) 100%
+    );
+    border-color: #4b5563;
+  }
+
+  .submission-details {
+    background: rgba(31, 41, 55, 0.5);
+    border-color: #4b5563;
+  }
+
+  .submission-details p {
+    color: #93c5fd;
+  }
+
+  .submission-details strong {
+    color: #dbeafe;
+  }
+
+  .btn-outline-secondary {
+    border-color: #9ca3af;
+    color: #d1d5db;
+  }
+
+  .btn-outline-secondary:hover:not(:disabled) {
+    background: rgba(55, 65, 81, 0.5);
+    border-color: #d1d5db;
+    color: #f9fafb;
   }
 }

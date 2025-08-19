@@ -22,7 +22,7 @@ const ConsultationSection = () => (
                 <div>
                   <strong>Requesting A Call</strong>
                   <br />
-                  <span>+234 814 254 9678</span>
+                  <span>+234 901 445 6659</span>
                 </div>
               </div>
 

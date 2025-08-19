@@ -877,7 +877,6 @@ export default function UploadedFiles() {
                 Edit
               </button>
             </div>
-
             <div className="uploaded-documents-card student-files-list">
               <div className="uploaded-documents-header">
                 <span>Uploaded Documents</span>

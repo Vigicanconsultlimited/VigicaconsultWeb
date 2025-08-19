@@ -49,8 +49,8 @@ export const login = async (email, password) => {
         userRole: userRole,
       });
 
-      console.log("Login successful:", data);
-      console.log("User role:", userRole);
+      //console.log("Login successful:", data);
+      //console.log("User role:", userRole);
 
       Toast.fire({
         icon: "success",
@@ -118,7 +118,7 @@ export const refreshAuthToken = async () => {
       userRole: userRole,
     };
   } catch (error) {
-    console.error("Token refresh failed:", error);
+    //console.error("Token refresh failed:", error);
     return null;
   }
 };
@@ -146,7 +146,7 @@ export const setUser = async () => {
       userRole: userRole,
     });
   } catch (error) {
-    console.error("Auth error:", error);
+    //console.error("Auth error:", error);
     logout();
   } finally {
     store.setLoading(false);

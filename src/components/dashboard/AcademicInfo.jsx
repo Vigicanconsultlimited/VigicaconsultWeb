@@ -39,16 +39,6 @@ export default function AcademicInfo({
   const [applicationStatus, setApplicationStatus] = useState(null);
   const [academicInfoId, setAcademicInfoId] = useState("");
 
-  // Current date and time as specified
-  const getCurrentDateTime = () => {
-    return "2025-08-07 22:20:32";
-  };
-
-  // Current user login as specified
-  const getCurrentUser = () => {
-    return "NeduStack";
-  };
-
   // Check if application status allows editing (only Pending or Rejected)
   const canEdit =
     applicationStatus === null ||
@@ -62,10 +52,6 @@ export default function AcademicInfo({
         const userId = authData["uid"];
 
         try {
-          console.log(
-            `Fetching personal info at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
           // First get the personal info ID
           const personalResponse = await apiInstance.get(
             `StudentPersonalInfo/user/${userId}`
@@ -80,17 +66,10 @@ export default function AcademicInfo({
 
             // Store in localStorage
             localStorage.setItem("studentPersonalInfoId", personalInfoId);
-            console.log(
-              `Stored personal info ID in localStorage: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
 
             // Check application status
             if (personalInfoId) {
               try {
-                console.log(
-                  `Fetching application status at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                );
-
                 const appResponse = await apiInstance.get(
                   `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
                 );
@@ -98,27 +77,14 @@ export default function AcademicInfo({
                 if (appResponse?.data?.result) {
                   const status = appResponse.data.result.applicationStatus;
                   setApplicationStatus(status);
-                  console.log(
-                    `Application status: ${getStatusText(
-                      status
-                    )} (${status}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                  );
                 }
               } catch (err) {
-                console.log(
-                  `No application found or error: ${
-                    err.message
-                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                );
+                console.log(`No application found or error: ${err.message}`);
                 setApplicationStatus(2); // Default to Pending
               }
 
               // Now try to fetch existing academic info
               try {
-                console.log(
-                  `Fetching academic data from Academic/StudentInformationId for PersonalInfoId: ${personalInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                );
-
                 const academicResponse = await apiInstance.get(
                   `Academic/StudentInformationId?PersonalInformationId=${personalInfoId}`
                 );
@@ -129,36 +95,17 @@ export default function AcademicInfo({
                 ) {
                   const savedData = academicResponse.data.result;
                   setAcademicInfoId(savedData.id || "");
-
-                  console.log(
-                    `Retrieved academic data with ID: ${
-                      savedData.id
-                    } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                  );
-
-                  // Wait for schools, programs, and courses to be loaded before mapping
-                  // We'll handle the mapping in a separate useEffect
                   setIsFormSubmitted(true);
                 }
               } catch (academicErr) {
                 console.warn(
-                  `No existing academic info found or error: ${
-                    academicErr.message
-                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+                  `No existing academic info found or error: ${academicErr.message}`
                 );
               }
             }
           }
-
-          console.log(
-            `Existing data fetch completed at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
         } catch (error) {
-          console.warn(
-            `Error fetching existing data: ${
-              error.message
-            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
+          console.warn(`Error fetching existing data: ${error.message}`);
         } finally {
           setLoading(false);
         }
@@ -184,26 +131,13 @@ export default function AcademicInfo({
   useEffect(() => {
     const fetchSchools = async () => {
       try {
-        console.log(
-          `Fetching schools at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-
         const response = await apiInstance.get("School");
 
         if (response?.data?.statusCode === 200) {
           setSchools(response.data.result || []);
-          console.log(
-            `${
-              response.data.result.length
-            } schools fetched at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
         }
       } catch (error) {
-        console.error(
-          `Error fetching schools: ${
-            error.message
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        console.error(`Error fetching schools: ${error.message}`);
       }
     };
 
@@ -214,26 +148,13 @@ export default function AcademicInfo({
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        console.log(
-          `Fetching academic programs at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-
         const response = await apiInstance.get("AcademicProgram");
 
         if (response?.data?.statusCode === 200) {
           setPrograms(response.data.result || []);
-          console.log(
-            `${
-              response.data.result.length
-            } programs fetched at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
         }
       } catch (error) {
-        console.error(
-          `Error fetching programs: ${
-            error.message
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        console.error(`Error fetching programs: ${error.message}`);
       }
     };
 
@@ -244,26 +165,13 @@ export default function AcademicInfo({
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        console.log(
-          `Fetching courses of interest at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
-
         const response = await apiInstance.get("CourseOfInterest");
 
         if (response?.data?.statusCode === 200) {
           setCourses(response.data.result || []);
-          console.log(
-            `${
-              response.data.result.length
-            } courses fetched at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
         }
       } catch (error) {
-        console.error(
-          `Error fetching courses: ${
-            error.message
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        console.error(`Error fetching courses: ${error.message}`);
       }
     };
 
@@ -281,10 +189,6 @@ export default function AcademicInfo({
         academicInfoId
       ) {
         try {
-          console.log(
-            `Mapping academic data for ID: ${academicInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
           const response = await apiInstance.get(
             `Academic/StudentInformationId?PersonalInformationId=${formData.PersonalInformationId}`
           );
@@ -311,23 +215,9 @@ export default function AcademicInfo({
               AcademicProgramId: programId,
               CourseOfInterestId: courseId,
             }));
-
-            console.log(
-              `Mapped academic data - School: ${
-                savedData.schoolResponse?.name
-              } (${schoolId}), Program: ${
-                savedData.program?.description
-              } (${programId}), Course: ${
-                savedData.courseOfInterest?.name
-              } (${courseId}) at ${getCurrentDateTime()} by ${getCurrentUser()}`
-            );
           }
         } catch (error) {
-          console.warn(
-            `Error mapping academic data: ${
-              error.message
-            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
+          console.warn(`Error mapping academic data: ${error.message}`);
         }
       }
     };
@@ -391,9 +281,7 @@ export default function AcademicInfo({
 
     // Verify we have the personal info ID
     if (!formData.PersonalInformationId) {
-      console.error(
-        `Cannot submit academic info: Missing Personal Info ID at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
+      console.error("Cannot submit academic info: Missing Personal Info ID");
 
       Toast.fire({
         icon: "error",
@@ -433,12 +321,6 @@ export default function AcademicInfo({
       setSubmitting(true);
       showLoadingOverlay();
 
-      console.log(
-        `Submitting academic info with PersonalInfoId: ${
-          formData.PersonalInformationId
-        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
-
       const response = await apiInstance.post("Academic", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -451,9 +333,6 @@ export default function AcademicInfo({
         const newAcademicInfoId = response.data.result.id;
         setAcademicInfoId(newAcademicInfoId);
         setFormData((prev) => ({ ...prev, Id: newAcademicInfoId }));
-        console.log(
-          `New academic info ID: ${newAcademicInfoId} at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
       }
 
       Toast.fire({ icon: "success", title: "Submitted successfully" });
@@ -464,11 +343,7 @@ export default function AcademicInfo({
       }, 500);
     } catch (error) {
       Swal.close();
-      console.error(
-        `Submission failed: ${
-          error.message
-        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
+      console.error(`Submission failed: ${error.message}`);
 
       // Check if it's the "Already exists" error
       if (
@@ -526,9 +401,6 @@ export default function AcademicInfo({
 
     try {
       showLoadingOverlay();
-      console.log(
-        `Updating academic info at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
 
       await apiInstance.put("Academic/update", payload, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -537,27 +409,15 @@ export default function AcademicInfo({
       Swal.close();
       Toast.fire({ icon: "success", title: "Updated successfully" });
       setIsEditing(false);
-
-      console.log(
-        `Academic info updated successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
     } catch (error) {
       Swal.close();
-      console.error(
-        `Update failed: ${
-          error.message
-        } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-      );
+      console.error(`Update failed: ${error.message}`);
       Toast.fire({ icon: "error", title: "Update failed" });
     }
   };
 
   // Handle "Next" button click
   const handleContinue = () => {
-    console.log(
-      `Continuing to next step at ${getCurrentDateTime()} by ${getCurrentUser()}`
-    );
-
     // Use setTimeout to ensure any state updates are completed
     setTimeout(() => {
       if (onContinue) onContinue();
@@ -579,6 +439,20 @@ export default function AcademicInfo({
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Academic Program Selection</h2>
 
+      {/* Application Status Display */}
+      {applicationStatus && (
+        <div
+          className={`application-status ${getStatusText(applicationStatus)
+            .toLowerCase()
+            .replace(" ", "-")}`}
+        >
+          <p>
+            Current Application Status:{" "}
+            <strong>{getStatusText(applicationStatus)}</strong>
+          </p>
+        </div>
+      )}
+
       {/* Only show "already submitted" message if editing is allowed */}
       {isFormSubmitted && !isEditing && canEdit && (
         <div className="alert alert-info mt-3">
@@ -596,13 +470,11 @@ export default function AcademicInfo({
       {applicationStatus &&
         applicationStatus !== 2 &&
         applicationStatus !== 4 && (
-          <div className="alert alert-primary mt-3">
-            <strong>Notice: Your application cannot be edited.</strong>
-            <br />
-            Current status: <strong>{getStatusText(applicationStatus)}</strong>.
-            <br />
-            This information cannot be modified at this time, but you can
-            proceed to the next step.
+          <div className="alert alert-primary mb-2 mt-0 p-2">
+            <p>
+              <strong>Notice:</strong> Your application cannot be edited at this
+              time.
+            </p>
           </div>
         )}
 

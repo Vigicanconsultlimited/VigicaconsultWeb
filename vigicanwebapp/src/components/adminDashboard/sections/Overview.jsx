@@ -348,7 +348,6 @@ export default function Overview() {
 
       {/* Application Insights Section */}
       <h2 className="overview-section-title">Application Insights</h2>
-
       <div className="insights-cards-row">
         {/* Active Applications Breakdown */}
         <div className="insights-card breakdown">
@@ -412,7 +411,6 @@ export default function Overview() {
             ))}
           </div>
         </div>
-
         {/* Audience Satisfaction */}
         <div className="insights-card satisfaction">
           <div className="insights-card-header">
@@ -470,7 +468,6 @@ export default function Overview() {
 
       {/* Site Analytics */}
       <h2 className="overview-section-title">Site Analytics</h2>
-
       <div className="analytics-cards-row">
         {analytics.map((a) => (
           <div key={a.title} className="analytics-card">
@@ -539,7 +536,6 @@ export default function Overview() {
               <div className="gender-label">Male</div>
               <div className="gender-value">{genderData.male}</div>
             </div>
-
             <div className="gender-bar-col">
               <div
                 className="gender-bar-female"

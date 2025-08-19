@@ -290,6 +290,323 @@
   border-left: 3px solid #1b2ebf;
 }
 
+/* Application Status Styling - Same as StudentDashboard and PersonalInfo */
+.application-status {
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 15px 0;
+  border-left: 5px solid;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(248, 250, 252, 0.9) 100%
+  );
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  padding-left: 60px;
+}
+
+.application-status p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.application-status strong {
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  margin-left: 8px;
+  position: relative;
+}
+
+/* Status: Submitted (Status Code: 1) */
+.application-status.submitted {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-left-color: #3b82f6;
+  border: 1px solid #93c5fd;
+}
+
+.application-status.submitted strong {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.application-status.submitted::before {
+  content: "📋";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Pending (Status Code: 2) */
+.application-status.pending {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-left-color: #f59e0b;
+  border: 1px solid #fbbf24;
+}
+
+.application-status.pending strong {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.application-status.pending::before {
+  content: "⏳";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Under Review (Status Code: 3) */
+.application-status.under-review {
+  background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+  border-left-color: #0ea5e9;
+  border: 1px solid #38bdf8;
+}
+
+.application-status.under-review strong {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+}
+
+.application-status.under-review::before {
+  content: "🔍";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Rejected (Status Code: 4) */
+.application-status.rejected {
+  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+  border-left-color: #ef4444;
+  border: 1px solid #f87171;
+}
+
+.application-status.rejected strong {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.application-status.rejected::before {
+  content: "❌";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Approved (Status Code: 5) */
+.application-status.approved {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-left-color: #10b981;
+  border: 1px solid #34d399;
+}
+
+.application-status.approved strong {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.application-status.approved::before {
+  content: "✅";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Status: Draft (Status Code: 0) */
+.application-status.draft {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-left-color: #64748b;
+  border: 1px solid #94a3b8;
+}
+
+.application-status.draft strong {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(100, 116, 139, 0.3);
+}
+
+.application-status.draft::before {
+  content: "📝";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Unknown Status Fallback */
+.application-status.unknown {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-left-color: #9ca3af;
+  border: 1px solid #d1d5db;
+}
+
+.application-status.unknown strong {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(156, 163, 175, 0.3);
+}
+
+.application-status.unknown::before {
+  content: "❓";
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24px;
+}
+
+/* Hover Effects */
+.application-status:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.application-status strong:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive Design for Status */
+@media (max-width: 768px) {
+  .application-status {
+    padding: 12px 16px 12px 50px;
+    margin: 12px 0;
+  }
+
+  .application-status p {
+    font-size: 14px;
+  }
+
+  .application-status strong {
+    font-size: 16px;
+    padding: 3px 8px;
+    margin-left: 4px;
+    display: block;
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .application-status::before {
+    left: 15px;
+    font-size: 20px;
+  }
+}
+
+/* Animation for Status Changes */
+@keyframes statusPulse {
+  0% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.application-status.status-changed {
+  animation: statusPulse 2s ease-in-out;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .application-status {
+    background: linear-gradient(
+      135deg,
+      rgba(31, 41, 55, 0.9) 0%,
+      rgba(17, 24, 39, 0.9) 100%
+    );
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .application-status p {
+    color: #f9fafb;
+  }
+
+  /* Adjust background colors for dark mode while keeping status colors vibrant */
+  .application-status.submitted {
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.2) 0%,
+      rgba(37, 99, 235, 0.2) 100%
+    );
+  }
+
+  .application-status.pending {
+    background: linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.2) 0%,
+      rgba(217, 119, 6, 0.2) 100%
+    );
+  }
+
+  .application-status.under-review {
+    background: linear-gradient(
+      135deg,
+      rgba(14, 165, 233, 0.2) 0%,
+      rgba(2, 132, 199, 0.2) 100%
+    );
+  }
+
+  .application-status.rejected {
+    background: linear-gradient(
+      135deg,
+      rgba(239, 68, 68, 0.2) 0%,
+      rgba(220, 38, 38, 0.2) 100%
+    );
+  }
+
+  .application-status.approved {
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.2) 0%,
+      rgba(5, 150, 105, 0.2) 100%
+    );
+  }
+
+  .application-status.draft {
+    background: linear-gradient(
+      135deg,
+      rgba(100, 116, 139, 0.2) 0%,
+      rgba(71, 85, 105, 0.2) 100%
+    );
+  }
+}
+
+.form-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+  font-family: "Segoe UI", sans-serif;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
