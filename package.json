@@ -1,6 +1,5 @@
 {
   "name": "vigicanwebapp",
-  "packageManager": "yarn@4.9.1",
   "private": true,
   "version": "1.0.0",
   "scripts": {
