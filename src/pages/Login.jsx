@@ -90,12 +90,8 @@ function Login() {
           title: error,
         });
         setIsLoading(false);
-        navigate("/verify-otp", { state: { email } });
+        //navigate("/verify-otp", { state: { email } });
       } else {
-        //console.log(
-        //  `Login successful at 2025-08-11 11:18:43 for ${email} with role: ${userRole}`
-        //);
-
         Toast.fire({
           icon: "success",
           title: "Login successful!",
