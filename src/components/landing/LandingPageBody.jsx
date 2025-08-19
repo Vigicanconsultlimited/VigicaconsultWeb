@@ -8,7 +8,7 @@ import { Textarea } from "../ui/textarea";
 import precious from "../../assets/images/img/vigica-img6.jpg";
 import mercy from "../../assets/images/mercy.png";
 import lolo from "../../assets/images/lolo.webp";
-import kelvin from "../../assets/images/kelvin.png";
+import kelvin from "../../assets/images/Kelvin.PNG";
 import john from "../../assets/images/john.jpg";
 import RentalHouse from "../../assets/images/houserental.jpg";
 import OrlandoExternal from "../../assets/images/OrlandoVillageExternal.WEBP";
