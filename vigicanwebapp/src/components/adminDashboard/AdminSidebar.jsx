@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import logo from "../../assets/images/vigica.png";
+//import logo from "../../assets/images/vigica.png";
+import logo from "../../assets/images/vigica-vertical-w.png";
 import {
   BarChart3,
   FileText,
@@ -60,12 +61,13 @@ export default function AdminSidebar({
         <div className="sidebar-content">
           {/* Logo Section */}
           <div className="sidebar-logo-section">
-            <div className="sidebar-logo-circle">
-              <img src={logo} alt="Vigica Logo" className="sidebar-logo-img" />
-            </div>
-            <div className="sidebar-logo-text">
-              <div className="sidebar-brand">VIGICA</div>
-              <div className="sidebar-subbrand">CONSULT LIMITED</div>
+            <div className="sidebar-logo-cicle">
+              <img
+                src={logo}
+                className="sidebar-logo-img me-2"
+                alt="Vigica Consult Ltd"
+                style={{ width: "100px", height: "auto" }}
+              />
             </div>
           </div>
           {/* Make nav scrollable so Logout stays at the bottom */}

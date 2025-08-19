@@ -11,9 +11,9 @@ const ConsultationSection = () => (
               Book a Free Consultation Today with Us
             </h2>
             <p className="consultation-description">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-              sodales pellentesque ullamcorper mollis velit porta ex et nisl
-              condorm ullamcorper.
+              Get personalized guidance for your study abroad journey, travel
+              plans, or hotel bookings. Our experts are here to assist you with
+              all your needs.
             </p>
 
             <div className="consultation-info">
@@ -22,7 +22,7 @@ const ConsultationSection = () => (
                 <div>
                   <strong>Requesting A Call</strong>
                   <br />
-                  <span>+234 814 254 9678</span>
+                  <span>+234 901 445 6659</span>
                 </div>
               </div>
 
@@ -40,7 +40,7 @@ const ConsultationSection = () => (
                 <div>
                   <strong>Location</strong>
                   <br />
-                  <span>6701 St Lorem Ipsum, Delaware 19930</span>
+                  <span>Plot 114/115, Okay Water, Lugbe, Abuja</span>
                 </div>
               </div>
             </div>

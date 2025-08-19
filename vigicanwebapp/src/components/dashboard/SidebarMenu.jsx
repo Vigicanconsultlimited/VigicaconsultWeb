@@ -1,191 +1,247 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
 import "./styles/SidebarMenu.css";
+import { FileText } from "lucide-react";
 
-export default function SidebarMenu() {
+export default function SidebarMenu({ setCurrentStep }) {
   const [docsOpen, setDocsOpen] = useState(true);
+  const [savedOpen, setSavedOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // for mobile toggle
+  const navigate = useNavigate();
 
   return (
-    <aside className="sidebar-menu d-flex flex-column justify-content-between px-3 py-3">
-      <nav>
-        <div className="sidebar-section-title mb-4">MENU</div>
-        <ul className="sidebar-list list-unstyled mb-0">
-          <li className="sidebar-item mb-2">
-            <span className="sidebar-link d-flex align-items-center">
-              <span className="sidebar-icon me-2">
-                {/* Onboarding Icon */}
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="10"
-                    stroke="#fff"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M11 13.5c2.5 0 4.5 1 4.5 2.5v1H6.5v-1c0-1.5 2-2.5 4.5-2.5z"
-                    fill="#fff"
-                  />
-                  <circle cx="11" cy="9" r="2" fill="#fff" />
-                </svg>
-              </span>
-              <span className="sidebar-link-text">Onboarding</span>
-            </span>
-          </li>
-          <li className="sidebar-item mb-2">
-            <span
-              className="sidebar-link d-flex align-items-center"
-              style={{ cursor: "pointer" }}
-              onClick={() => setDocsOpen((v) => !v)}
-            >
-              <span className="sidebar-icon me-2">
-                {/* Documents Icon */}
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="10"
-                    stroke="#fff"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M8 11.5l2 2 4-4"
-                    stroke="#fff"
-                    strokeWidth="2"
+    <>
+      {/* Hamburger Button */}
+      <button
+        className="hamburger-btn d-md-none"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        ☰
+      </button>
+
+      <aside
+        className={`sidebar-menu d-flex flex-column justify-content-between px-2 py-3 ${
+          isOpen ? "open" : ""
+        }`}
+      >
+        <nav>
+          <div className="sidebar-section-title mb-4"></div>
+          <br />
+          <span className="sidebar-link-text mb-4">Menu</span>
+
+          <ul className="sidebar-list list-unstyled mb-0">
+            {/* Dashboard */}
+
+            <li className="sidebar-item mb-2">
+              <span
+                className="sidebar-link d-flex align-items-center"
+                onClick={() => {
+                  window.location.href = "/dashboard";
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <span className="sidebar-icon me-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
                     fill="none"
-                  />
-                </svg>
-              </span>
-              <span className="sidebar-link-text fw-bold">My Documents</span>
-              <span className="ms-auto">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  style={{
-                    transition: "transform 0.2s",
-                    transform: docsOpen ? "rotate(180deg)" : "rotate(0deg)",
-                  }}
-                >
-                  <path
-                    d="M4 6l4 4 4-4"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-            </span>
-            {docsOpen && (
-              <ul className="sidebar-sub-list list-unstyled ms-4 mt-2">
-                <li className="sidebar-sub-item mb-1">
-                  <span className="sidebar-sub-link">Required Documents</span>
-                </li>
-                <li className="sidebar-sub-item mb-1">
-                  <span className="sidebar-sub-link">Upload Document</span>
-                </li>
-                <li className="sidebar-sub-item">
-                  <span className="sidebar-sub-link">Document Status</span>
-                </li>
-              </ul>
-            )}
-          </li>
-        </ul>
-      </nav>
-      <div className="sidebar-footer">
-        <ul className="sidebar-list list-unstyled mb-0">
-          <li className="sidebar-item mb-2">
-            <span className="sidebar-link d-flex align-items-center">
-              <span className="sidebar-icon me-2">
-                {/* Logout Icon */}
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="10"
-                    stroke="#fff"
-                    strokeWidth="2"
-                  />
-                  <rect
-                    x="6"
-                    y="6"
-                    width="6"
-                    height="10"
-                    rx="2"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    fill="none"
-                  />
-                  <path
-                    d="M15.5 11H9.5"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M13.5 9L15.5 11L13.5 13"
-                    stroke="#fff"
+                    stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                  />
-                </svg>
+                    className="feather feather-layout"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="9" y1="21" x2="9" y2="9" />
+                  </svg>
+                </span>
+
+                <span className="sidebar-link-text">Dashboard</span>
               </span>
-              <span className="sidebar-link-text text-decoration-none text-white">
-                <Link to="/logout">Logout</Link>
+            </li>
+            <li className="sidebar-item mb-2">
+              <span
+                className="sidebar-link d-flex align-items-center"
+                onClick={() => setCurrentStep("personal-info")}
+              >
+                <span className="sidebar-icon me-2">
+                  <FileText size={24} color="#fff" />
+                </span>
+                <span className="sidebar-link-text fw-bold">
+                  My Application
+                </span>
               </span>
-            </span>
-          </li>
-          <li className="sidebar-item mb-2">
-            <span className="sidebar-link d-flex align-items-center">
-              <span className="sidebar-icon me-2">
-                {/* Settings Icon */}
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="10"
-                    stroke="#fff"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M11 8v5M8 11h6"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
+            </li>
+
+            {/* My Applications */}
+            {/*}
+            <li className="sidebar-item mb-2">
+              <span
+                className="sidebar-link d-flex align-items-center"
+                onClick={() => setDocsOpen((v) => !v)}
+              >
+                <span className="sidebar-icon me-2">
+                  <FileText size={24} color="#fff" />
+                </span>
+                <span className="sidebar-link-text fw-bold">Application</span>
+                <span
+                  className="ms-auto"
+                  style={{
+                    transform: docsOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s",
+                  }}
+                >
+                  ▼
+                </span>
               </span>
-              <span className="sidebar-link-text">Settings</span>
-            </span>
-          </li>
-          <li className="sidebar-item">
-            <span className="sidebar-link d-flex align-items-center">
-              <span className="sidebar-icon me-2">
-                {/* Help Icon */}
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="10"
-                    stroke="#fff"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M11 15h0M11 13.5V14m0-5.75a2.25 2.25 0 0 1 2.25 2.25c0 1.5-2.25 2-2.25 2"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
+              {docsOpen && (
+                <ul className="sidebar-sub-list list-unstyled ms-4 mt-2">
+                  <li className="sidebar-sub-item mb-1">
+                    <span
+                      className="sidebar-sub-link"
+                      onClick={() => setCurrentStep("personal-info")}
+                    >
+                      Bio Data
+                    </span>
+                  </li>
+                  <li className="sidebar-sub-item mb-1">
+                    <span
+                      className="sidebar-sub-link"
+                      onClick={() => setCurrentStep("academic-documents")}
+                    >
+                      Academic Documents
+                    </span>
+                  </li>
+                  <li className="sidebar-sub-item">
+                    <span
+                      className="sidebar-sub-link"
+                      onClick={() => setCurrentStep("supporting-documents")}
+                    >
+                      Supporting Documents
+                    </span>
+                  </li>
+                </ul>
+              )}
+            </li>
+            */}
+
+            {/* Saved Application */}
+            {/*}
+            <li className="sidebar-item mb-2">
+              <span
+                className="sidebar-link d-flex align-items-center"
+                onClick={() => setSavedOpen((v) => !v)}
+              >
+                <span className="sidebar-icon me-2">💾</span>
+                <span className="sidebar-link-text fw-bold">
+                  Saved Application
+                </span>
+                <span
+                  className="ms-auto"
+                  style={{
+                    transform: savedOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s",
+                  }}
+                >
+                  ▼
+                </span>
               </span>
-              <span className="sidebar-link-text">Get Help</span>
-            </span>
-          </li>
-        </ul>
-      </div>
-    </aside>
+              {savedOpen && (
+                <ul className="sidebar-sub-list list-unstyled ms-4 mt-2">
+                  <li className="sidebar-sub-item mb-1">
+                    <span
+                      className="sidebar-sub-link"
+                      onClick={() => setCurrentStep("saved-personal-info")}
+                    >
+                      Saved Bio Data
+                    </span>
+                  </li>
+                  <li className="sidebar-sub-item mb-1">
+                    <span
+                      className="sidebar-sub-link"
+                      onClick={() => setCurrentStep("saved-academic-documents")}
+                    >
+                      Saved Academic Documents
+                    </span>
+                  </li>
+                  <li className="sidebar-sub-item">
+                    <span
+                      className="sidebar-sub-link"
+                      onClick={() =>
+                        setCurrentStep("saved-supporting-documents")
+                      }
+                    >
+                      Saved Supporting Documents
+                    </span>
+                  </li>
+                </ul>
+              )}
+            </li> 
+            */}
+
+            {/* Application Status */}
+            <li className="sidebar-item mb-2">
+              <span
+                className="sidebar-link d-flex align-items-center"
+                onClick={() => setCurrentStep("application-status")}
+              >
+                <span className="sidebar-icon me-2">
+                  <i className="fas fa-tasks"></i>
+                </span>
+                <span className="sidebar-link-text">Document Status</span>
+              </span>
+            </li>
+
+            {/* Inbox */}
+            <li className="sidebar-item mb-2">
+              <span
+                className="sidebar-link d-flex align-items-center"
+                onClick={() => setCurrentStep("inbox")}
+              >
+                <span className="sidebar-icon me-2">
+                  <i className="fas fa-inbox"></i>
+                </span>
+                <span className="sidebar-link-text">Inbox</span>
+              </span>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Footer */}
+        <div className="sidebar-footer">
+          <ul className="sidebar-list list-unstyled mb-0">
+            <li className="sidebar-item mb-2">
+              <span className="sidebar-link d-flex align-items-center">
+                <span className="sidebar-icon me-2">
+                  <i className="fas fa-sign-out-alt"></i>
+                </span>
+                <span className="sidebar-link-text">
+                  <Link
+                    to="/logout"
+                    className="text-white text-decoration-none"
+                  >
+                    Logout
+                  </Link>
+                </span>
+              </span>
+            </li>
+            <li className="sidebar-item mb-2">
+              <span className="sidebar-link d-flex align-items-center">
+                <span className="sidebar-icon me-2">⚙️</span>
+                <span className="sidebar-link-text">Settings</span>
+              </span>
+            </li>
+            <li className="sidebar-item">
+              <span className="sidebar-link d-flex align-items-center">
+                <span className="sidebar-icon me-2">❓</span>
+                <span className="sidebar-link-text">Get Help</span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </>
   );
 }

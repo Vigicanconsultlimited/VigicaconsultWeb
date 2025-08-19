@@ -1,5 +1,5 @@
 import React from "react";
-import studentImage from "../../assets/images/student.png";
+import studentImage from "../../assets/images//img/vigica-img8.jpg";
 import studentsImage from "../../assets/images/students.png";
 
 import "./AboutUsSection.css";
@@ -27,23 +27,24 @@ const AboutUsSection = () => (
           <div className="about-content">
             <span className="about-subtitle">— Why Choose Us</span>
             <h2 className="about-title">
-              Vigica Consult Lorem Ipsum Dolor Sit Amet, Cons
+              Vigica Consult is your trusted partner for study abroad, travel,
+              and hotel bookings
             </h2>
             <p className="about-description">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-              sodales pellentesque ullamcorper mollis velit porta ex et nisl
-              condorm ullamcorper.
+              We provide personalized visa application guidance, scholarship
+              support, and pre-departure orientation. Our team is dedicated to
+              making your study abroad journey smooth and successful.
             </p>
 
             <div className="timeline">
               <div className="timeline-item">
                 <div className="timeline-number">01</div>
                 <div className="timeline-content">
-                  <h4>Lorem Ipsum dolor ex et</h4>
+                  <h4>Student Visa</h4>
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Vivamus sodales pellentesque ullamcorper mollis velit porta
-                    ex et nisl condorm ullamcorper.
+                    We assist with student visa applications, ensuring you have
+                    the right documentation and support for your study abroad
+                    journey.
                   </p>
                 </div>
               </div>
@@ -51,11 +52,11 @@ const AboutUsSection = () => (
               <div className="timeline-item">
                 <div className="timeline-number">02</div>
                 <div className="timeline-content">
-                  <h4>Lorem Ipsum dolor ex et</h4>
+                  <h4>Visa Application</h4>
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Vivamus sodales pellentesque ullamcorper mollis velit porta
-                    ex et nisl condorm.
+                    Our experts guide you through the visa application process,
+                    helping you understand requirements and prepare necessary
+                    documents.
                   </p>
                 </div>
               </div>
@@ -63,11 +64,11 @@ const AboutUsSection = () => (
               <div className="timeline-item">
                 <div className="timeline-number">03</div>
                 <div className="timeline-content">
-                  <h4>Lorem Ipsum dolor ex et</h4>
+                  <h4>Accomodation</h4>
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Vivamus sodales pellentesque ullamcorper mollis velit porta
-                    ex et nisl condorm.
+                    We assist in finding suitable accommodation options that
+                    meet your needs and budget, ensuring a comfortable stay
+                    during your studies.
                   </p>
                 </div>
               </div>

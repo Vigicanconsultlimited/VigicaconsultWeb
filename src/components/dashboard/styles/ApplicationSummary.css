@@ -27,6 +27,57 @@
   line-height: 1.6;
 }
 
+.application-summary-button {
+  background-color: #1b2ebf;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: block;
+  margin: 0 auto;
+  min-width: 200px;
+}
+
+.application-summary-button:hover {
+  background-color: #14239d;
+}
+
+.application-status-card {
+  background-color: #f3f6ff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  border-left: 4px solid #1b2ebf;
+}
+
+.status-icon {
+  font-size: 2rem;
+  margin-right: 1.5rem;
+}
+
+.status-details h3 {
+  color: #1b2ebf;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.status-details p {
+  color: #5c6fb2;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.summary-section {
+  margin: 2rem 0;
+}
+
 .section-title {
   color: #1b2ebf;
   font-weight: 600;
@@ -260,6 +311,16 @@
   line-height: 1.5;
 }
 
+.summary-list {
+  padding-left: 1.5rem;
+  color: #5c6fb2;
+}
+
+.summary-list li {
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+
 .next-steps-section {
   background: #f0f9ff;
   border: 1px solid #0ea5e9;
@@ -333,17 +394,37 @@
   min-width: 160px;
 }
 
-.application-summary-button {
-  background-color: #1b2ebf;
-  color: #ffffff;
-  border: none;
+/* Button styling from both versions merged */
+.btn-outline-secondary {
+  background: transparent;
+  border: 2px solid #5c6fb2;
+  color: #5c6fb2;
 }
 
-.application-summary-button:hover:not(:disabled) {
-  background-color: #14239d;
+.btn-outline-secondary:hover:not(:disabled) {
+  background-color: #f0f3ff;
+  border-color: #4b5563;
+  color: #374151;
   transform: translateY(-1px);
 }
 
+.btn-success {
+  background-color: #1c964a;
+  color: #fff;
+  border: none;
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: #157a3c;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Additional button styles from first version */
 .btn-outline-primary {
   background: transparent;
   border: 2px solid #1b2ebf;
@@ -352,19 +433,6 @@
 
 .btn-outline-primary:hover:not(:disabled) {
   background-color: #f0f3ff;
-}
-
-.btn-outline-secondary {
-  background: transparent;
-  border: 2px solid #6b7280;
-  color: #6b7280;
-}
-
-.btn-outline-secondary:hover:not(:disabled) {
-  background: #f3f4f6;
-  border-color: #4b5563;
-  color: #374151;
-  transform: translateY(-1px);
 }
 
 .btn-primary {
@@ -376,21 +444,6 @@
   background: linear-gradient(135deg, #14239d 0%, #0f1a7a 100%);
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(27, 46, 191, 0.3);
-}
-
-.btn-success {
-  background-color: #1c964a;
-  color: #fff;
-}
-
-.btn-success:hover:not(:disabled) {
-  background-color: #157a3c;
-}
-
-.btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
 }
 
 /* Resubmit Button */
@@ -412,6 +465,11 @@
   box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
 }
 
+/* Submit button styling from second version */
+.submit-button {
+  min-width: 200px;
+}
+
 /* ===== BUTTON CONTAINERS ===== */
 .button-group {
   display: flex;
@@ -429,6 +487,13 @@
   display: flex;
   gap: 12px;
   align-items: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  gap: 1rem;
 }
 
 .submitted-action-buttons {
@@ -462,18 +527,29 @@
   border-width: 0.2em;
 }
 
-.spinner-border {
-  animation: spin 1s linear infinite;
+.submission-success {
+  text-align: center;
+  padding: 2rem 0;
 }
 
-/* ===== ANIMATIONS ===== */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: bounce 1s infinite alternate;
+}
+
+.application-reference {
+  background-color: #f3f6ff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 2rem 0;
+  text-align: center;
+  color: #3b4ea1;
+  font-size: 0.9rem;
+}
+
+.application-reference p {
+  margin: 0.3rem 0;
 }
 
 @keyframes bounce {
@@ -545,8 +621,10 @@
     font-size: 20px;
   }
 
+  /* Button container responsiveness from both versions */
   .button-group,
-  .submitted-action-buttons {
+  .submitted-action-buttons,
+  .button-container {
     flex-direction: column;
     gap: 12px;
     padding: 15px;
@@ -564,6 +642,7 @@
   .btn {
     width: 100%;
     justify-content: center;
+    margin-bottom: 0.8rem;
   }
 
   .status-specific-note {
@@ -575,6 +654,17 @@
   .next-steps-section {
     padding: 12px;
     margin: 15px 0;
+  }
+
+  /* Responsive styles from the second version */
+  .application-status-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .status-icon {
+    margin-right: 0;
+    margin-bottom: 1rem;
   }
 }
 

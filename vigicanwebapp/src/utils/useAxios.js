@@ -1,5 +1,5 @@
 import axios from "axios";
-import { isAccessTokenExpired, setAuthUser, getRefreshToken } from "./auth";
+import { isTokenExpired, setAuthUser, getRefreshToken } from "./auth";
 import { BASE_URL } from "./constant";
 import Cookies from "js-cookie";
 
@@ -13,7 +13,7 @@ const useAxios = () => {
     },
   });
   axiosInstance.interceptors.request.use(async (req) => {
-    if (!isAccessTokenExpired()) {
+    if (!isTokenExpired()) {
       return req;
     }
     const response = await getRefreshToken(refresh_Token);

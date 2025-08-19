@@ -2,8 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import apiInstance from "../utils/axios";
-import "../styles/OtpverifyPage.css";
-import OtpVerifyImage from "../assets/images/visa-apply.jpg";
+import "../styles/OtpVerifyPage.css";
+import OtpVerifyImage from "../assets/images/img/vigica-img6.jpg";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -101,20 +101,20 @@ export default function OtpverifyPage() {
     formData.append("otp", otp.join(""));
 
     try {
-      console.log("Sending OTP validation request with:", {
-        Email: email,
-        otp: otp.join(""),
-      });
+      //console.log("Sending OTP validation request with:", {
+      //  Email: email,
+      //  otp: otp.join(""),
+      //});
 
       const response = await apiInstance.post("User/otpvalidation", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log("Full response:", response);
+      //console.log("Full response:", response);
 
       if (response.data.result === true) {
-        console.log("OTP validation successful:", response.data);
+        //console.log("OTP validation successful:", response.data);
 
         Toast.fire({
           icon: "success",
@@ -127,7 +127,7 @@ export default function OtpverifyPage() {
         throw new Error(response.data.message || "OTP validation failed");
       }
     } catch (err) {
-      console.error("OTP Validation Error:", err);
+      //console.error("OTP Validation Error:", err);
       Toast.fire({
         icon: "error",
         title: "Verification Failed",
@@ -142,12 +142,25 @@ export default function OtpverifyPage() {
   const handleResendOTP = async () => {
     setResendDisabled(true);
     try {
-      const response = await apiInstance.post("User/resendotp", { email });
-      if (response.status === 200) {
+      // Create FormData for resend OTP
+      const formData = new FormData();
+      formData.append("Email", email);
+
+      const response = await apiInstance.post("User/getotp", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response?.data?.statusCode === 200) {
         Toast.fire({
           icon: "success",
+          title: "OTP Resent",
           text: "New OTP sent to your email!",
         });
+        // Clear existing OTP
+        setOtp(["", "", "", "", "", ""]);
+        inputRefs.current[0].focus();
       } else {
         throw new Error("Failed to resend OTP");
       }
@@ -177,10 +190,8 @@ export default function OtpverifyPage() {
           />
           <div className="otpverify-img-overlay px-3 py-2 rounded">
             <p className="mb-0 otpverify-img-text">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
-              consequat ornare feugiat. Nulla diam elit, ornare non felis vitae,
-              porttitor venenatis nunc. Morbi dictum molestie dapibus. Vivamus
-              lacinia nunc eu elit volutpat blandit.
+              Verify your email to continue using our services. Please enter the
+              OTP sent to your email.
             </p>
           </div>
         </div>

@@ -1,84 +1,69 @@
-.sidebar-menu {
-  width: 230px;
-  min-width: 0;
-  height: 100vh;
-  background: #2135b0;
+/* Hamburger button */
+.hamburger-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  background: none;
+  border: none;
   color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-family: "Inter", Arial, sans-serif;
+  font-size: 28px;
 }
 
-.sidebar-section-title {
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 1px;
-  margin-top: 4px;
-  margin-bottom: 16px;
+/* Sidebar base */
+.sidebar-menu {
+  width: 260px;
+  background-color: #1b2ebf;
+  height: auto !important;
+  overflow-y: auto;
+  position: fixed;
+  color: #fff;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  transition: transform 0.3s ease-in-out;
+  z-index: 1050;
+}
+
+.sidebar-item {
+  margin-bottom: 1rem !important;
 }
 
 .sidebar-link,
 .sidebar-sub-link {
-  font-size: 15px;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
   cursor: pointer;
-  transition: color 0.15s;
-}
-
-.sidebar-link-text {
-  font-size: 15px;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .sidebar-link:hover,
 .sidebar-sub-link:hover {
-  color: #b7c3ff;
+  background-color: #e0e0e0;
+  color: #333;
+  border-radius: 5px;
+  padding-left: 5px;
 }
 
-.sidebar-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sidebar-sub-list {
-  border-left: 1.5px solid #fff;
-  padding-left: 14px;
-  margin-top: 2px;
-}
-
-.sidebar-sub-link {
-  font-size: 14px;
-  font-weight: 400;
-  color: #fff;
-  padding-left: 2px;
-  display: block;
-  margin-bottom: 2px;
-  transition: color 0.15s;
-}
-
-.sidebar-footer {
-  margin-bottom: 10px;
-}
-
-@media (max-width: 767.98px) {
+/* Hide on small screens by default */
+@media (max-width: 768px) {
   .sidebar-menu {
-    width: 100vw;
-    height: auto;
-    min-height: 0;
-    border-radius: 0 0 10px 10px;
-    padding-bottom: 8px;
+    transform: translateX(-100%);
   }
-  .sidebar-section-title {
-    margin-top: 2px;
-    margin-bottom: 10px;
+
+  .sidebar-menu.open {
+    transform: translateX(0);
+    box-shadow: 2px 0 10px #1b2ebf;
   }
-  .sidebar-footer {
-    margin-bottom: 0;
+}
+
+/* Always show on desktop */
+@media (min-width: 768px) {
+  .hamburger-btn {
+    display: none;
+  }
+
+  .sidebar-menu {
+    transform: translateX(0) !important;
+    position: relative;
+    box-shadow: none;
   }
 }

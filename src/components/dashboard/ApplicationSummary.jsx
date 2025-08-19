@@ -4,9 +4,6 @@ import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import Swal from "sweetalert2";
 
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 18:13:32
-// Current User's Login: NeduStack
-
 function ApplicationSummary({ setCurrentStep }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);

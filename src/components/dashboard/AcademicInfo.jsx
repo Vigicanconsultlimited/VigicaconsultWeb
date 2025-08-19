@@ -4,9 +4,6 @@ import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import Swal from "sweetalert2";
 
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 17:19:42
-// Current User's Login: NeduStack
-
 // SweetAlert Toast
 const Toast = Swal.mixin({
   toast: true,

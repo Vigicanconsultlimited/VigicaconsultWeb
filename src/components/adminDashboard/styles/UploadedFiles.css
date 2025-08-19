@@ -479,6 +479,7 @@
   letter-spacing: 0.01em;
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 /* Additional CSS for enhanced UploadedFiles component */
@@ -605,6 +606,8 @@
   }
 }
 >>>>>>> main
+=======
+>>>>>>> 1748a5e68d38906a8dfe30d72ef9dec426031c60
 @media (max-width: 600px) {
   .search-input-container {
     min-width: 140px;

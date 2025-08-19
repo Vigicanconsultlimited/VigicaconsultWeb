@@ -2,6 +2,19 @@ import React, { useState, useEffect } from "react";
 import "./styles/PersonalInfo.css";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
+import Swal from "sweetalert2";
+
+// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 17:13:28
+// Current User's Login: NeduStack
+
+// SweetAlert Toast
+const Toast = Swal.mixin({
+  toast: true,
+  position: "top",
+  showConfirmButton: false,
+  timer: 1500,
+  timerProgressBar: true,
+});
 
 export default function PersonalInfo({ onContinue, onBack }) {
   const authData = useAuthStore((state) => state.allUserData);
@@ -32,9 +45,22 @@ export default function PersonalInfo({ onContinue, onBack }) {
     "Other",
   ];
 
+  // Gender options
+  const genderOptions = [
+    "Male",
+    "Female",
+    "Non-binary",
+    "Prefer not to say",
+    "Other",
+  ];
+
   const getMappedValue = (label, options) => {
     const index = options.indexOf(label);
     return index !== -1 ? index + 1 : 0;
+  };
+
+  const getLabelFromMappedValue = (value, options) => {
+    return options[value - 1] || "";
   };
 
   const [formData, setFormData] = useState({
@@ -49,235 +75,443 @@ export default function PersonalInfo({ onContinue, onBack }) {
     UserId: "",
     PreferredPronoun: "",
     FirstLanguage: "",
+    Gender: "", // Added gender field
   });
 
-  useEffect(() => {
-    if (authData) {
-      const email =
-        authData["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-      const userId = authData["uid"];
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [applicationStatus, setApplicationStatus] = useState(null);
+  const [personalInfoId, setPersonalInfoId] = useState("");
 
-      setFormData((prev) => ({
-        ...prev,
-        Email: email || "",
-        UserId: userId || "",
-      }));
-    }
+  // Check if application status allows editing (only Pending or Rejected)
+  const canEdit =
+    applicationStatus === null ||
+    applicationStatus === 2 ||
+    applicationStatus === 4;
+
+  useEffect(() => {
+    const fetchExistingData = async () => {
+      if (authData) {
+        const userId = authData["uid"];
+        const email =
+          authData[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+          ];
+        setFormData((prev) => ({
+          ...prev,
+          Email: email || "",
+          UserId: userId || "",
+        }));
+
+        try {
+          const response = await apiInstance.get(
+            `StudentPersonalInfo/user/${userId}`
+          );
+
+          if (response?.data?.result) {
+            const savedData = response.data.result;
+            setPersonalInfoId(savedData.id || "");
+
+            // Store the personal info ID in localStorage for access by other components
+            localStorage.setItem("studentPersonalInfoId", savedData.id || "");
+
+            setFormData({
+              FirstName: savedData.firstName || "",
+              MiddleName: savedData.middleName || "",
+              LastName: savedData.lastName || "",
+              Phone: savedData.phone || "",
+              Email: savedData.email || email,
+              Address: savedData.address || "",
+              PostCode: savedData.postCode || "",
+              DOB: savedData.dob ? savedData.dob.split("T")[0] : "",
+              Id: savedData.id || "",
+              PreferredPronoun: getLabelFromMappedValue(
+                savedData.preferredPronoun,
+                pronounOptions
+              ),
+              FirstLanguage: getLabelFromMappedValue(
+                savedData.firstLanguage,
+                languageOptions
+              ),
+              Gender: getLabelFromMappedValue(savedData.gender, genderOptions),
+            });
+
+            setIsFormSubmitted(true);
+
+            // Now fetch application status
+            if (savedData.id) {
+              try {
+                const appResponse = await apiInstance.get(
+                  `StudentApplication/application?StudentPersonalInformationId=${savedData.id}`
+                );
+
+                if (appResponse?.data?.result) {
+                  // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
+                  const status = appResponse.data.result.applicationStatus;
+                  setApplicationStatus(status);
+                }
+              } catch (err) {
+                console.log(`No application found or error: ${err.message}`);
+                // If no application exists yet, it's effectively pending
+                setApplicationStatus(2); // Pending
+              }
+            }
+          }
+        } catch (error) {
+          console.warn(
+            `No existing personal info found or error: ${error.message}`
+          );
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchExistingData();
   }, [authData]);
+
+  // Helper function to get status text
+  const getStatusText = (status) => {
+    const statusMap = {
+      1: "Submitted",
+      2: "Pending",
+      3: "Under Review",
+      4: "Rejected",
+      5: "Approved",
+    };
+    return statusMap[status] || "Unknown";
+  };
+
+  const showLoadingOverlay = () => {
+    Swal.fire({
+      title: "Please wait...",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = new FormData();
-    payload.append("FirstName", formData.FirstName);
-    payload.append("MiddleName", formData.MiddleName);
-    payload.append("LastName", formData.LastName);
-    payload.append("Phone", formData.Phone);
-    payload.append("Email", formData.Email);
-    payload.append("Address", formData.Address);
-    payload.append("PostCode", formData.PostCode);
-    payload.append("DOB", formData.DOB);
-    payload.append("UserId", formData.UserId);
-    payload.append(
+    // Prevent submission if application status doesn't allow editing
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
+    const requiredFields = [
+      "FirstName",
+      "LastName",
+      "Phone",
+      "DOB",
+      "Address",
+      "PostCode",
       "FirstLanguage",
-      getMappedValue(formData.FirstLanguage, languageOptions)
-    );
-    payload.append(
       "PreferredPronoun",
-      getMappedValue(formData.PreferredPronoun, pronounOptions)
+      "Gender", // Added gender as required field
+    ];
+    const isFormComplete = requiredFields.every(
+      (field) => formData[field] && formData[field].trim() !== ""
     );
 
+    if (!isFormComplete) {
+      Toast.fire({
+        icon: "warning",
+        title: "Please complete all required fields.",
+      });
+      return;
+    }
+
+    const payload = new FormData();
+    Object.entries({
+      ...formData,
+      FirstLanguage: getMappedValue(formData.FirstLanguage, languageOptions),
+      PreferredPronoun: getMappedValue(
+        formData.PreferredPronoun,
+        pronounOptions
+      ),
+      Gender: getMappedValue(formData.Gender, genderOptions), // Add gender to payload
+    }).forEach(([key, value]) => payload.append(key, value));
+
     try {
+      showLoadingOverlay();
+
       const response = await apiInstance.post(
         "StudentPersonalInfo/create",
         payload,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
-      const result = await response.json();
-      console.log("Form submitted:", result);
-      if (onContinue) onContinue();
+      Swal.close();
+      setIsFormSubmitted(true);
+
+      // If we get a response with an ID, save it to localStorage
+      if (response?.data?.result?.id) {
+        const newPersonalInfoId = response.data.result.id;
+        setPersonalInfoId(newPersonalInfoId);
+        localStorage.setItem("studentPersonalInfoId", newPersonalInfoId);
+      }
+
+      Toast.fire({ icon: "success", title: "Submitted successfully" });
+
+      // Use setTimeout to ensure the localStorage is updated before continuing
+      setTimeout(() => {
+        if (onContinue) onContinue();
+      }, 500);
     } catch (error) {
-      console.error("Submission failed:", error);
+      Swal.close();
+      console.error(`Submission failed: ${error.message}`);
+      Toast.fire({ icon: "error", title: "Submission failed" });
     }
   };
+
+  const handleEditSubmit = async () => {
+    // Prevent editing if application status doesn't allow it
+    if (!canEdit) {
+      Toast.fire({
+        icon: "warning",
+        title: `Cannot edit. Application status: ${getStatusText(
+          applicationStatus
+        )}`,
+      });
+      return;
+    }
+
+    const payload = new FormData();
+    Object.entries({
+      ...formData,
+      FirstLanguage: getMappedValue(formData.FirstLanguage, languageOptions),
+      PreferredPronoun: getMappedValue(
+        formData.PreferredPronoun,
+        pronounOptions
+      ),
+      Gender: getMappedValue(formData.Gender, genderOptions), // Add gender to update payload
+    }).forEach(([key, value]) => payload.append(key, value));
+
+    try {
+      showLoadingOverlay();
+
+      await apiInstance.put("StudentPersonalInfo/update", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      Swal.close();
+      Toast.fire({ icon: "success", title: "Updated successfully" });
+      setIsEditing(false);
+
+      // Make sure localStorage has the latest ID
+      if (formData.Id) {
+        localStorage.setItem("studentPersonalInfoId", formData.Id);
+      }
+    } catch (error) {
+      Swal.close();
+      console.error(`Update failed: ${error.message}`);
+      Toast.fire({ icon: "error", title: "Update failed" });
+    }
+  };
+
+  // Handle "Next" button click
+  const handleContinue = () => {
+    // Make sure the ID is stored in localStorage before continuing
+    if (personalInfoId) {
+      localStorage.setItem("studentPersonalInfoId", personalInfoId);
+    }
+
+    // Use setTimeout to ensure the localStorage is updated before continuing
+    setTimeout(() => {
+      if (onContinue) onContinue();
+    }, 200);
+  };
+
+  if (loading) {
+    return (
+      <div className="loading-overlay">
+        <div className="spinner-container">
+          <div className="loading-spinner"></div>
+          <p>Loading Personal Info...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form className="form-container" onSubmit={handleSubmit}>
       <h2 className="form-title">Personal Information</h2>
-      <p className="form-subtitle">
-        Please provide accurate information. Inaccuracies may delay or reject
-        your application.
-      </p>
 
-      {/* Title and Full Name */}
-      <div className="row">
-        {/* <div className="col-md-2 col-6">
-          <label className="form-label">Title</label>
-          <select className="form-input">
-            <option value="">Mr.</option>
-            <option>Mrs.</option>
-            <option>Miss</option>
-            <option>Dr.</option>
-            <option>Prof.</option>
-          </select>
-        </div> */}
-        <div className="col-md-3 col-12">
-          <label className="form-label">First Name</label>
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Enter your first name"
-            value={formData.FirstName}
-            onChange={(e) =>
-              setFormData({ ...formData, FirstName: e.target.value })
-            }
-          />
+      {/* Application Status Display */}
+      {applicationStatus && (
+        <div
+          className={`application-status ${getStatusText(applicationStatus)
+            .toLowerCase()
+            .replace(" ", "-")}`}
+        >
+          <p>
+            Current Application Status:{" "}
+            <strong>{getStatusText(applicationStatus)}</strong>
+          </p>
         </div>
-        <div className="col-md-3 col-12">
-          <label className="form-label">Middle Name</label>
+      )}
+
+      {/* Only show "already submitted" message if editing is allowed */}
+      {isFormSubmitted && !isEditing && canEdit && (
+        <div className="alert alert-info mt-3">
+          <strong>You've already Saved this form.</strong>
+          <br />
+          Click edit to update your information.
+          <br />
+          <p className="form-subtitle">
+            Please provide accurate information. Inaccuracies may delay or
+            reject your application.
+          </p>
+        </div>
+      )}
+
+      {applicationStatus &&
+        applicationStatus !== 2 &&
+        applicationStatus !== 4 && (
+          <div className="alert alert-primary mb-2 mt-0 p-2">
+            <p>
+              <strong>Notice:</strong> Your application cannot be edited at this
+              time.
+            </p>
+          </div>
+        )}
+
+      {/* Name Fields */}
+      <div className="row g-3 pb-3">
+        {["FirstName", "MiddleName", "LastName"].map((field, i) => (
+          <div className="col-md-4 col-12" key={i}>
+            <label className="form-label">
+              {field.replace("Name", " Name")}
+              {(field === "FirstName" || field === "LastName") && (
+                <span className="required-field">*</span>
+              )}
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData[field]}
+              disabled={(!isEditing && isFormSubmitted) || !canEdit}
+              onChange={(e) =>
+                setFormData({ ...formData, [field]: e.target.value })
+              }
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Contact Info */}
+      <div className="row g-3 pb-3">
+        <div className="col-md-4 col-12">
+          <label className="form-label">Email</label>
           <input
-            type="text"
+            type="email"
             className="form-input"
-            placeholder="Enter your middle name"
-            value={formData.MiddleName}
-            onChange={(e) =>
-              setFormData({ ...formData, MiddleName: e.target.value })
-            }
+            value={formData.Email}
+            disabled
           />
         </div>
         <div className="col-md-4 col-12">
-          <label className="form-label">Last Name</label>
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Enter your last name"
-            value={formData.LastName}
-            onChange={(e) =>
-              setFormData({ ...formData, LastName: e.target.value })
-            }
-          />
-        </div>
-        <div className="col-12">
-          <small className="form-hint">
-            Enter your full name exactly as it appears on your passport. Note
-            that any discrepancies may cause issues with your application.
-          </small>
-        </div>
-      </div>
-
-      {/* Phone & Date of Birth */}
-      <div className="row">
-        {/* Phone */}
-        <div className="col-md-6 col-12">
-          <label className="form-label">Phone Number</label>
+          <label className="form-label">
+            Phone Number<span className="required-field">*</span>
+          </label>
           <input
             type="tel"
-            className="form-input form-input-error"
-            placeholder="+234 80..."
+            className="form-input"
             value={formData.Phone}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, Phone: e.target.value })
             }
           />
-          <small className="form-hint">
-            Enter an active phone number where you can receive an SMS from us
-          </small>
         </div>
-
-        {/* Date of Birth */}
-        <div className="col-md-6 col-12">
-          <label className="form-label">Date of Birth</label>
+        <div className="col-md-4 col-12">
+          <label className="form-label">
+            Date of Birth<span className="required-field">*</span>
+          </label>
           <input
             type="date"
             className="form-input"
             value={formData.DOB}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) => setFormData({ ...formData, DOB: e.target.value })}
           />
-          <small className="form-hint">
-            Select your date of birth (e.g., 1990-05-20)
-          </small>
         </div>
       </div>
 
-      {/* Email */}
-      <div className="form-group">
-        <label className="form-label">Email</label>
-        <input
-          type="email"
-          className="form-input"
-          placeholder="Enter your email"
-          value={formData.Email}
-          disabled
-        />
-        <small className="form-hint">
-          Enter an active email address where you can receive messages from us
-        </small>
-      </div>
-
-      {/* Address */}
-      <div className="form-group">
-        <label className="form-label">Permanent Address</label>
-        <input
-          type="text"
-          className="form-input"
-          placeholder="Enter address"
-          value={formData.Address}
-          onChange={(e) =>
-            setFormData({ ...formData, Address: e.target.value })
-          }
-        />
-        <small className="form-hint">Provide your permanent home address</small>
-      </div>
-
-      {/* Postcode & Course */}
-      <div className="row">
-        <div className="col-md-6 col-12">
-          <label className="form-label">Post Code</label>
+      {/* Address and Post Code - MOVED POSTCODE NEXT TO ADDRESS */}
+      <div className="row g-3 pb-3">
+        <div className="col-md-8 col-12">
+          <label className="form-label">
+            Permanent Address<span className="required-field">*</span>
+          </label>
           <input
             type="text"
             className="form-input"
-            placeholder="Enter postcode"
+            value={formData.Address}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
+            onChange={(e) =>
+              setFormData({ ...formData, Address: e.target.value })
+            }
+          />
+        </div>
+        <div className="col-md-4 col-12">
+          <label className="form-label">
+            Post Code<span className="required-field">*</span>
+          </label>
+          <input
+            type="text"
+            className="form-input"
             value={formData.PostCode}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, PostCode: e.target.value })
             }
           />
-          <small className="form-hint">What is your postal code?</small>
         </div>
+      </div>
 
-        <div className="col-md-6 col-12">
-          <label className="form-label">Preferred Language</label>
+      {/* Gender, Pronoun, Language */}
+      <div className="row g-3 pb-3">
+        <div className="col-md-4 col-12">
+          <label className="form-label">
+            Gender<span className="required-field">*</span>
+          </label>
           <select
-            id="language"
-            className="form-select personal-info-input"
-            value={formData.FirstLanguage}
+            className="form-select"
+            value={formData.Gender}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
-              setFormData({ ...formData, FirstLanguage: e.target.value })
+              setFormData({ ...formData, Gender: e.target.value })
             }
           >
-            <option value="">Select language</option>
-            {languageOptions.map((lang, i) => (
-              <option key={i} value={lang}>
-                {lang}
+            <option value="">Select gender</option>
+            {genderOptions.map((gender, i) => (
+              <option key={i} value={gender}>
+                {gender}
               </option>
             ))}
           </select>
-          <small className="form-hint">Which language do you prefer?</small>
         </div>
-        {/* Pronoun */}
-        <div className="mb-3">
-          <label className="form-label personal-info-label" htmlFor="pronoun">
-            Preferred Pronoun
+        <div className="col-md-4 col-12">
+          <label className="form-label">
+            Preferred Pronoun<span className="required-field">*</span>
           </label>
           <select
-            id="pronoun"
-            className="form-select personal-info-input"
+            className="form-select"
             value={formData.PreferredPronoun}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
               setFormData({ ...formData, PreferredPronoun: e.target.value })
             }
@@ -289,37 +523,96 @@ export default function PersonalInfo({ onContinue, onBack }) {
               </option>
             ))}
           </select>
-          <div className="form-hint">How would you like to be addressed?</div>
         </div>
-        {/* <div className="col-md-6 col-12">
-          <label className="form-label">Preferred Course</label>
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Enter preferred course"
-          />
-          <small className="form-hint">
-            Which course are you interested in applying for?
-          </small>
+        <div className="col-md-4 col-12">
+          <label className="form-label">
+            Preferred Language<span className="required-field">*</span>
+          </label>
+          <select
+            className="form-select"
+            value={formData.FirstLanguage}
+            disabled={(!isEditing && isFormSubmitted) || !canEdit}
+            onChange={(e) =>
+              setFormData({ ...formData, FirstLanguage: e.target.value })
+            }
+          >
+            <option value="">Select language</option>
+            {languageOptions.map((lang, i) => (
+              <option key={i} value={lang}>
+                {lang}
+              </option>
+            ))}
+          </select>
         </div>
-        */}
       </div>
 
-      {/* Footer */}
-      <div className="form-footer">
+      {/* Footer Buttons */}
+      <div
+        className="form-footer d-flex justify-content-between"
+        style={{
+          marginTop: "20px",
+          backgroundColor: "#e3e8fd",
+          padding: "15px",
+          borderRadius: "8px",
+        }}
+      >
         <button
           type="button"
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary px-4"
           onClick={onBack}
         >
-          ⬅ Back
+          ← Back to Dashboard
         </button>
-        <button type="button" className="btn btn-secondary">
-          💾 Save as Draft
-        </button>
-        <button type="submit" className="btn btn-primary">
-          Continue →
-        </button>
+
+        <div>
+          {!isFormSubmitted ? (
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!canEdit}
+            >
+              Continue →
+            </button>
+          ) : isEditing ? (
+            <>
+              <button
+                type="button"
+                className="btn btn-success me-2 "
+                onClick={handleEditSubmit}
+                disabled={!canEdit}
+              >
+                ✅ Finish Editing
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleContinue}
+              >
+                ➡ Next
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Only show Edit button if editing is allowed */}
+              {canEdit && (
+                <button
+                  type="button"
+                  className="btn btn-secondary me-2 btn-outline-primary"
+                  onClick={() => setIsEditing(true)}
+                >
+                  ✏️ Edit
+                </button>
+              )}
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleContinue}
+              >
+                ➡ Next
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </form>
   );

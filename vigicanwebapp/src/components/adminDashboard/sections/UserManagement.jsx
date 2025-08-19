@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Button from "../../shared/Button";
 import Modal from "../../shared/Modal";
 import LoadingSpinner from "../../shared/LoadingSpinner";
 import profile from "../../../assets/images/default-profile.jpg";
 import apiInstance from "../../../utils/axios";
+import "../styles/UserManagement.css";
 import {
   Search,
   Filter,
@@ -14,11 +15,25 @@ import {
   UserCheck,
   UserX,
   Mail,
-  Shield,
   Users,
+  Download,
+  RefreshCw,
+  MoreVertical,
+  Phone,
+  MapPin,
+  Calendar,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Clock,
+  X,
 } from "lucide-react";
 
 export default function UserManagement() {
+  // Current timestamp: 2025-08-10 22:35:25 UTC by NeduStack
+  const getCurrentDateTime = () => "2025-08-10 22:35:25";
+  const getCurrentUser = () => "NeduStack";
+
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
