@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/auth";
-//import apiInstance from "../../utils/axios";
 import { Link } from "react-router-dom";
-//import logo from "../../assets/images/vigica.png";
-import logo from "../../assets/images/vigica-vertical-w.png";
+import logo from "../../assets/images/vigica-white-spread.png";
 import profile from "../../assets/images/default-profile.jpg";
 import { ChevronDown, Menu } from "lucide-react";
 import "./styles/AdminHeader.css";
@@ -12,7 +10,6 @@ export default function AdminHeader({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const avatarUrl = profile;
 
-  // Auth store usage
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const user = useAuthStore((state) => state.allUserData);
   const [adminName, setAdminName] = useState("");
@@ -21,7 +18,6 @@ export default function AdminHeader({ toggleSidebar }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Only fetch if user is logged in and role is Admin
     const fetchAdminInfo = async () => {
       try {
         const userRole =
@@ -46,12 +42,11 @@ export default function AdminHeader({ toggleSidebar }) {
           setAdminEmail(userRsponse?.email || "");
           setAdminName(userRsponse?.email || "User");
         }
-      } catch (error) {
+      } catch {
         setIsAdmin(false);
         setAdminRole("");
         setAdminEmail("");
         setAdminName("Admin");
-        //console.warn("Failed to fetch admin info:", error);
       }
     };
 
@@ -59,6 +54,10 @@ export default function AdminHeader({ toggleSidebar }) {
       fetchAdminInfo();
     }
   }, [isLoggedIn, user]);
+
+  // Mobile: show first name or email (fallback) inside dropdown only
+  const mobileDisplayName =
+    (adminName && adminName.split(" ")[0]) || adminEmail || "Admin";
 
   return (
     <header className="admin-header-redesign">
@@ -89,7 +88,7 @@ export default function AdminHeader({ toggleSidebar }) {
           </div>
         </div>
 
-        {/* Desktop: Admin profile and dropdown */}
+        {/* Desktop: Admin profile and dropdown (unchanged) */}
         <div className="admin-header-desktop-profile">
           <img
             className="profile-avatar"
@@ -122,14 +121,8 @@ export default function AdminHeader({ toggleSidebar }) {
           )}
         </div>
 
-        {/* Mobile: Only avatar, name, dropdown */}
+        {/* Mobile: REMOVE avatar/name from header; show them ONLY inside dropdown */}
         <div className="admin-header-mobile">
-          <div className="admin-header-mobile-profile">
-            <img className="profile-avatar" src={avatarUrl} alt={adminName} />
-            <div className="admin-name">
-              {adminName ? adminName.split(" ")[0] : "Admin"}
-            </div>
-          </div>
           <div className="admin-header-mobile-dropdown">
             <button
               className="header-action-btn arrow"
@@ -140,6 +133,21 @@ export default function AdminHeader({ toggleSidebar }) {
             </button>
             {dropdownOpen && (
               <div className="admin-header-mobile-dropdown-menu">
+                {/* Avatar + name inside dropdown */}
+                <div className="mobile-dropdown-header">
+                  <img
+                    className="mobile-dropdown-avatar"
+                    src={avatarUrl}
+                    alt={mobileDisplayName}
+                  />
+                  <div
+                    className="mobile-dropdown-name"
+                    title={mobileDisplayName}
+                  >
+                    {mobileDisplayName}
+                  </div>
+                </div>
+
                 <button className="dropdown-item">Settings</button>
                 <button className="dropdown-item">Account</button>
                 <button className="dropdown-item">
@@ -154,6 +162,7 @@ export default function AdminHeader({ toggleSidebar }) {
             )}
           </div>
         </div>
+        {/* End mobile */}
       </div>
     </header>
   );
