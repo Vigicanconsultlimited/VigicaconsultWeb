@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import logo from "../../assets/images/vigica-vertical-w.png";
+//import logo from "../../assets/images/vigica-vertical-w.png";
+import logo from "../../assets/images/vigica-white-spread.png";
 import profile from "../../assets/images/default-profile.jpg";
 import "./styles/DashboardNavbar.css";
 import { useAuthStore } from "../../store/auth";
@@ -40,7 +41,7 @@ export default function DashboardNavbar() {
   return (
     <nav className="dashboard-navbar px-3 px-md-4 mb-3">
       <div className="dashboard-navbar-container">
-        {/* Desktop Section */}
+        {/* Desktop Section (unchanged) */}
         <div className="navbar-desktop d-none d-lg-flex align-items-center w-100">
           {/* Left: Desktop Logo */}
           <div className="dashboard-navbar-left">
@@ -96,7 +97,6 @@ export default function DashboardNavbar() {
 
           {/* Right: Desktop Profile */}
           <div className="dashboard-navbar-right d-flex align-items-center">
-
             <img
               src={profile}
               alt="User"
@@ -125,13 +125,9 @@ export default function DashboardNavbar() {
         <div className="navbar-mobile d-lg-none">
           <div className="nav-mobile-inner">
             {/* Left placeholder (e.g., menu button slot) */}
-            <div className="nav-mobile-left">
-              {/* If you have a hamburger, place it here. Example placeholder box:
-              <button className="menu-btn" aria-label="Menu">☰</button>
-              */}
-            </div>
+            <div className="nav-mobile-left"></div>
 
-            {/* Centered Logo (absolutely centered) */}
+            {/* Centered Logo */}
             <div className="nav-mobile-center">
               {!logoError ? (
                 <img
@@ -145,26 +141,22 @@ export default function DashboardNavbar() {
               )}
             </div>
 
-            {/* Right: User mini profile */}
+            {/* Right: User mini profile (avatar very small; name/email beneath) */}
             <div className="nav-mobile-right">
-              <img
-                src={profile}
-                alt="User"
-                className="dashboard-navbar-avatar mobile-avatar"
-              />
-              <div className="mobile-user-info text-white">
-                <div className="mobile-user-line">
-                  {isLoggedIn() ? displayName || email || "Hi" : "Guest"}
-                </div>
-                <div className="mobile-user-sub text-white-50">
-                  {(isLoggedIn() && email) || "guest@example.com"}
+              <div className="mobile-avatar-wrap">
+                <img
+                  src={profile}
+                  alt="User"
+                  className="dashboard-navbar-avatar mobile-avatar"
+                />
+                <div className="mobile-user-below text-white">
+                  {isLoggedIn() ? displayName || email || "Guest" : "Guest"}
                 </div>
               </div>
             </div>
           </div>
         </div>
         {/* End Mobile Section */}
-
       </div>
     </nav>
   );
