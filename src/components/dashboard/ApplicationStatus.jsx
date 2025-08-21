@@ -3,16 +3,6 @@ import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import "./styles/ApplicationStatus.css";
 
-/*
-  Enhanced, mobile‑friendly & compact ApplicationStatus component
-  Features:
-  - Responsive compact mobile layout (accordion style)
-  - Desktop enhancements: status summary chips, legend, search + filter, view mode toggle (Grid/List)
-  - Consistent status color + icon mapping
-  - Accessibility: role attributes, focus styles, keyboard toggling
-  - Graceful handling of missing docs
-*/
-
 const documentTypes = [
   "Degree Certificate",
   "WAEC Certificate",
@@ -109,9 +99,11 @@ const statusMeta = {
 // Convert API status code to key
 const mapStatusKey = (code) => statusKeyMap[code] || "pending";
 
-// Truncate helper
-const truncate = (str, max = 42) =>
-  !str ? "" : str.length > max ? str.slice(0, max - 1) + "…" : str;
+// Uniform "View <Doc>" label (same approach as Supporting / Academic documents)
+const getViewLabel = (type) => {
+  if (type === "Proof of English Proficiency") return "View English Proof";
+  return `View ${type}`;
+};
 
 const ApplicationStatus = () => {
   const authData = useAuthStore((s) => s.allUserData);
@@ -124,7 +116,6 @@ const ApplicationStatus = () => {
   const [viewMode, setViewMode] = useState("grid"); // grid | list
   const [expandedMobile, setExpandedMobile] = useState(null); // for mobile accordion
 
-  // Fetch
   useEffect(() => {
     const fetchDocuments = async () => {
       if (!authData?.uid) return;
@@ -173,7 +164,8 @@ const ApplicationStatus = () => {
               const statusKey = mapStatusKey(detail.status);
               return {
                 type,
-                fileName: detail[nameKey]?.split("/").pop() || "View File",
+                // stored fileName still used for search but not displayed
+                fileName: detail[nameKey]?.split("/").pop() || "File",
                 url: detail[viewKey] || detail[nameKey] || null,
                 statusKey,
                 createdAt: detail.createdAt,
@@ -218,21 +210,22 @@ const ApplicationStatus = () => {
   }, [docs]);
 
   // Filtered docs
-  const filtered = useMemo(() => {
-    return docs.filter((d) => {
-      const matchesText =
-        !search ||
-        d.type.toLowerCase().includes(search.toLowerCase()) ||
-        (d.fileName || "").toLowerCase().includes(search.toLowerCase());
-      const matchesStatus =
-        statusFilter === "all" || d.statusKey === statusFilter;
-      return matchesText && matchesStatus;
-    });
-  }, [docs, search, statusFilter]);
+  const filtered = useMemo(
+    () =>
+      docs.filter((d) => {
+        const matchesText =
+          !search ||
+          d.type.toLowerCase().includes(search.toLowerCase()) ||
+          (d.fileName || "").toLowerCase().includes(search.toLowerCase());
+        const matchesStatus =
+          statusFilter === "all" || d.statusKey === statusFilter;
+        return matchesText && matchesStatus;
+      }),
+    [docs, search, statusFilter]
+  );
 
-  const toggleExpandMobile = (type) => {
+  const toggleExpandMobile = (type) =>
     setExpandedMobile((prev) => (prev === type ? null : type));
-  };
 
   if (loading) {
     return (
@@ -247,7 +240,6 @@ const ApplicationStatus = () => {
 
   return (
     <div className="app-status-wrapper">
-      {/* Header / Summary (desktop & tablet) */}
       <div className="app-status-header">
         <h2 className="app-status-title">Application Document Status</h2>
         <p className="app-status-subtitle">
@@ -361,34 +353,40 @@ const ApplicationStatus = () => {
                 </span>
               </div>
 
-              <div className="doc-file-line">
+              <div className="sup-file-inline">
                 {doc.url ? (
-                  <a
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="doc-file-link"
-                  >
-                    {truncate(doc.fileName || `View ${doc.type}`, 38)}
-                  </a>
+                  <>
+                    <span
+                      className="sup-file-inline-name"
+                      title={getViewLabel(doc.type)}
+                    >
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="sup-view-link"
+                        aria-label={getViewLabel(doc.type)}
+                      >
+                        {getViewLabel(doc.type)}
+                      </a>
+                    </span>
+                  </>
                 ) : (
                   <span className="no-file">No file uploaded</span>
                 )}
               </div>
 
               <div className="doc-meta">
-                <span>
-                  Uploaded:{" "}
-                  {doc.createdAt
-                    ? new Date(doc.createdAt).toLocaleDateString()
-                    : "—"}
-                </span>
-                <span>
-                  Updated:{" "}
-                  {doc.updatedAt
-                    ? new Date(doc.updatedAt).toLocaleDateString()
-                    : "—"}
-                </span>
+                {doc.createdAt && (
+                  <span>
+                    Uploaded: {new Date(doc.createdAt).toLocaleDateString()}
+                  </span>
+                )}
+                {doc.updatedAt && (
+                  <span>
+                    Updated: {new Date(doc.updatedAt).toLocaleDateString()}
+                  </span>
+                )}
               </div>
             </div>
           );
@@ -431,7 +429,7 @@ const ApplicationStatus = () => {
               </button>
               <div
                 className="acc-body"
-                style={{ maxHeight: open ? "260px" : "0px" }}
+                style={{ maxHeight: open ? "300px" : "0px" }}
               >
                 <div className="acc-row">
                   <span className="label">File:</span>
@@ -441,9 +439,10 @@ const ApplicationStatus = () => {
                         href={doc.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="acc-link"
+                        className="acc-link sup-view-link-inline"
+                        aria-label={getViewLabel(doc.type)}
                       >
-                        {truncate(doc.fileName || "View", 26)}
+                        {getViewLabel(doc.type)}
                       </a>
                     ) : (
                       <span className="no-file-inline">None</span>
