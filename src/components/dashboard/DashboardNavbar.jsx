@@ -5,7 +5,6 @@ import "./styles/DashboardNavbar.css";
 import { useAuthStore } from "../../store/auth";
 import apiInstance from "../../utils/axios";
 
-
 export default function DashboardNavbar() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const user = useAuthStore((state) => state.allUserData);

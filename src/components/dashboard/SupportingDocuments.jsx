@@ -58,6 +58,26 @@ const DOCUMENTS = {
   },
 };
 
+// Helper: map label to display "View <Something>"
+const getViewLabel = (label) => {
+  switch (label) {
+    case "Personal Statement (PS) or SOP":
+      return "View Personal Statement";
+    case "CV/Resume":
+      return "View CV/Resume";
+    case "Academic References":
+      return "View Academic References";
+    case "Professional References":
+      return "View Professional References";
+    case "Work Experience":
+      return "View Work Experience";
+    case "International Passport":
+      return "View International Passport";
+    default:
+      return `View ${label}`;
+  }
+};
+
 export default function SupportingDocuments({ onContinue, onBack }) {
   const authData = useAuthStore((s) => s.allUserData);
   const [studentId, setStudentId] = useState(null);
@@ -68,7 +88,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Status mapping
   const getStatusText = (status) => {
     const map = {
       1: "Submitted",
@@ -85,7 +104,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
     applicationStatus === 2 ||
     applicationStatus === 4;
 
-  // Init load
   useEffect(() => {
     const init = async () => {
       if (!authData) {
@@ -93,7 +111,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
         return;
       }
       try {
-        // Personal info -> student id
         const { data } = await apiInstance.get(
           `StudentPersonalInfo/user/${authData.uid}`
         );
@@ -101,7 +118,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
         if (!sid) throw new Error("StudentPersonalInformationId missing");
         setStudentId(sid);
 
-        // Application status
         try {
           const appResp = await apiInstance.get(
             `StudentApplication/application?StudentPersonalInformationId=${sid}`
@@ -115,7 +131,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
           setApplicationStatus(2);
         }
 
-        // Existing docs
         for (const [label, cfg] of Object.entries(DOCUMENTS)) {
           try {
             const idResp = await apiInstance.get(`${cfg.uploadUrl}/${sid}`);
@@ -137,7 +152,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
               },
             }));
           } catch {
-            // ignore
+            // ignore each doc failure
           }
         }
       } catch (e) {
@@ -149,7 +164,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
     init();
   }, [authData, canEdit]);
 
-  // Upload
   const uploadHandler = async (label, file) => {
     if (!canEdit) {
       Toast.fire({
@@ -175,7 +189,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
         },
       });
 
-      // Refetch doc meta to capture canonical URLs
       try {
         const fileIdResp = await apiInstance.get(
           `${cfg.uploadUrl}/${studentId}`
@@ -277,7 +290,6 @@ export default function SupportingDocuments({ onContinue, onBack }) {
   };
   const onDragOver = (e) => e.preventDefault();
 
-  // Mobile summary chips
   const summaryChips = Object.keys(DOCUMENTS).map((label) => {
     const uploaded = !!documents[label];
     return { label, uploaded };
@@ -425,11 +437,12 @@ export default function SupportingDocuments({ onContinue, onBack }) {
                   {doc && (
                     <div className="sup-file-card">
                       <div className="sup-file-info">
+                        {/* Show uniform "View <Doc Label>" instead of saved filename */}
                         <span
                           className="sup-file-name"
-                          title={doc.name || label}
+                          title={getViewLabel(label)}
                         >
-                          {doc.name || label}
+                          {getViewLabel(label)}
                         </span>
                         <div className="sup-file-actions">
                           <a
@@ -437,14 +450,16 @@ export default function SupportingDocuments({ onContinue, onBack }) {
                             href={doc.viewUrl || doc.url}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label={getViewLabel(label)}
                           >
-                            View
+                            Open
                           </a>
                           {canEdit && !doc.locked && (
                             <button
                               type="button"
                               className="sup-remove-btn"
                               onClick={() => deleteHandler(label)}
+                              aria-label={`Remove ${label}`}
                             >
                               ✖
                             </button>
