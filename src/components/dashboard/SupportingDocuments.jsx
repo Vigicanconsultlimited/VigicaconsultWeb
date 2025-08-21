@@ -4,9 +4,7 @@ import apiInstance from "../../utils/axios";
 import Swal from "sweetalert2";
 import "./styles/SupportingDocuments.css";
 
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 17:28:20
-// Current User's Login: NeduStack
-
+// Toast
 const Toast = Swal.mixin({
   toast: true,
   position: "top",
@@ -14,15 +12,6 @@ const Toast = Swal.mixin({
   timer: 1500,
   timerProgressBar: true,
 });
-
-const LoadingSpinner = () => (
-  <div className="loading-spinner-container">
-    <div className="loading-spinner">
-      <div className="spinner"></div>
-      <p className="loading-text">Loading your documents...</p>
-    </div>
-  </div>
-);
 
 const DOCUMENTS = {
   "Personal Statement (PS) or SOP": {
@@ -70,107 +59,106 @@ const DOCUMENTS = {
 };
 
 export default function SupportingDocuments({ onContinue, onBack }) {
-  const authData = useAuthStore((state) => state.allUserData);
+  const authData = useAuthStore((s) => s.allUserData);
   const [studentId, setStudentId] = useState(null);
+  const [applicationStatus, setApplicationStatus] = useState(null);
   const [documents, setDocuments] = useState({});
-  const [expanded, setExpanded] = useState(null);
+  const [expanded, setExpanded] = useState("Personal Statement (PS) or SOP");
   const [progress, setProgress] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
-  const [applicationStatus, setApplicationStatus] = useState(null);
 
-  // Helper function to get status text
+  // Status mapping
   const getStatusText = (status) => {
-    const statusMap = {
+    const map = {
       1: "Submitted",
       2: "Pending",
       3: "Under Review",
       4: "Rejected",
       5: "Approved",
     };
-    return statusMap[status] || "Unknown";
+    return map[status] || "Unknown";
   };
 
-  // Check if application status allows editing (only Pending or Rejected)
   const canEdit =
     applicationStatus === null ||
     applicationStatus === 2 ||
     applicationStatus === 4;
 
+  // Init load
   useEffect(() => {
     const init = async () => {
-      if (!authData) return;
+      if (!authData) {
+        setLoading(false);
+        return;
+      }
       try {
+        // Personal info -> student id
         const { data } = await apiInstance.get(
           `StudentPersonalInfo/user/${authData.uid}`
         );
-        const sid = data.result?.id;
+        const sid = data?.result?.id;
         if (!sid) throw new Error("StudentPersonalInformationId missing");
         setStudentId(sid);
 
-        // Fetch application status
-        if (sid) {
-          try {
-            const appResponse = await apiInstance.get(
-              `StudentApplication/application?StudentPersonalInformationId=${sid}`
-            );
-
-            if (appResponse?.data?.result) {
-              // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
-              const status = appResponse.data.result.applicationStatus;
-              setApplicationStatus(status);
-            }
-          } catch (err) {
-            console.log(`No application found or error: ${err.message}`);
-            // If no application exists yet, it's effectively pending
-            setApplicationStatus(2); // Pending
+        // Application status
+        try {
+          const appResp = await apiInstance.get(
+            `StudentApplication/application?StudentPersonalInformationId=${sid}`
+          );
+          if (appResp?.data?.result) {
+            setApplicationStatus(appResp.data.result.applicationStatus);
+          } else {
+            setApplicationStatus(2);
           }
+        } catch {
+          setApplicationStatus(2);
         }
 
+        // Existing docs
         for (const [label, cfg] of Object.entries(DOCUMENTS)) {
           try {
-            const fileIdRes = await apiInstance.get(`${cfg.uploadUrl}/${sid}`);
-            const fileId = fileIdRes.data.result?.id;
-            if (!fileId) continue;
-
+            const idResp = await apiInstance.get(`${cfg.uploadUrl}/${sid}`);
+            const docId = idResp?.data?.result?.id;
+            if (!docId) continue;
             const det = await apiInstance.get(
-              `${cfg.statusUrl}?DocId=${fileId}`
+              `${cfg.statusUrl}?DocId=${docId}`
             );
-            const obj = det.data.result;
+            const res = det?.data?.result;
+            if (!res) continue;
             setDocuments((prev) => ({
               ...prev,
               [label]: {
-                name: obj[cfg.downloadKey]?.split("/").pop(),
-                url: obj[cfg.downloadKey],
-                viewUrl: obj[cfg.viewKey],
-                docId: obj.id,
+                name: res[cfg.downloadKey]?.split("/").pop(),
+                docId: res.id,
+                url: res[cfg.downloadKey],
+                viewUrl: res[cfg.viewKey],
                 locked: !canEdit,
               },
             }));
-          } catch (err) {
-            // No existing file — ignore
-            console.log(`No existing file for ${label} or error`);
+          } catch {
+            // ignore
           }
         }
-      } catch (err) {
-        console.error(`Initialization error: ${err.message}`);
+      } catch (e) {
+        console.warn("Initialization error:", e.message);
       } finally {
         setLoading(false);
       }
     };
     init();
-  }, [authData]);
+  }, [authData, canEdit]);
 
+  // Upload
   const uploadHandler = async (label, file) => {
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
+        title: `Cannot edit. Status: ${getStatusText(applicationStatus)}`,
       });
       return;
     }
+    if (!studentId) return;
 
     const cfg = DOCUMENTS[label];
     const fd = new FormData();
@@ -178,9 +166,8 @@ export default function SupportingDocuments({ onContinue, onBack }) {
     fd.append("StudentPersonalInformationId", studentId);
 
     try {
-      setErrors((prev) => ({ ...prev, [label]: null }));
-
-      const r = await apiInstance.post(cfg.uploadUrl, fd, {
+      setErrors((p) => ({ ...p, [label]: null }));
+      await apiInstance.post(cfg.uploadUrl, fd, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (e) => {
           const pct = Math.round((e.loaded * 100) / e.total);
@@ -188,45 +175,80 @@ export default function SupportingDocuments({ onContinue, onBack }) {
         },
       });
 
-      const res = r.data.result;
-      setDocuments((prev) => ({
-        ...prev,
-        [label]: {
-          name: file.name,
-          url: res[cfg.downloadKey],
-          viewUrl: res[cfg.viewKey],
-          docId: res.id,
-          locked: false,
-        },
-      }));
+      // Refetch doc meta to capture canonical URLs
+      try {
+        const fileIdResp = await apiInstance.get(
+          `${cfg.uploadUrl}/${studentId}`
+        );
+        const docId = fileIdResp?.data?.result?.id;
+        if (docId) {
+          const det = await apiInstance.get(`${cfg.statusUrl}?DocId=${docId}`);
+          const res = det?.data?.result;
+          if (res) {
+            setDocuments((prev) => ({
+              ...prev,
+              [label]: {
+                name: res[cfg.downloadKey]?.split("/").pop() || file.name,
+                docId: res.id,
+                url: res[cfg.downloadKey],
+                viewUrl: res[cfg.viewKey],
+                locked: false,
+              },
+            }));
+          }
+        }
+      } catch {
+        setDocuments((prev) => ({
+          ...prev,
+          [label]: {
+            name: file.name,
+            url: "#",
+            viewUrl: "#",
+            locked: false,
+          },
+        }));
+      }
 
       Toast.fire({ icon: "success", title: `${label} uploaded` });
     } catch (e) {
-      const msg = e.response?.data?.message || "Upload failed";
-      setErrors((prev) => ({ ...prev, [label]: msg }));
+      const msg = e?.response?.data?.message || "Upload failed";
+      setErrors((p) => ({ ...p, [label]: msg }));
       Toast.fire({ icon: "error", title: msg });
     } finally {
       setProgress((prev) => ({ ...prev, [label]: null }));
     }
   };
 
+  const fileChange = (label, file) => {
+    if (!file) return;
+    if (
+      ![
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ].includes(file.type)
+    ) {
+      const msg = "Only PDF or DOCX allowed";
+      setErrors((p) => ({ ...p, [label]: msg }));
+      return Toast.fire({ icon: "warning", title: msg });
+    }
+    uploadHandler(label, file);
+  };
+
   const deleteHandler = async (label) => {
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
+        title: `Cannot edit. Status: ${getStatusText(applicationStatus)}`,
       });
       return;
     }
-
     const cfg = DOCUMENTS[label];
-    const id = documents[label]?.docId;
-    if (!id) return;
+    const docId = documents[label]?.docId;
+    if (!docId) return;
 
     const confirm = await Swal.fire({
       title: `Delete "${label}"?`,
+      text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete",
@@ -234,49 +256,38 @@ export default function SupportingDocuments({ onContinue, onBack }) {
     if (!confirm.isConfirmed) return;
 
     try {
-      await apiInstance.delete(`${cfg.deleteUrl}/${id}`);
+      await apiInstance.delete(`${cfg.deleteUrl}/${docId}`);
       setDocuments((prev) => {
-        const c = { ...prev };
-        delete c[label];
-        return c;
+        const cp = { ...prev };
+        delete cp[label];
+        return cp;
       });
       Toast.fire({ icon: "success", title: `${label} deleted` });
     } catch (e) {
-      const msg = e.response?.data?.message || "Deletion failed";
-      setErrors((prev) => ({ ...prev, [label]: msg }));
+      const msg = e?.response?.data?.message || "Deletion failed";
+      setErrors((p) => ({ ...p, [label]: msg }));
       Toast.fire({ icon: "error", title: msg });
     }
   };
 
-  const fileChange = (label, file) => {
-    if (!canEdit) {
-      Toast.fire({
-        icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
-      });
-      return;
-    }
-
-    if (!file) return;
-    const types = [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    if (!types.includes(file.type)) {
-      const m = "Only PDF or DOCX allowed";
-      setErrors((prev) => ({ ...prev, [label]: m }));
-      return Toast.fire({ icon: "warning", title: m });
-    }
-    uploadHandler(label, file);
+  const onDrop = (e, label) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    fileChange(label, file);
   };
+  const onDragOver = (e) => e.preventDefault();
+
+  // Mobile summary chips
+  const summaryChips = Object.keys(DOCUMENTS).map((label) => {
+    const uploaded = !!documents[label];
+    return { label, uploaded };
+  });
 
   if (loading)
     return (
       <div className="loading-overlay">
         <div className="spinner-container">
-          <div className="loading-spinner"></div>
+          <div className="loading-spinner" />
           <p>Loading your Documents...</p>
         </div>
       </div>
@@ -284,122 +295,181 @@ export default function SupportingDocuments({ onContinue, onBack }) {
 
   return (
     <form
-      className="supporting-docs p-3 p-md-4"
+      className="supporting-docs-form"
       onSubmit={(e) => {
         e.preventDefault();
-        onContinue();
+        onContinue && onContinue();
       }}
+      noValidate
     >
-      <h2 className="title">Supporting Documents</h2>
+      <h2 className="supporting-title">Supporting Documents</h2>
 
-      {/* Application Status Display */}
-      {applicationStatus && (
+      {applicationStatus !== null && (
         <div
           className={`application-status ${getStatusText(applicationStatus)
             .toLowerCase()
             .replace(" ", "-")}`}
         >
           <p>
-            Current Application Status:{" "}
-            <strong>{getStatusText(applicationStatus)}</strong>
+            Status: <strong>{getStatusText(applicationStatus)}</strong>
           </p>
         </div>
       )}
 
-      <p className="subtitle">
+      <div className="supporting-desc">
         {!canEdit && (
-          <div className="alert alert-primary mb-2 mt-0 p-2">
-            <p>
-              <strong>Notice:</strong> Your application cannot be edited at this
-              time.
-            </p>
+          <div className="alert alert-primary compact-alert mb-2">
+            <strong>Notice:</strong> Editing disabled at current status.
           </div>
         )}
-        Click each section to upload/view the document.
-      </p>
-      <div className="divider" />
+        Upload or review each required document below.
+      </div>
 
-      {Object.keys(DOCUMENTS).map((label) => (
-        <div key={label} className="accordion-item mb-2">
+      {/* Mobile summary chips */}
+      <div className="supporting-chips">
+        {summaryChips.map((chip) => (
           <div
-            className={`accordion-header ${
-              expanded === label ? "expanded" : ""
+            key={chip.label}
+            className={`sup-chip ${
+              chip.uploaded ? "sup-chip--ok" : "sup-chip--pending"
             }`}
-            onClick={() => setExpanded(expanded === label ? null : label)}
+            onClick={() =>
+              setExpanded((prev) => (prev === chip.label ? null : chip.label))
+            }
           >
-            {label}
-            <span className="chevron">{expanded === label ? "▲" : "▼"}</span>
+            <span className="sup-chip-label">
+              {chip.label === "Personal Statement (PS) or SOP"
+                ? "Personal Statement"
+                : chip.label}
+            </span>
+            <span className="sup-chip-status">{chip.uploaded ? "✓" : "•"}</span>
           </div>
+        ))}
+      </div>
 
-          {expanded === label && (
+      <div className="supporting-accordion">
+        {Object.keys(DOCUMENTS).map((label) => {
+          const isOpen = expanded === label;
+          const doc = documents[label];
+          return (
             <div
-              className="accordion-body"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                fileChange(label, e.dataTransfer.files[0]);
-              }}
+              key={label}
+              className={`sup-acc-item ${isOpen ? "open" : ""} ${
+                doc ? "has-file" : ""
+              }`}
             >
-              <label className={`upload-box ${!canEdit ? "disabled" : ""}`}>
-                <input
-                  type="file"
-                  className="d-none"
-                  accept=".pdf,.docx"
-                  onChange={(e) => fileChange(label, e.target.files[0])}
-                  disabled={!canEdit}
-                />
-                <div className="upload-placeholder">
-                  {canEdit ? "📎 Attach or drop file" : "🔒 Editing locked"}
-                </div>
-              </label>
+              <button
+                type="button"
+                className="sup-acc-header"
+                aria-expanded={isOpen}
+                onClick={() =>
+                  setExpanded((prev) => (prev === label ? null : label))
+                }
+              >
+                <span className="sup-acc-title">{label}</span>
+                <span className="sup-acc-meta">
+                  {doc ? (
+                    <span className="badge-uploaded">Uploaded</span>
+                  ) : (
+                    <span className="badge-missing">Pending</span>
+                  )}
+                  <span className="chevron">{isOpen ? "▲" : "▼"}</span>
+                </span>
+              </button>
 
-              {progress[label] != null && (
-                <div className="progress-bar mt-2">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${progress[label]}%` }}
-                  />
-                </div>
-              )}
-
-              {errors[label] && (
-                <div className="error-text mt-2">{errors[label]}</div>
-              )}
-
-              {documents[label] && (
-                <div className="uploaded-file mt-2">
-                  <a
-                    href={documents[label].viewUrl || documents[label].url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+              {isOpen && (
+                <div
+                  className="sup-acc-body"
+                  onDragOver={onDragOver}
+                  onDrop={(e) => onDrop(e, label)}
+                >
+                  <label
+                    className={`sup-upload-box ${!canEdit ? "disabled" : ""} ${
+                      doc ? "has-file" : ""
+                    }`}
                   >
-                    View {label}
-                  </a>
-                  {canEdit && !documents[label].locked && (
-                    <span
-                      className="remove-file"
-                      onClick={() => deleteHandler(label)}
-                    >
-                      ✖
-                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,.docx"
+                      disabled={!canEdit}
+                      className="sup-hidden-input"
+                      onChange={(e) => fileChange(label, e.target.files[0])}
+                    />
+                    <div className="sup-upload-text">
+                      {canEdit
+                        ? doc
+                          ? "Replace file (PDF / DOCX)"
+                          : "📎 Tap or drag file (PDF / DOCX)"
+                        : "🔒 Editing locked"}
+                    </div>
+                  </label>
+
+                  {progress[label] != null && (
+                    <div className="sup-progress-wrap">
+                      <div className="sup-progress-bar">
+                        <div
+                          className="sup-progress-fill"
+                          style={{ width: `${progress[label]}%` }}
+                        />
+                      </div>
+                      <span className="sup-progress-val">
+                        {progress[label]}%
+                      </span>
+                    </div>
+                  )}
+
+                  {errors[label] && (
+                    <div className="sup-error-text">{errors[label]}</div>
+                  )}
+
+                  {doc && (
+                    <div className="sup-file-card">
+                      <div className="sup-file-info">
+                        <span
+                          className="sup-file-name"
+                          title={doc.name || label}
+                        >
+                          {doc.name || label}
+                        </span>
+                        <div className="sup-file-actions">
+                          <a
+                            className="sup-view-link"
+                            href={doc.viewUrl || doc.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View
+                          </a>
+                          {canEdit && !doc.locked && (
+                            <button
+                              type="button"
+                              className="sup-remove-btn"
+                              onClick={() => deleteHandler(label)}
+                            >
+                              ✖
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
             </div>
-          )}
-        </div>
-      ))}
+          );
+        })}
+      </div>
 
-      <div className="footer d-flex justify-content-between align-items-center p-2 mb-4">
+      <div className="form-footer non-fixed-footer sup-footer">
         <button
           type="button"
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary back-btn"
           onClick={onBack}
         >
           ← Back
         </button>
-        <div>
-          <button type="submit" className="btn continue-btn">
+        <div className="inline-action-pair">
+          <button type="submit" className="btn btn-primary next-btn">
             Continue →
           </button>
         </div>

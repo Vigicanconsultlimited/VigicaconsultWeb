@@ -1,73 +1,137 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./styles/SidebarMenu.css";
+//import logo from "../../assets/images/vigica-vertical-w.png";
 import { FileText } from "lucide-react";
 
 export default function SidebarMenu({ setCurrentStep }) {
   const [docsOpen, setDocsOpen] = useState(true);
   const [savedOpen, setSavedOpen] = useState(false);
-  const [isOpen, setIsOpen] = useState(false); // for mobile toggle
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const sidebarRef = useRef(null);
+  const hamburgerRef = useRef(null);
+
+  // Toggle sidebar and prevent body scroll when sidebar is open
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      document.body.classList.add("sidebar-open");
+    } else {
+      document.body.classList.remove("sidebar-open");
+    }
+  };
+
+  // Close sidebar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        hamburgerRef.current &&
+        !hamburgerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+        document.body.classList.remove("sidebar-open");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.classList.remove("sidebar-open");
+    };
+  }, []);
+
+  // Close sidebar when a menu item is clicked on mobile
+  const handleMenuItemClick = (step) => {
+    setCurrentStep(step);
+    if (window.innerWidth < 768) {
+      setIsOpen(false);
+      document.body.classList.remove("sidebar-open");
+    }
+  };
+
+  // Close sidebar when component unmounts
+  useEffect(() => {
+    return () => {
+      setIsOpen(false);
+      document.body.classList.remove("sidebar-open");
+    };
+  }, []);
 
   return (
     <>
-      {/* Hamburger Button */}
+      {/* Enhanced Hamburger Button with ref */}
       <button
+        ref={hamburgerRef}
         className="hamburger-btn d-md-none"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleSidebar}
+        aria-label="Toggle menu"
       >
-        ☰
+        <i className={`fas fa-${isOpen ? "times" : "bars"}`}></i>
       </button>
 
+      {/* Overlay for mobile */}
+      {isOpen && <div className="sidebar-overlay d-md-none"></div>}
+
       <aside
+        ref={sidebarRef}
         className={`sidebar-menu d-flex flex-column justify-content-between px-2 py-3 ${
           isOpen ? "open" : ""
         }`}
       >
+        {/* Close button for mobile */}
+        <button
+          className="sidebar-close-btn d-md-none"
+          onClick={() => {
+            setIsOpen(false);
+            document.body.classList.remove("sidebar-open");
+          }}
+          aria-label="Close menu"
+        >
+          <i className="fas fa-times"></i>
+        </button>
+
+        {/* User Information */}
+
         <nav>
-          <div className="sidebar-section-title mb-4"></div>
-          <br />
-          <span className="sidebar-link-text mb-4">Menu</span>
+          {/*<div className="sidebar-header mb-4">
+            <div className="sidebar-logo">
+              <img src={logo} alt="Logo" style={{ height: "40px" }} />
+            </div>
+            <span className="sidebar-link-text">Menu</span>
+          </div>*/}
 
           <ul className="sidebar-list list-unstyled mb-0">
             {/* Dashboard */}
-
-            <li className="sidebar-item mb-2">
+            <li className="sidebar-item mb-2 mt-6 sidebar-first-text">
               <span
                 className="sidebar-link d-flex align-items-center"
                 onClick={() => {
                   window.location.href = "/dashboard";
+                  if (window.innerWidth < 768) {
+                    setIsOpen(false);
+                    document.body.classList.remove("sidebar-open");
+                  }
                 }}
                 style={{ cursor: "pointer" }}
               >
                 <span className="sidebar-icon me-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="feather feather-layout"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                    <line x1="3" y1="9" x2="21" y2="9" />
-                    <line x1="9" y1="21" x2="9" y2="9" />
-                  </svg>
+                  <i className="fas fa-tachometer-alt"></i>
                 </span>
-
                 <span className="sidebar-link-text">Dashboard</span>
               </span>
             </li>
+
+            {/* My Application */}
             <li className="sidebar-item mb-2">
               <span
                 className="sidebar-link d-flex align-items-center"
-                onClick={() => setCurrentStep("personal-info")}
+                onClick={() => handleMenuItemClick("personal-info")}
               >
                 <span className="sidebar-icon me-2">
-                  <FileText size={24} color="#fff" />
+                  <i className="fas fa-file-alt"></i>
                 </span>
                 <span className="sidebar-link-text fw-bold">
                   My Application
@@ -75,117 +139,11 @@ export default function SidebarMenu({ setCurrentStep }) {
               </span>
             </li>
 
-            {/* My Applications */}
-            {/*}
-            <li className="sidebar-item mb-2">
-              <span
-                className="sidebar-link d-flex align-items-center"
-                onClick={() => setDocsOpen((v) => !v)}
-              >
-                <span className="sidebar-icon me-2">
-                  <FileText size={24} color="#fff" />
-                </span>
-                <span className="sidebar-link-text fw-bold">Application</span>
-                <span
-                  className="ms-auto"
-                  style={{
-                    transform: docsOpen ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.2s",
-                  }}
-                >
-                  ▼
-                </span>
-              </span>
-              {docsOpen && (
-                <ul className="sidebar-sub-list list-unstyled ms-4 mt-2">
-                  <li className="sidebar-sub-item mb-1">
-                    <span
-                      className="sidebar-sub-link"
-                      onClick={() => setCurrentStep("personal-info")}
-                    >
-                      Bio Data
-                    </span>
-                  </li>
-                  <li className="sidebar-sub-item mb-1">
-                    <span
-                      className="sidebar-sub-link"
-                      onClick={() => setCurrentStep("academic-documents")}
-                    >
-                      Academic Documents
-                    </span>
-                  </li>
-                  <li className="sidebar-sub-item">
-                    <span
-                      className="sidebar-sub-link"
-                      onClick={() => setCurrentStep("supporting-documents")}
-                    >
-                      Supporting Documents
-                    </span>
-                  </li>
-                </ul>
-              )}
-            </li>
-            */}
-
-            {/* Saved Application */}
-            {/*}
-            <li className="sidebar-item mb-2">
-              <span
-                className="sidebar-link d-flex align-items-center"
-                onClick={() => setSavedOpen((v) => !v)}
-              >
-                <span className="sidebar-icon me-2">💾</span>
-                <span className="sidebar-link-text fw-bold">
-                  Saved Application
-                </span>
-                <span
-                  className="ms-auto"
-                  style={{
-                    transform: savedOpen ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.2s",
-                  }}
-                >
-                  ▼
-                </span>
-              </span>
-              {savedOpen && (
-                <ul className="sidebar-sub-list list-unstyled ms-4 mt-2">
-                  <li className="sidebar-sub-item mb-1">
-                    <span
-                      className="sidebar-sub-link"
-                      onClick={() => setCurrentStep("saved-personal-info")}
-                    >
-                      Saved Bio Data
-                    </span>
-                  </li>
-                  <li className="sidebar-sub-item mb-1">
-                    <span
-                      className="sidebar-sub-link"
-                      onClick={() => setCurrentStep("saved-academic-documents")}
-                    >
-                      Saved Academic Documents
-                    </span>
-                  </li>
-                  <li className="sidebar-sub-item">
-                    <span
-                      className="sidebar-sub-link"
-                      onClick={() =>
-                        setCurrentStep("saved-supporting-documents")
-                      }
-                    >
-                      Saved Supporting Documents
-                    </span>
-                  </li>
-                </ul>
-              )}
-            </li> 
-            */}
-
             {/* Application Status */}
             <li className="sidebar-item mb-2">
               <span
                 className="sidebar-link d-flex align-items-center"
-                onClick={() => setCurrentStep("application-status")}
+                onClick={() => handleMenuItemClick("application-status")}
               >
                 <span className="sidebar-icon me-2">
                   <i className="fas fa-tasks"></i>
@@ -198,7 +156,7 @@ export default function SidebarMenu({ setCurrentStep }) {
             <li className="sidebar-item mb-2">
               <span
                 className="sidebar-link d-flex align-items-center"
-                onClick={() => setCurrentStep("inbox")}
+                onClick={() => handleMenuItemClick("inbox")}
               >
                 <span className="sidebar-icon me-2">
                   <i className="fas fa-inbox"></i>
@@ -215,29 +173,35 @@ export default function SidebarMenu({ setCurrentStep }) {
             <li className="sidebar-item mb-2">
               <span className="sidebar-link d-flex align-items-center">
                 <span className="sidebar-icon me-2">
-                  <i className="fas fa-sign-out-alt"></i>
+                  <i className="fas fa-cog"></i>
                 </span>
-                <span className="sidebar-link-text">
-                  <Link
-                    to="/logout"
-                    className="text-white text-decoration-none"
-                  >
-                    Logout
-                  </Link>
-                </span>
+                <span className="sidebar-link-text">Settings</span>
               </span>
             </li>
             <li className="sidebar-item mb-2">
               <span className="sidebar-link d-flex align-items-center">
-                <span className="sidebar-icon me-2">⚙️</span>
-                <span className="sidebar-link-text">Settings</span>
+                <span className="sidebar-icon me-2">
+                  <i className="fas fa-question-circle"></i>
+                </span>
+                <span className="sidebar-link-text">Get Help</span>
               </span>
             </li>
             <li className="sidebar-item">
-              <span className="sidebar-link d-flex align-items-center">
-                <span className="sidebar-icon me-2">❓</span>
-                <span className="sidebar-link-text">Get Help</span>
-              </span>
+              <Link
+                to="/logout"
+                className="sidebar-link d-flex align-items-center text-decoration-none"
+                onClick={() => {
+                  if (window.innerWidth < 768) {
+                    setIsOpen(false);
+                    document.body.classList.remove("sidebar-open");
+                  }
+                }}
+              >
+                <span className="sidebar-icon me-2">
+                  <i className="fas fa-sign-out-alt"></i>
+                </span>
+                <span className="sidebar-link-text">Logout</span>
+              </Link>
             </li>
           </ul>
         </div>

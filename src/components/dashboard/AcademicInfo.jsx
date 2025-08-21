@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./styles/AcademicInfo.css";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
@@ -32,6 +32,7 @@ export default function AcademicInfo({
   const [schools, setSchools] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [courses, setCourses] = useState([]);
+
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -39,244 +40,30 @@ export default function AcademicInfo({
   const [applicationStatus, setApplicationStatus] = useState(null);
   const [academicInfoId, setAcademicInfoId] = useState("");
 
-  // State to track if selected program is PhD level
   const [isPhDProgram, setIsPhDProgram] = useState(false);
 
-  // Check if application status allows editing (only Pending or Rejected)
+  // Mobile summary chips expand/collapse
+  const [showProgramDetailsMobile, setShowProgramDetailsMobile] =
+    useState(false);
+  const [showSchoolDetailsMobile, setShowSchoolDetailsMobile] = useState(false);
+
+  // Can edit if status null / Pending (2) / Rejected (4)
   const canEdit =
     applicationStatus === null ||
     applicationStatus === 2 ||
     applicationStatus === 4;
 
-  // Fetch user's personal info ID and existing academic data
-  useEffect(() => {
-    const fetchExistingData = async () => {
-      if (authData) {
-        const userId = authData["uid"];
-
-        try {
-          // First get the personal info ID
-          const personalResponse = await apiInstance.get(
-            `StudentPersonalInfo/user/${userId}`
-          );
-
-          if (personalResponse?.data?.result) {
-            const personalInfoId = personalResponse.data.result.id || "";
-            setFormData((prev) => ({
-              ...prev,
-              PersonalInformationId: personalInfoId,
-            }));
-
-            // Store in localStorage
-            localStorage.setItem("studentPersonalInfoId", personalInfoId);
-
-            // Check application status
-            if (personalInfoId) {
-              try {
-                const appResponse = await apiInstance.get(
-                  `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
-                );
-
-                if (appResponse?.data?.result) {
-                  const status = appResponse.data.result.applicationStatus;
-                  setApplicationStatus(status);
-                }
-              } catch (err) {
-                console.log(`No application found or error: ${err.message}`);
-                setApplicationStatus(2); // Default to Pending
-              }
-
-              // Now try to fetch existing academic info
-              try {
-                const academicResponse = await apiInstance.get(
-                  `Academic/StudentInformationId?PersonalInformationId=${personalInfoId}`
-                );
-
-                if (
-                  academicResponse?.data?.result &&
-                  academicResponse.data.statusCode === 201
-                ) {
-                  const savedData = academicResponse.data.result;
-                  setAcademicInfoId(savedData.id || "");
-                  setIsFormSubmitted(true);
-                }
-              } catch (academicErr) {
-                console.warn(
-                  `No existing academic info found or error: ${academicErr.message}`
-                );
-              }
-            }
-          }
-        } catch (error) {
-          console.warn(`Error fetching existing data: ${error.message}`);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchExistingData();
-  }, [authData]);
-
-  // Helper function to get status text
   const getStatusText = (status) => {
-    const statusMap = {
+    const map = {
       1: "Submitted",
       2: "Pending",
       3: "Under Review",
       4: "Rejected",
       5: "Approved",
     };
-    return statusMap[status] || "Unknown";
+    return map[status] || "Unknown";
   };
 
-  // Fetch schools
-  useEffect(() => {
-    const fetchSchools = async () => {
-      try {
-        const response = await apiInstance.get("School");
-
-        if (response?.data?.statusCode === 200) {
-          setSchools(response.data.result || []);
-        }
-      } catch (error) {
-        console.error(`Error fetching schools: ${error.message}`);
-      }
-    };
-
-    fetchSchools();
-  }, []);
-
-  // Fetch academic programs
-  useEffect(() => {
-    const fetchPrograms = async () => {
-      try {
-        const response = await apiInstance.get("AcademicProgram");
-
-        if (response?.data?.statusCode === 200) {
-          setPrograms(response.data.result || []);
-        }
-      } catch (error) {
-        console.error(`Error fetching programs: ${error.message}`);
-      }
-    };
-
-    fetchPrograms();
-  }, []);
-
-  // Fetch courses of interest
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await apiInstance.get("CourseOfInterest");
-
-        if (response?.data?.statusCode === 200) {
-          setCourses(response.data.result || []);
-        }
-      } catch (error) {
-        console.error(`Error fetching courses: ${error.message}`);
-      }
-    };
-
-    fetchCourses();
-  }, []);
-
-  // Fetch and map existing academic data when all dropdowns are loaded
-  useEffect(() => {
-    const fetchAndMapAcademicData = async () => {
-      if (
-        formData.PersonalInformationId &&
-        schools.length > 0 &&
-        programs.length > 0 &&
-        courses.length > 0 &&
-        academicInfoId
-      ) {
-        try {
-          const response = await apiInstance.get(
-            `Academic/StudentInformationId?PersonalInformationId=${formData.PersonalInformationId}`
-          );
-
-          if (response?.data?.result && response.data.statusCode === 201) {
-            const savedData = response.data.result;
-
-            // Find the corresponding IDs from the fetched data
-            const schoolId =
-              schools.find((s) => s.name === savedData.schoolResponse?.name)
-                ?.id || "";
-            const programId =
-              programs.find(
-                (p) => p.description === savedData.program?.description
-              )?.id || "";
-            const courseId =
-              courses.find((c) => c.name === savedData.courseOfInterest?.name)
-                ?.id || "";
-
-            setFormData((prev) => ({
-              ...prev,
-              Id: savedData.id || "",
-              SchoolId: schoolId,
-              AcademicProgramId: programId,
-              CourseOfInterestId: courseId,
-            }));
-
-            // Check if selected program is PhD level
-            if (programId) {
-              const selectedProgram = programs.find((p) => p.id === programId);
-              if (selectedProgram && selectedProgram.programLevel === 2) {
-                // PhD level is 2
-                setIsPhDProgram(true);
-                // Store PhD program info in localStorage for document component
-                localStorage.setItem("isPhDProgram", "true");
-              } else {
-                localStorage.setItem("isPhDProgram", "false");
-              }
-            }
-          }
-        } catch (error) {
-          console.warn(`Error mapping academic data: ${error.message}`);
-        }
-      }
-    };
-
-    fetchAndMapAcademicData();
-  }, [
-    formData.PersonalInformationId,
-    schools.length,
-    programs.length,
-    courses.length,
-    academicInfoId,
-  ]);
-
-  // Effect to check if selected program is PhD level
-  useEffect(() => {
-    if (formData.AcademicProgramId && programs.length > 0) {
-      const selectedProgram = programs.find(
-        (p) => p.id === formData.AcademicProgramId
-      );
-      const isPhdLevel = selectedProgram && selectedProgram.programLevel === 2;
-      setIsPhDProgram(isPhdLevel);
-
-      // Store PhD program info in localStorage for document component
-      localStorage.setItem("isPhDProgram", isPhdLevel ? "true" : "false");
-    } else {
-      setIsPhDProgram(false);
-      localStorage.setItem("isPhDProgram", "false");
-    }
-  }, [formData.AcademicProgramId, programs]);
-
-  // Get school name by ID
-  const getSchoolName = (schoolId) => {
-    const school = schools.find((s) => s.id === schoolId);
-    return school ? school.name : "Unknown School";
-  };
-
-  // Get course name by ID
-  const getCourseName = (courseId) => {
-    const course = courses.find((c) => c.id === courseId);
-    return course ? course.name : "Unknown Course";
-  };
-
-  // Get program level as human-readable text
   const getProgramLevelText = (level) => {
     const levels = {
       0: "Undergraduate",
@@ -287,64 +74,191 @@ export default function AcademicInfo({
     return levels[level] || "Other";
   };
 
+  const getSchoolName = (id) => schools.find((s) => s.id === id)?.name || "";
+  const getCourseName = (id) => courses.find((c) => c.id === id)?.name || "";
+  const selectedProgram = programs.find(
+    (p) => p.id === formData.AcademicProgramId
+  );
+
+  // Load personal info & existing academic record
+  useEffect(() => {
+    const load = async () => {
+      if (!authData) {
+        setLoading(false);
+        return;
+      }
+      const userId = authData.uid;
+      try {
+        const personalRes = await apiInstance.get(
+          `StudentPersonalInfo/user/${userId}`
+        );
+        const personalInfo = personalRes?.data?.result;
+        if (personalInfo) {
+          const personalInfoId = personalInfo.id;
+          setFormData((p) => ({ ...p, PersonalInformationId: personalInfoId }));
+          localStorage.setItem("studentPersonalInfoId", personalInfoId);
+
+          try {
+            const statusRes = await apiInstance.get(
+              `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+            );
+            if (statusRes?.data?.result) {
+              setApplicationStatus(statusRes.data.result.applicationStatus);
+            } else {
+              setApplicationStatus(2);
+            }
+          } catch {
+            setApplicationStatus(2);
+          }
+
+          try {
+            const acadRes = await apiInstance.get(
+              `Academic/StudentInformationId?PersonalInformationId=${personalInfoId}`
+            );
+            if (acadRes?.data?.result && acadRes.data.statusCode === 201) {
+              const saved = acadRes.data.result;
+              setAcademicInfoId(saved.id || "");
+              setIsFormSubmitted(true);
+            }
+          } catch {
+            /* no record */
+          }
+        }
+      } catch {
+        /* ignore */
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [authData]);
+
+  // Lookup lists
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await apiInstance.get("School");
+        if (r?.data?.statusCode === 200) setSchools(r.data.result || []);
+      } catch {}
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await apiInstance.get("AcademicProgram");
+        if (r?.data?.statusCode === 200) setPrograms(r.data.result || []);
+      } catch {}
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await apiInstance.get("CourseOfInterest");
+        if (r?.data?.statusCode === 200) setCourses(r.data.result || []);
+      } catch {}
+    })();
+  }, []);
+
+  // Map existing academic record once lookups ready
+  useEffect(() => {
+    const mapRecord = async () => {
+      if (
+        !formData.PersonalInformationId ||
+        !academicInfoId ||
+        !schools.length ||
+        !programs.length ||
+        !courses.length
+      )
+        return;
+      try {
+        const r = await apiInstance.get(
+          `Academic/StudentInformationId?PersonalInformationId=${formData.PersonalInformationId}`
+        );
+        if (r?.data?.result && r.data.statusCode === 201) {
+          const saved = r.data.result;
+          const schoolId =
+            schools.find((s) => s.name === saved.schoolResponse?.name)?.id ||
+            "";
+          const programId =
+            programs.find((p) => p.description === saved.program?.description)
+              ?.id || "";
+          const courseId =
+            courses.find((c) => c.name === saved.courseOfInterest?.name)?.id ||
+            "";
+          setFormData((p) => ({
+            ...p,
+            Id: saved.id || "",
+            SchoolId: schoolId,
+            AcademicProgramId: programId,
+            CourseOfInterestId: courseId,
+          }));
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    mapRecord();
+  }, [
+    formData.PersonalInformationId,
+    academicInfoId,
+    schools,
+    programs,
+    courses,
+  ]);
+
+  // Track PhD
+  useEffect(() => {
+    if (formData.AcademicProgramId && programs.length) {
+      const p = programs.find((x) => x.id === formData.AcademicProgramId);
+      const phd = p && p.programLevel === 2;
+      setIsPhDProgram(phd);
+      localStorage.setItem("isPhDProgram", phd ? "true" : "false");
+    } else {
+      setIsPhDProgram(false);
+      localStorage.setItem("isPhDProgram", "false");
+    }
+  }, [formData.AcademicProgramId, programs]);
+
   const showLoadingOverlay = () => {
     Swal.fire({
       title: "Please wait...",
       allowOutsideClick: false,
       allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+      didOpen: () => Swal.showLoading(),
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Prevent submission if application status doesn't allow editing
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
+        title: `Cannot edit. Status: ${getStatusText(applicationStatus)}`,
       });
       return;
     }
-
-    // Verify we have the personal info ID
     if (!formData.PersonalInformationId) {
-      console.error("Cannot submit academic info: Missing Personal Info ID");
-
       Toast.fire({
         icon: "error",
-        title:
-          "Missing personal information ID. Please go back and complete your personal information.",
+        title: "Missing personal info (previous step).",
       });
       return;
     }
-
-    const requiredFields = [
+    const required = [
       "PersonalInformationId",
       "SchoolId",
       "AcademicProgramId",
       "CourseOfInterestId",
     ];
-    const isFormComplete = requiredFields.every(
-      (field) => formData[field] && String(formData[field]).trim() !== ""
+    const complete = required.every(
+      (f) => formData[f] && String(formData[f]).trim() !== ""
     );
-
-    if (!isFormComplete) {
-      Toast.fire({
-        icon: "warning",
-        title: "Please complete all required fields",
-      });
+    if (!complete) {
+      Toast.fire({ icon: "warning", title: "Fill all required fields" });
       return;
     }
 
     const payload = new FormData();
-
-    // Add required fields to the payload
     payload.append("PersonalInformationId", formData.PersonalInformationId);
     payload.append("SchoolId", formData.SchoolId);
     payload.append("AcademicProgramId", formData.AcademicProgramId);
@@ -353,44 +267,27 @@ export default function AcademicInfo({
     try {
       setSubmitting(true);
       showLoadingOverlay();
-
-      const response = await apiInstance.post("Academic", payload, {
+      const res = await apiInstance.post("Academic", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       Swal.close();
       setIsFormSubmitted(true);
-
-      // If we get a response with an ID, save it
-      if (response?.data?.result?.id) {
-        const newAcademicInfoId = response.data.result.id;
-        setAcademicInfoId(newAcademicInfoId);
-        setFormData((prev) => ({ ...prev, Id: newAcademicInfoId }));
+      if (res?.data?.result?.id) {
+        const newId = res.data.result.id;
+        setAcademicInfoId(newId);
+        setFormData((p) => ({ ...p, Id: newId }));
       }
-
-      Toast.fire({ icon: "success", title: "Submitted successfully" });
-
-      // Use setTimeout to ensure everything is saved before continuing
-      setTimeout(() => {
-        if (onContinue) onContinue();
-      }, 500);
-    } catch (error) {
+      Toast.fire({ icon: "success", title: "Saved" });
+      setTimeout(() => onContinue && onContinue(), 400);
+    } catch (err) {
       Swal.close();
-      console.error(`Submission failed: ${error.message}`);
-
-      // Check if it's the "Already exists" error
       if (
-        error.response &&
-        error.response.data &&
-        error.response.data.statusCode === 400 &&
-        error.response.data.message.includes("Already exits")
+        err.response?.data?.statusCode === 400 &&
+        err.response.data.message?.includes("Already exits")
       ) {
-        Toast.fire({
-          icon: "info",
-          title: "Academic information already exists",
-        });
+        Toast.fire({ icon: "info", title: "Record exists. Continuing..." });
         setIsFormSubmitted(true);
-        if (onContinue) onContinue();
+        onContinue && onContinue();
       } else {
         Toast.fire({ icon: "error", title: "Submission failed" });
       }
@@ -400,79 +297,83 @@ export default function AcademicInfo({
   };
 
   const handleEditSubmit = async () => {
-    // Prevent editing if application status doesn't allow it
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
+        title: `Cannot edit. Status: ${getStatusText(applicationStatus)}`,
       });
       return;
     }
-
-    // Verify we have the ID for updates
     if (!formData.Id) {
-      Toast.fire({
-        icon: "error",
-        title: "Cannot update: Missing record ID",
-      });
+      Toast.fire({ icon: "error", title: "Missing record ID" });
       return;
     }
-
     const payload = new FormData();
-
-    // Add required fields for update API
     payload.append("Id", formData.Id);
-    payload.append(
-      "PersonalInformationId",
-      formData.PersonalInformationId || ""
-    );
-    payload.append("SchoolId", formData.SchoolId || "");
-    payload.append("ProgramId", formData.AcademicProgramId || ""); // Note the field name change for update
-    payload.append("CourseId", formData.CourseOfInterestId || ""); // Note the field name change for update
+    payload.append("PersonalInformationId", formData.PersonalInformationId);
+    payload.append("SchoolId", formData.SchoolId);
+    payload.append("ProgramId", formData.AcademicProgramId);
+    payload.append("CourseId", formData.CourseOfInterestId);
 
     try {
       showLoadingOverlay();
-
       await apiInstance.put("Academic/update", payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       Swal.close();
-      Toast.fire({ icon: "success", title: "Updated successfully" });
+      Toast.fire({ icon: "success", title: "Updated" });
       setIsEditing(false);
-    } catch (error) {
+    } catch {
       Swal.close();
-      console.error(`Update failed: ${error.message}`);
       Toast.fire({ icon: "error", title: "Update failed" });
     }
   };
 
-  // Handle "Next" button click
-  const handleContinue = () => {
-    // Use setTimeout to ensure any state updates are completed
-    setTimeout(() => {
-      if (onContinue) onContinue();
-    }, 200);
-  };
+  const handleContinue = useCallback(
+    () => setTimeout(() => onContinue && onContinue(), 150),
+    [onContinue]
+  );
 
   if (loading) {
     return (
       <div className="loading-overlay">
         <div className="spinner-container">
-          <div className="loading-spinner"></div>
+          <div className="loading-spinner" />
           <p>Loading Academic Programs...</p>
         </div>
       </div>
     );
   }
 
+  const mobileChips = [
+    formData.SchoolId && {
+      label: "School",
+      value: getSchoolName(formData.SchoolId),
+      expandable: true,
+      toggle: () => setShowSchoolDetailsMobile((v) => !v),
+      open: showSchoolDetailsMobile,
+    },
+    formData.AcademicProgramId && {
+      label: "Program",
+      value: selectedProgram?.description,
+      expandable: true,
+      toggle: () => setShowProgramDetailsMobile((v) => !v),
+      open: showProgramDetailsMobile,
+    },
+    formData.CourseOfInterestId && {
+      label: "Course",
+      value: getCourseName(formData.CourseOfInterestId),
+    },
+    selectedProgram && {
+      label: "Level",
+      value: getProgramLevelText(selectedProgram.programLevel),
+    },
+  ].filter(Boolean);
+
   return (
-    <form className="form-container" onSubmit={handleSubmit}>
+    <form className="form-container academic-info-form" onSubmit={handleSubmit}>
       <h2 className="form-title">Academic Program Selection</h2>
 
-      {/* Application Status Display */}
       {applicationStatus && (
         <div
           className={`application-status ${getStatusText(applicationStatus)
@@ -480,45 +381,109 @@ export default function AcademicInfo({
             .replace(" ", "-")}`}
         >
           <p>
-            Current Application Status:{" "}
-            <strong>{getStatusText(applicationStatus)}</strong>
+            Status: <strong>{getStatusText(applicationStatus)}</strong>
           </p>
         </div>
       )}
 
-      {/* Only show "already submitted" message if editing is allowed */}
       {isFormSubmitted && !isEditing && canEdit && (
-        <div className="alert alert-info mt-3">
-          <strong>You've already saved this form.</strong>
-          <br />
-          Click edit to update your program selection.
-          <br />
-          <p className="form-subtitle">
-            Select the academic program you wish to apply for. Your choice can
-            be updated later if needed.
+        <div className="alert alert-info mt-3 compact-alert">
+          <strong>Saved.</strong> Tap Edit to change selections.
+          <p className="form-subtitle mb-0">
+            You can modify while status allows editing.
           </p>
         </div>
       )}
 
-      {applicationStatus &&
-        applicationStatus !== 2 &&
-        applicationStatus !== 4 && (
-          <div className="alert alert-primary mb-2 mt-0 p-2">
-            <p>
-              <strong>Notice:</strong> Your application cannot be edited at this
-              time.
-            </p>
+      {applicationStatus && ![2, 4, null].includes(applicationStatus) && (
+        <div className="alert alert-primary mb-2 mt-0 p-2 compact-alert">
+          <p className="mb-0">
+            <strong>Notice:</strong> Editing disabled for this status.
+          </p>
+        </div>
+      )}
+
+      {/* Mobile summary chips */}
+      <div className="mobile-summary-bar">
+        {mobileChips.map((chip, i) => (
+          <div
+            key={i}
+            className={`summary-chip ${
+              chip.expandable ? "chip-expandable" : ""
+            }`}
+            onClick={chip.expandable ? chip.toggle : undefined}
+          >
+            <span className="chip-label">{chip.label}:</span>
+            <span className="chip-value" title={chip.value}>
+              {chip.value?.length > 22
+                ? chip.value.slice(0, 22) + "…"
+                : chip.value}
+            </span>
+            {chip.expandable && (
+              <span
+                className={`chip-caret ${chip.open ? "chip-caret-open" : ""}`}
+              >
+                ▾
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {formData.SchoolId && showSchoolDetailsMobile && (
+        <div className="mobile-detail-panel">
+          {schools
+            .filter((s) => s.id === formData.SchoolId)
+            .map((s) => (
+              <div key={s.id} className="mobile-detail-grid">
+                <div>
+                  <strong>Name:</strong> {s.name}
+                </div>
+                <div>
+                  <strong>Location:</strong> {s.town}, {s.county}
+                </div>
+                <div>
+                  <strong>Post Code:</strong> {s.postCode}
+                </div>
+                <div>
+                  <strong>Address:</strong> {s.addresss}
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
+
+      {formData.AcademicProgramId &&
+        showProgramDetailsMobile &&
+        selectedProgram && (
+          <div className="mobile-detail-panel">
+            <div className="mobile-detail-grid">
+              <div>
+                <strong>Program:</strong> {selectedProgram.description}
+              </div>
+              <div>
+                <strong>Faculty:</strong> {selectedProgram.faculty}
+              </div>
+              <div>
+                <strong>Level:</strong>{" "}
+                {getProgramLevelText(selectedProgram.programLevel)}
+              </div>
+              <div>
+                <strong>Duration:</strong> {selectedProgram.durationInYears}{" "}
+                years
+              </div>
+            </div>
           </div>
         )}
 
-      {/* School Selection */}
-      <div className="row g-3 pb-3">
+      {/* School */}
+      <div className="row g-3 pb-2 compact-row">
         <div className="col-12">
           <label className="form-label">
             School <span className="required-asterisk">*</span>
           </label>
           <select
-            className="form-select"
+            className="form-select compact-select"
             value={formData.SchoolId}
             disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
@@ -528,40 +493,40 @@ export default function AcademicInfo({
             <option value="">Select a school</option>
             {schools.map((school) => (
               <option key={school.id} value={school.id}>
-                {school.name} - {school.town}, {school.county}
+                {school.name} – {school.town}, {school.county}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Show selected school info */}
+      {/* Desktop school detail */}
       {formData.SchoolId && schools.length > 0 && (
-        <div className="selected-school-info mb-3">
+        <div className="selected-school-info mb-3 desktop-school-details">
           {schools
-            .filter((school) => school.id === formData.SchoolId)
-            .map((school) => (
-              <div key={school.id} className="school-details">
-                <h4 className="selected-school-title mb-1">{school.name}</h4>
+            .filter((s) => s.id === formData.SchoolId)
+            .map((s) => (
+              <div key={s.id} className="school-details">
+                <h4 className="selected-school-title mb-1">{s.name}</h4>
                 <div className="school-address">
                   <p className="mb-1">
-                    {school.addresss}, {school.town}, {school.county}
+                    {s.addresss}, {s.town}, {s.county}
                   </p>
-                  <p>Post Code: {school.postCode}</p>
+                  <p className="mb-0">Post Code: {s.postCode}</p>
                 </div>
               </div>
             ))}
         </div>
       )}
 
-      {/* Program Selection */}
-      <div className="row g-3 pb-3">
+      {/* Program */}
+      <div className="row g-3 pb-2 compact-row">
         <div className="col-12">
           <label className="form-label">
             Academic Program <span className="required-asterisk">*</span>
           </label>
           <select
-            className="form-select"
+            className="form-select compact-select"
             value={formData.AcademicProgramId}
             disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
@@ -569,186 +534,161 @@ export default function AcademicInfo({
             }
           >
             <option value="">Select a program</option>
-            {programs.map((program) => (
-              <option key={program.id} value={program.id}>
-                {program.description} (
-                {getProgramLevelText(program.programLevel)}) - {program.faculty}
+            {programs.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.description} ({getProgramLevelText(p.programLevel)}) –{" "}
+                {p.faculty}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* PhD Program Info Alert */}
       {isPhDProgram && (
-        <div className="alert alert-info mb-4">
-          <i className="fas fa-info-circle me-2"></i>
-          <strong>PhD Program Selected:</strong> You will need to upload a
-          Research Proposal document in the next step.
+        <div className="alert alert-info mb-3 compact-alert phd-alert">
+          <i className="fas fa-info-circle me-2" />
+          <strong>PhD Selected.</strong> Research Proposal required next step.
         </div>
       )}
 
-      {/* Course of Interest Selection */}
-      <div className="row g-3 pb-3">
+      {/* Course */}
+      <div className="row g-3 pb-2 compact-row">
         <div className="col-12">
           <label className="form-label">
             Course of Interest <span className="required-asterisk">*</span>
           </label>
           <select
-            className="form-select"
+            className="form-select compact-select"
             value={formData.CourseOfInterestId}
             disabled={(!isEditing && isFormSubmitted) || !canEdit}
             onChange={(e) =>
-              setFormData({ ...formData, CourseOfInterestId: e.target.value })
+              setFormData({
+                ...formData,
+                CourseOfInterestId: e.target.value,
+              })
             }
           >
             <option value="">Select a course</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
+            {courses.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Program Details */}
-      {formData.AcademicProgramId && programs.length > 0 && (
-        <div className="program-details-card">
+      {formData.AcademicProgramId && selectedProgram && (
+        <div className="program-details-card desktop-program-details">
           <h3 className="program-details-title">Selected Program Details</h3>
-          {programs
-            .filter((program) => program.id === formData.AcademicProgramId)
-            .map((program) => (
-              <div key={program.id} className="program-info">
-                <div className="program-info-row">
-                  <span className="info-label">Program:</span>
-                  <span className="info-value">{program.description}</span>
-                </div>
-                <div className="program-info-row">
-                  <span className="info-label">Faculty:</span>
-                  <span className="info-value">{program.faculty}</span>
-                </div>
-                <div className="program-info-row">
-                  <span className="info-label">Level:</span>
-                  <span className="info-value">
-                    {getProgramLevelText(program.programLevel)}
-                  </span>
-                </div>
-                <div className="program-info-row">
-                  <span className="info-label">Duration:</span>
-                  <span className="info-value">
-                    {program.durationInYears} years
-                  </span>
-                </div>
-                {formData.SchoolId && (
-                  <div className="program-info-row">
-                    <span className="info-label">School:</span>
-                    <span className="info-value">
-                      {getSchoolName(formData.SchoolId)}
-                    </span>
-                  </div>
-                )}
-                {formData.CourseOfInterestId && (
-                  <div className="program-info-row">
-                    <span className="info-label">Course of Interest:</span>
-                    <span className="info-value">
-                      {getCourseName(formData.CourseOfInterestId)}
-                    </span>
-                  </div>
-                )}
-                {/* 
-                {program.programLevel === 2 && ( // PhD level
-                  <div className="program-info-row">
-                    <span className="info-label">Research Proposal:</span>
-                    <span className="info-value">
-                      <strong>Required</strong> (Upload in next step)
-                    </span>
-                  </div>
-                )}
-                */}
+          <div className="program-info">
+            <div className="program-info-row">
+              <span className="info-label">Program:</span>
+              <span className="info-value">{selectedProgram.description}</span>
+            </div>
+            <div className="program-info-row">
+              <span className="info-label">Faculty:</span>
+              <span className="info-value">{selectedProgram.faculty}</span>
+            </div>
+            <div className="program-info-row">
+              <span className="info-label">Level:</span>
+              <span className="info-value">
+                {getProgramLevelText(selectedProgram.programLevel)}
+              </span>
+            </div>
+            <div className="program-info-row">
+              <span className="info-label">Duration:</span>
+              <span className="info-value">
+                {selectedProgram.durationInYears} years
+              </span>
+            </div>
+            {formData.SchoolId && (
+              <div className="program-info-row">
+                <span className="info-label">School:</span>
+                <span className="info-value">
+                  {getSchoolName(formData.SchoolId)}
+                </span>
               </div>
-            ))}
+            )}
+            {formData.CourseOfInterestId && (
+              <div className="program-info-row">
+                <span className="info-label">Course:</span>
+                <span className="info-value">
+                  {getCourseName(formData.CourseOfInterestId)}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Footer Buttons */}
-      <div
-        className="form-footer d-flex justify-content-between"
-        style={{
-          marginTop: "20px",
-          backgroundColor: "#e3e8fd",
-          padding: "15px",
-          borderRadius: "8px",
-        }}
-      >
+      {/* Footer – NOT fixed, matches PersonalInfo style */}
+      <div className="form-footer non-fixed-footer">
         <button
           type="button"
-          className="btn btn-outline-primary px-4"
+          className="btn btn-outline-primary back-btn"
           onClick={onBack}
         >
           ← Back
         </button>
 
-        <div>
-          {!isFormSubmitted ? (
+        {!isFormSubmitted ? (
+          <button
+            type="submit"
+            className="btn btn-primary primary-action"
+            disabled={!canEdit || submitting}
+          >
+            {submitting ? (
+              <>
+                <span
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                />
+                Saving...
+              </>
+            ) : (
+              "Continue →"
+            )}
+          </button>
+        ) : isEditing ? (
+          <div className="inline-action-pair">
             <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={!canEdit || submitting}
+              type="button"
+              className="btn btn-success save-btn"
+              onClick={handleEditSubmit}
+              disabled={!canEdit}
             >
-              {submitting ? (
-                <>
-                  <span
-                    className="spinner-border spinner-border-sm me-2"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  Saving...
-                </>
-              ) : (
-                "Continue →"
-              )}
+              ✅ Save
             </button>
-          ) : isEditing ? (
-            <>
+            <button
+              type="button"
+              className="btn btn-primary next-btn"
+              onClick={handleContinue}
+            >
+              ➡ Next
+            </button>
+          </div>
+        ) : (
+          <div className="inline-action-pair">
+            {canEdit && (
               <button
                 type="button"
-                className="btn btn-success me-2"
-                onClick={handleEditSubmit}
-                disabled={!canEdit}
+                className="btn btn-secondary btn-outline-primary edit-btn"
+                onClick={() => setIsEditing(true)}
               >
-                ✅ Finish Editing
+                ✏️ Edit
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleContinue}
-              >
-                ➡ Next
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Only show Edit button if editing is allowed */}
-              {canEdit && (
-                <button
-                  type="button"
-                  className="btn btn-secondary me-2 btn-outline-primary"
-                  onClick={() => setIsEditing(true)}
-                >
-                  ✏️ Edit
-                </button>
-              )}
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleContinue}
-              >
-                ➡ Next
-              </button>
-            </>
-          )}
-        </div>
+            )}
+            <button
+              type="button"
+              className="btn btn-primary next-btn"
+              onClick={handleContinue}
+            >
+              ➡ Next
+            </button>
+          </div>
+        )}
       </div>
     </form>
   );

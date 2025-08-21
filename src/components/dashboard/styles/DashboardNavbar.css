@@ -1,43 +1,62 @@
+/* Base Navbar */
 .dashboard-navbar {
   background: #2135b0;
   padding: 8px 16px;
   width: 100%;
   position: relative;
+  z-index: 50;
 }
 
 .dashboard-navbar-container {
-  display: flex;
-  align-items: center;
   width: 100%;
-}
-
-.dashboard-navbar-left {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
 }
 
-.dashboard-navbar-logo {
-  height: 48px;
+/* Desktop layout wrapper */
+.navbar-desktop {
+  min-height: 60px;
+}
+
+/* Desktop Logo */
+.desktop-logo-wrapper {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.desktop-logo {
+  height: 56px;
   width: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.25s;
+}
+.desktop-logo:hover {
+  transform: translateY(-2px);
 }
 
-.dashboard-navbar-brand {
-  color: black;
-  /* color: #fff; */
+.logo-fallback-text {
   font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.5px;
+  color: #fff;
+  font-family: system-ui, Segoe UI, sans-serif;
+}
+.logo-fallback-text.small {
+  font-size: 1.05rem;
 }
 
-.dashboard-navbar-sub {
-  font-size: 10px;
-  color: #2135b0;
-}
-
-.dashboard-navbar-search {
+/* Search */
+.dashboard-search-group {
+  border-radius: 999px !important;
+  border: 1.5px solid #fff !important;
+  background: transparent !important;
+  overflow: hidden;
+  height: 36px;
+  display: flex;
+  align-items: center;
   width: 100%;
 }
-
-/* Replace existing .dashboard-search-input styles with these */
 .dashboard-search-input-working {
   background: transparent !important;
   border: none !important;
@@ -46,91 +65,205 @@
   padding: 0 8px;
   font-size: 15px;
   font-weight: 400;
+  outline: none;
 }
-
-.dashboard-search-input-working:focus {
-  box-shadow: none !important;
-  outline: none !important;
-}
-
 .dashboard-search-input-working::placeholder {
-  color: #fff !important;
-  opacity: 1;
+  color: #ffffffcc;
 }
-
-/* Keep your existing .dashboard-search-group styles */
-.dashboard-search-group {
-  border-radius: 999px !important;
-  border: 1.5px solid #fff !important;
-  background: transparent !important;
-  overflow: hidden;
-  height: 36px;
-}
-
-.dashboard-navbar form .input-group,
-.dashboard-navbar form .form-control {
-  background: #2640c6;
-  border-radius: 25px;
-  border: 1px solid #4a5ac2;
-  overflow: hidden;
-}
-
-.dashboard-navbar form input.form-control {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  color: #fff !important;
-  font-size: 16px;
-  font-weight: 500;
-  padding-left: 0.5rem;
-}
-
-.dashboard-navbar form input.form-control::placeholder {
-  color: rgba(255, 255, 255, 0.8) !important;
-  opacity: 1;
-}
-
 .dashboard-navbar .input-group-text {
   background: transparent;
   border: none;
   color: #fff;
+  display: flex;
+  align-items: center;
 }
 
+/* Avatar / user */
 .dashboard-navbar-avatar {
   width: 42px;
   height: 42px;
   object-fit: cover;
   border-radius: 50%;
   border: 2px solid #fff;
+  flex-shrink: 0;
 }
-
 .dashboard-navbar-user {
   display: block;
   font-size: 15px;
+  line-height: 1.2;
 }
-
 .dashboard-navbar-email {
   font-size: 12px;
+  line-height: 1.1;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* Desktop right container */
 .dashboard-navbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
   gap: 1rem;
 }
 
-/* Hide search bar on mobile (already handled with d-none d-lg-flex in JSX) */
+/* ============= MOBILE ============= */
+.navbar-mobile {
+  width: 100%;
+  position: relative;
+  min-height: 56px;
+}
 
-@media (max-width: 991.98px) {
-  .dashboard-navbar-left {
-    justify-content: center;
-    width: 100%;
+.nav-mobile-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 56px;
+}
+
+/* Left placeholder (e.g., hamburger) */
+.nav-mobile-left {
+  flex: 0 0 46px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.menu-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+}
+.menu-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Centered logo */
+.nav-mobile-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none; /* prevent accidental overlap clicks */
+  max-width: 60%;
+}
+
+.mobile-logo {
+  height: 35px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Right profile */
+.nav-mobile-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 60%;
+}
+
+.mobile-avatar {
+  width: 34px;
+  height: 34px;
+  border-width: 1.5px;
+}
+
+.mobile-user-info {
+  line-height: 1.05;
+  font-size: 11.5px;
+  font-weight: 600;
+  max-width: 140px;
+  display: flex;
+  flex-direction: column;
+}
+.mobile-user-line,
+.mobile-user-sub {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mobile-user-sub {
+  font-size: 10px;
+  margin-top: 2px;
+  color: #dbe4ff;
+}
+
+/* Prevent external utilities from hiding our mobile logo */
+.dashboard-mobile-logo,
+.nav-mobile-center {
+  display: flex !important;
+}
+
+/* Small phones */
+@media (max-width: 360px) {
+  .mobile-user-info {
+    max-width: 110px;
   }
-
-  .dashboard-navbar-logo {
-    height: 40px;
+  .nav-mobile-left {
+    flex: 0 0 40px;
   }
+  .menu-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.05rem;
+  }
+}
 
-  .dashboard-navbar-center {
-    display: none !important;
+/* Desktop reaffirmation */
+@media (min-width: 992px) {
+  .navbar-mobile {
+    display: none;
+  }
+  .navbar-desktop {
+    display: flex;
+  }
+}
+
+/* Accessibility focus */
+.dashboard-search-input-working:focus,
+.desktop-logo-wrapper:focus,
+.mobile-logo:focus,
+.menu-btn:focus {
+  outline: 3px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Dark mode tweaks */
+@media (prefers-color-scheme: dark) {
+  .dashboard-navbar {
+    background: #1a2e80;
+  }
+  .dashboard-search-group {
+    border-color: #e0e7ff !important;
+  }
+  .dashboard-search-input-working::placeholder {
+    color: #dbe4ff;
+  }
+  .menu-btn {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .menu-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
   }
 }
