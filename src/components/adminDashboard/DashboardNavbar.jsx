@@ -49,7 +49,7 @@ export default function DashboardNavbar() {
           {/* Mobile Centered Logo */}
           <div className="d-flex d-lg-none flex-column text-center w-100">
             <img
-              src={logo}
+              src={loo}
               alt="Vigica Logo"
               className="dashboard-navbar-logo mx-auto mb-1"
             />

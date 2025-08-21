@@ -78,7 +78,7 @@
   align-items: center;
 }
 
-/* Avatar / user */
+/* Avatar / user (desktop defaults) */
 .dashboard-navbar-avatar {
   width: 42px;
   height: 42px;
@@ -132,25 +132,6 @@
   justify-content: flex-start;
 }
 
-.menu-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #fff;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-  transition: background 0.2s;
-}
-.menu-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
 /* Centered logo */
 .nav-mobile-center {
   position: absolute;
@@ -177,36 +158,36 @@
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   max-width: 60%;
 }
 
+/* Stack name/email UNDER the avatar on mobile */
+.mobile-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: 80px;
+}
+
 .mobile-avatar {
-  width: 34px;
-  height: 34px;
+  width: 30px; /* smaller avatar on mobile */
+  height: 30px;
   border-width: 1.5px;
 }
 
-.mobile-user-info {
+/* Single line below avatar: first name OR email (fallback) */
+.mobile-user-below {
+  font-size: 10.5px;
+  font-weight: 700;
   line-height: 1.05;
-  font-size: 11.5px;
-  font-weight: 600;
-  max-width: 140px;
-  display: flex;
-  flex-direction: column;
-}
-.mobile-user-line,
-.mobile-user-sub {
+  text-align: center;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #ffffff;
 }
-.mobile-user-sub {
-  font-size: 10px;
-  margin-top: 2px;
-  color: #dbe4ff;
-}
-
 
 /* Prevent external utilities from hiding our mobile logo */
 .dashboard-mobile-logo,
@@ -214,18 +195,28 @@
   display: flex !important;
 }
 
-/* Small phones */
-@media (max-width: 360px) {
-  .mobile-user-info {
-    max-width: 110px;
+/* Small phones: make avatar very small and tighten text */
+@media (max-width: 400px) {
+  .mobile-avatar {
+    width: 26px;
+    height: 26px;
   }
+  .mobile-user-below {
+    font-size: 10px;
+    max-width: 68px;
+  }
+}
+@media (max-width: 360px) {
   .nav-mobile-left {
     flex: 0 0 40px;
   }
-  .menu-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 1.05rem;
+  .mobile-avatar {
+    width: 24px;
+    height: 24px;
+  }
+  .mobile-user-below {
+    font-size: 9.5px;
+    max-width: 60px;
   }
 }
 
@@ -247,24 +238,4 @@
   outline: 3px solid rgba(255, 255, 255, 0.45);
   outline-offset: 2px;
   border-radius: 8px;
-}
-
-/* Dark mode tweaks */
-@media (prefers-color-scheme: dark) {
-  .dashboard-navbar {
-    background: #1a2e80;
-  }
-  .dashboard-search-group {
-    border-color: #e0e7ff !important;
-  }
-  .dashboard-search-input-working::placeholder {
-    color: #dbe4ff;
-  }
-  .menu-btn {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-  .menu-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
 }
