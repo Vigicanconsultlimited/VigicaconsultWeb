@@ -8,13 +8,22 @@ import "../styles/Login.css";
 import registerImage from "../assets/images/img/vigica-img6.jpg";
 import vigicaLogo from "../assets/images/vigicaV2.png";
 
-// SweetAlert Toast
+// SweetAlert Toast with mobile-optimized styling
 const Toast = Swal.mixin({
   toast: true,
   position: "top",
   showConfirmButton: false,
   timer: 1500,
   timerProgressBar: true,
+  customClass: {
+    container: "swal-mobile-container",
+    popup: "swal-mobile-popup",
+    title: "swal-mobile-title",
+  },
+  didOpen: (toast) => {
+    toast.addEventListener("mouseenter", Swal.stopTimer);
+    toast.addEventListener("mouseleave", Swal.resumeTimer);
+  },
 });
 
 function Login() {

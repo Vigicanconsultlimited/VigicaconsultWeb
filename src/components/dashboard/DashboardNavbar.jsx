@@ -46,32 +46,38 @@ export default function DashboardNavbar() {
   return (
     <nav className="dashboard-navbar d-flex align-items-center justify-content-between px-3 px-md-4 mb-3">
       <div className="dashboard-navbar-container d-flex align-items-center w-100">
-        <div className="dashboard-navbar-left d-flex align-items-center">
-          {/* Mobile Centered Logo */}
-          <div className="d-flex d-lg-none flex-column text-center w-100">
+        {/* Desktop Left Logo */}
+        <div className="dashboard-navbar-left d-none d-lg-flex align-items-center">
+          <a
+            href="/"
+            className="dashboard-navbar-link"
+            style={{ textDecoration: "none" }}
+          >
             <img
               src={logo}
               alt="Vigica Consult Ltd"
               className="me-2"
-              style={{ width: "100px", height: "auto" }}
+              style={{
+                width: "auto",
+                height: "40px",
+                objectFit: "contain",
+              }}
             />
-          </div>
+          </a>
+        </div>
 
-          {/* Desktop Left Logo */}
-          <div className="d-none d-lg-flex align-items-center">
-            <a
-              href="/"
-              className="dashboard-navbar-link"
-              style={{ textDecoration: "none" }}
-            >
-              <img
-                src={logo}
-                alt="Vigica Consult Ltd"
-                className="me-2"
-                style={{ width: "100px", height: "auto" }}
-              />
-            </a>
-          </div>
+        {/* Mobile Centered Logo - Positioned absolutely in the center */}
+        <div className="d-flex d-lg-none position-absolute start-50 translate-middle-x h-100 align-items-center">
+          <img
+            src={logo}
+            alt="Vigica Consult Ltd"
+            style={{
+              width: "auto",
+              height: "35px",
+              objectFit: "contain",
+              maxHeight: "100%",
+            }}
+          />
         </div>
 
         {/* Center: Desktop Search */}
@@ -116,27 +122,17 @@ export default function DashboardNavbar() {
 
         {/* Right: Profile and Mobile Search Icon */}
         <div className="dashboard-navbar-right d-flex align-items-center ms-auto">
-          {/*}
-          <button
-            className="btn d-lg-none me-2"
-            onClick={() => setIsSearchActive(true)}
-          >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="8" stroke="#fff" strokeWidth="2" />
-              <path
-                d="M20 20L16.65 16.65"
-                stroke="#fff"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-          */}
           <div className="d-flex align-items-center">
             <img
               src={profile}
               alt="User"
               className="dashboard-navbar-avatar me-2"
+              style={{
+                width: "40px",
+                height: "40px",
+                objectFit: "cover",
+                borderRadius: "50%",
+              }}
             />
             <div className="d-none d-md-block text-white">
               <span className="dashboard-navbar-user fw-medium">
@@ -154,31 +150,6 @@ export default function DashboardNavbar() {
           </div>
         </div>
       </div>
-
-      {/* Mobile Search View 
-      {isSearchActive && (
-        <div className="d-flex align-items-center w-100 d-lg-none mt-2">
-          <button className="btn me-2" onClick={() => setIsSearchActive(false)}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M19 5L5 19M5 5l14 14"
-                stroke="#fff"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-          <form className="flex-grow-1">
-            <input
-              type="text"
-              className="form-control dashboard-search-input bg-transparent border-0 text-white"
-              placeholder="Search..."
-              autoFocus
-            />
-          </form>
-        </div>
-      )}
-        */}
     </nav>
   );
 }
