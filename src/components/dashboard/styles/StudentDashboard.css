@@ -1,3 +1,5 @@
+/* StudentDashboard.css - Enhanced Mobile View */
+
 .student-dashboard {
   padding: 2rem;
   font-family: "Segoe UI", sans-serif;
@@ -803,6 +805,495 @@
   transform: scale(1.05);
 }
 
+.student-dashboard {
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+  color: #1e1e1e;
+}
+.welcome-card {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 2rem;
+  text-align: justify;
+}
+.subtitle {
+  color: #555;
+  margin-bottom: 1rem;
+}
+.section-title {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  color: #2135b0;
+}
+.table-container {
+  margin-top: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  font-size: 0.95rem;
+}
+.styled-table thead tr {
+  background: #2135b0;
+  color: #fff;
+  text-align: left;
+}
+.styled-table th,
+.styled-table td {
+  padding: 12px 16px;
+}
+.styled-table tbody tr {
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.2s;
+}
+.styled-table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+/* Icon buttons */
+.icon-btn {
+  border: none;
+  background: none;
+  font-size: 1.1rem;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn:hover {
+  transform: scale(1.15);
+  color: #2135b0;
+}
+.icon-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Apply button states (Available Programs) */
+.apply-btn {
+  padding: 6px 12px;
+  background: #2135b0;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+.apply-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+  filter: grayscale(20%);
+}
+.apply-btn.btn-applied {
+  background: #16a34a;
+}
+.apply-btn.btn-applied:hover {
+  background: #15803d;
+}
+.apply-btn.btn-locked {
+  background: #1e3a8a;
+}
+.apply-btn.btn-open {
+  background: #2135b0;
+}
+.apply-btn.btn-open:hover {
+  background: #1a2b8c;
+}
+
+/* Application status block (already present in your previous file; keep existing if duplicated) */
+.application-status {
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 15px 0;
+  border-left: 5px solid;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(248, 250, 252, 0.9) 100%
+  );
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+.application-status p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+}
+.application-status strong {
+  font-weight: 700;
+  font-size: 18px;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+/* (Add your existing status color variations here or keep them unmodified) */
+
+/* ---------- AVAILABLE PROGRAMS (Already given previously) ---------- */
+.programs-table tbody tr.applied-row {
+  --state-accent: #16a34a;
+}
+.programs-table tbody tr.locked-row {
+  --state-accent: #dc2626;
+}
+.programs-table tbody tr.open-row {
+  --state-accent: #2135b0;
+}
+.programs-table tbody tr.applied-row,
+.programs-table tbody tr.locked-row,
+.programs-table tbody tr.open-row {
+  border-left: 5px solid var(--state-accent);
+}
+
+/* ---------- YOUR APPLICATIONS (NEW MOBILE CARD TRANSFORM) ---------- */
+/* Desktop accent (optional subtle indicator) */
+.apps-table tbody tr.editable {
+  border-left: 5px solid #15803d;
+}
+.apps-table tbody tr.locked {
+  border-left: 5px solid #6b7280;
+}
+
+/* MOBILE TRANSFORM SHARED PATTERN */
+@media (max-width: 767px) {
+  .student-dashboard {
+    padding: 1rem;
+  }
+
+  .welcome-card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .section-title {
+    font-size: 1.35rem;
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  /* Hide headers for both transformed tables */
+  .apps-table thead,
+  .programs-table thead {
+    display: none;
+  }
+
+  /* Available Programs card layout (already provided) */
+  .programs-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .programs-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .programs-table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+  .programs-table tbody tr:active {
+    transform: scale(0.995);
+  }
+  .programs-table tbody tr.applied-row,
+  .programs-table tbody tr.locked-row,
+  .programs-table tbody tr.open-row {
+    border-left: 6px solid var(--state-accent);
+  }
+  .programs-table tbody tr td {
+    border: none;
+    padding: 4px 0;
+    background: transparent;
+    font-size: 0.9rem;
+    line-height: 1.25;
+  }
+  .programs-table tbody tr td.program {
+    order: 1;
+    flex: 1 1 100%;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+  .programs-table tbody tr td.faculty {
+    order: 2;
+    flex: 1 1 100%;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  .programs-table tbody tr td.level,
+  .programs-table tbody tr td.duration {
+    order: 3;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    color: #334155;
+    padding: 4px 10px 4px 8px;
+    margin-right: 8px;
+    border-radius: 30px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1;
+    gap: 4px;
+  }
+  .programs-table tbody tr td.level::before {
+    content: "📘";
+    font-size: 0.85rem;
+  }
+  .programs-table tbody tr td.duration::before {
+    content: "⏱";
+    font-size: 0.85rem;
+  }
+  .programs-table tbody tr td.action {
+    order: 4;
+    flex: 1 1 100%;
+    margin-top: 10px;
+  }
+  .programs-table tbody tr td.action .apply-btn {
+    width: 100%;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 12px 14px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+  .programs-table tbody tr td.action .apply-btn:focus {
+    outline: 3px solid rgba(33, 53, 176, 0.35);
+    outline-offset: 2px;
+  }
+  .programs-table tbody tr td::before {
+    content: none !important;
+  }
+
+  /* YOUR APPLICATIONS: Card layout */
+  .apps-table {
+    width: 100%;
+    border-collapse: separate;
+  }
+  .apps-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .apps-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+  .apps-table tbody tr.editable {
+    border-left: 6px solid #16a34a;
+  }
+  .apps-table tbody tr.locked {
+    border-left: 6px solid #6b7280;
+  }
+
+  .apps-table tbody tr:active {
+    transform: scale(0.995);
+  }
+  .apps-table tbody tr td {
+    border: none;
+    background: transparent;
+    padding: 4px 0;
+    font-size: 0.85rem;
+  }
+
+  /* Column placements (using grid for clarity) */
+  .apps-table tbody tr td.select-cell {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+  }
+  .apps-table tbody tr td.school {
+    grid-column: span 10;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #111827;
+  }
+  .apps-table tbody tr td.program-col {
+    grid-column: span 12;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* Level + Status badges row */
+  .apps-table tbody tr td.level,
+  .apps-table tbody tr td.status-col {
+    grid-column: auto;
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    color: #334155;
+    padding: 4px 10px 4px 8px;
+    margin: 6px 8px 0 0;
+    border-radius: 30px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    line-height: 1;
+    gap: 4px;
+    height: 26px;
+  }
+  .apps-table tbody tr td.level::before {
+    content: "🎓";
+    font-size: 0.85rem;
+  }
+
+  .apps-table tbody tr td.status-col .badge {
+    font-size: 0.65rem;
+    padding: 6px 10px;
+    border-radius: 30px;
+    font-weight: 600;
+  }
+
+  /* Actions row full width at bottom */
+  .apps-table tbody tr td.action-col {
+    grid-column: span 12;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .apps-table tbody tr td.action-col .icon-btn {
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 10px;
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+  .apps-table tbody tr td.action-col .icon-btn.disabled {
+    opacity: 0.5;
+  }
+  .apps-table tbody tr td.action-col .icon-btn:focus {
+    outline: 3px solid rgba(33, 53, 176, 0.35);
+    outline-offset: 2px;
+  }
+
+  /* Remove generic data-label pseudo approach for this table */
+  .apps-table tbody tr td::before {
+    content: none !important;
+  }
+}
+
+/* Ultra-small tweaks */
+@media (max-width: 420px) {
+  .programs-table tbody tr,
+  .apps-table tbody tr {
+    padding: 12px 12px 10px;
+  }
+
+  .programs-table tbody tr td.program {
+    font-size: 1rem;
+  }
+  .apps-table tbody tr td.school {
+    font-size: 0.95rem;
+  }
+
+  .programs-table tbody tr td.level,
+  .programs-table tbody tr td.duration {
+    font-size: 0.62rem;
+    padding: 4px 8px 4px 6px;
+    margin-right: 6px;
+  }
+  .apps-table tbody tr td.level,
+  .apps-table tbody tr td.status-col {
+    font-size: 0.6rem;
+    padding: 4px 8px 4px 6px;
+  }
+  .programs-table tbody tr td.action .apply-btn {
+    font-size: 0.8rem;
+    padding: 11px 12px;
+  }
+  .apps-table tbody tr td.action-col .icon-btn {
+    width: 44px;
+    height: 44px;
+    padding: 8px;
+  }
+}
+
+/* Loading overlay & spinners (keep existing if already present) */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.spinner-container {
+  text-align: center;
+}
+.loading-spinner {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+.table-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+}
+.small-spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .application-status {
@@ -869,6 +1360,193 @@
   border-color: #ffffff;
   outline: 2px solid;
   outline-offset: 2px;
+}
+
+.programs-table tbody tr.applied-row {
+  --state-accent: #16a34a;
+}
+.programs-table tbody tr.locked-row {
+  --state-accent: #dc2626;
+}
+.programs-table tbody tr.open-row {
+  --state-accent: #2135b0;
+}
+
+.programs-table tbody tr.applied-row,
+.programs-table tbody tr.locked-row,
+.programs-table tbody tr.open-row {
+  border-left: 5px solid var(--state-accent);
+}
+
+/* Button state colors */
+.apply-btn.btn-applied {
+  background: #16a34a;
+}
+.apply-btn.btn-applied:hover {
+  background: #15803d;
+}
+.apply-btn.btn-locked {
+  background: #1e3a8a;
+  opacity: 0.9;
+}
+.apply-btn.btn-open {
+  background: #2135b0;
+}
+.apply-btn.btn-open:hover {
+  background: #1a2b8c;
+}
+.apply-btn.btn-locked:hover {
+  background: #1e3a8a;
+}
+.apply-btn.disabled {
+  cursor: not-allowed;
+  filter: grayscale(25%);
+  opacity: 0.85;
+}
+
+/* -------- Mobile Card Transformation (Available Programs only) -------- */
+@media (max-width: 767px) {
+  .programs-table thead {
+    display: none;
+  }
+  .programs-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .programs-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .programs-table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+
+  .programs-table tbody tr:active {
+    transform: scale(0.995);
+  }
+
+  .programs-table tbody tr.applied-row,
+  .programs-table tbody tr.locked-row,
+  .programs-table tbody tr.open-row {
+    border-left: 6px solid var(--state-accent);
+  }
+
+  .programs-table tbody tr td {
+    border: none;
+    padding: 4px 0;
+    background: transparent;
+    font-size: 0.9rem;
+    line-height: 1.25;
+  }
+
+  .programs-table tbody tr td.program {
+    order: 1;
+    flex: 1 1 100%;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #111827;
+    margin-bottom: 2px;
+  }
+
+  .programs-table tbody tr td.faculty {
+    order: 2;
+    flex: 1 1 100%;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+
+  .programs-table tbody tr td.level,
+  .programs-table tbody tr td.duration {
+    order: 3;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    color: #334155;
+    padding: 4px 10px 4px 8px;
+    margin-right: 8px;
+    border-radius: 30px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1;
+    gap: 4px;
+    position: relative;
+  }
+
+  .programs-table tbody tr td.level::before {
+    content: "📘";
+    font-size: 0.85rem;
+  }
+  .programs-table tbody tr td.duration::before {
+    content: "⏱";
+    font-size: 0.85rem;
+  }
+
+  .programs-table tbody tr td.action {
+    order: 4;
+    flex: 1 1 100%;
+    margin-top: 10px;
+  }
+
+  .programs-table tbody tr td.action .apply-btn {
+    width: 100%;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 12px 14px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .programs-table tbody tr td.action .apply-btn:focus {
+    outline: 3px solid rgba(33, 53, 176, 0.35);
+    outline-offset: 2px;
+  }
+
+  /* Remove any generic data-label fallback for this table */
+  .programs-table tbody tr td::before {
+    content: none !important;
+  }
+}
+
+/* Ultra small tweaks */
+@media (max-width: 420px) {
+  .programs-table tbody tr {
+    padding: 12px 12px 10px;
+  }
+  .programs-table tbody tr td.program {
+    font-size: 1rem;
+  }
+  .programs-table tbody tr td.level,
+  .programs-table tbody tr td.duration {
+    font-size: 0.62rem;
+    padding: 4px 8px 4px 6px;
+    margin-right: 6px;
+  }
+  .programs-table tbody tr td.action .apply-btn {
+    font-size: 0.8rem;
+    padding: 11px 12px;
+  }
 }
 
 /* Dark Mode Support */
@@ -1028,18 +1706,43 @@
   }
 }
 
-@media (max-width: 768px) {
+/* Mobile-specific enhancements */
+@media (max-width: 767px) {
   .student-dashboard {
     padding: 1rem;
   }
 
   .welcome-card {
     padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .welcome-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .welcome-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  /* Table improvements for mobile */
+  .table-container {
+    border-radius: 10px;
+    margin-top: 1rem;
+    overflow-x: auto;
   }
 
   .styled-table {
-    font-size: 0.85rem;
     min-width: unset;
+    width: 100%;
+    font-size: 0.85rem;
   }
 
   .styled-table thead {
@@ -1059,31 +1762,139 @@
     justify-content: space-between;
     padding: 8px 12px;
     border: none;
+    text-align: right;
   }
 
   .styled-table td::before {
     content: attr(data-label);
     font-weight: bold;
     color: #555;
+    text-align: left;
+    flex: 1;
   }
 
-  .section-title {
-    font-size: 1.25rem;
-    margin-top: 1.5rem;
+  .styled-table td:last-child {
+    border-bottom: none;
   }
 
+  /* Button improvements for mobile */
   .apply-btn {
     width: 100%;
     padding: 10px;
     font-size: 1rem;
+    margin-top: 5px;
   }
 
   .icon-btn {
     font-size: 1rem;
     margin: 4px 2px;
+    padding: 8px;
   }
 
-  .table-container {
-    overflow-x: hidden;
+  /* Form improvements for mobile */
+  .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  /* Application status improvements for mobile */
+  .application-status {
+    padding: 12px 15px;
+    margin: 1rem 0;
+  }
+
+  .application-status p {
+    font-size: 14px;
+  }
+
+  .application-status strong {
+    font-size: 15px;
+    display: block;
+    margin-top: 5px;
+    text-align: center;
+  }
+
+  /* Loading improvements for mobile */
+  .loading-overlay {
+    padding: 1rem;
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+  }
+
+  .table-loading {
+    padding: 15px;
+    justify-content: center;
+  }
+
+  /* Alert improvements for mobile */
+  .alert {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* Action buttons container */
+  .actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  /* Fix for iOS input zoom */
+  @supports (-webkit-touch-callout: none) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Enhance touch targets */
+  button,
+  .icon-btn,
+  .apply-btn {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Improve focus states for accessibility */
+  button:focus,
+  .icon-btn:focus,
+  .apply-btn:focus {
+    outline: 2px solid #1b2ebf;
+    outline-offset: 2px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .student-dashboard {
+    padding: 0.8rem;
+  }
+
+  .welcome-card {
+    padding: 1.2rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .styled-table td {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .icon-btn {
+    font-size: 0.9rem;
+    padding: 6px;
   }
 }

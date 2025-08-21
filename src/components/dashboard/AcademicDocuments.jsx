@@ -4,9 +4,7 @@ import { useAuthStore } from "../../store/auth";
 import "./styles/AcademicDocuments.css";
 import Swal from "sweetalert2";
 
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-19 16:23:36
-// Current User's Login: NeduStack
-
+// Toast
 const Toast = Swal.mixin({
   toast: true,
   position: "top",
@@ -15,7 +13,7 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 });
 
-// Base document types list
+// Base document types (Research Proposal appended dynamically for PhD)
 const baseDocumentTypes = [
   "Degree Certificate",
   "WAEC Certificate",
@@ -61,230 +59,233 @@ const documentAPIMap = {
   },
 };
 
-// Loading Spinner Component
-const LoadingSpinner = () => (
-  <div className="loading-spinner-container">
-    <div className="loading-spinner">
-      <div className="spinner"></div>
-      <p className="loading-text">Loading your documents...</p>
-    </div>
-  </div>
-);
-
 export default function AcademicDocuments({ onContinue, onBack }) {
-  const authData = useAuthStore((state) => state.allUserData);
-  const [appId, setAppId] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const authData = useAuthStore((s) => s.allUserData);
+
+  const [studentPersonalInfoId, setStudentPersonalInfoId] = useState("");
+  const [applicationStatus, setApplicationStatus] = useState(null);
+  const [isPhDProgram, setIsPhDProgram] = useState(false);
+
+  const [documentTypes, setDocumentTypes] = useState([...baseDocumentTypes]);
   const [expanded, setExpanded] = useState("Degree Certificate");
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [uploadProgress, setUploadProgress] = useState({});
   const [errors, setErrors] = useState({});
-  const [applicationStatus, setApplicationStatus] = useState(null);
-  const [isPhDProgram, setIsPhDProgram] = useState(false);
-  const [documentTypes, setDocumentTypes] = useState([...baseDocumentTypes]);
+  const [loading, setLoading] = useState(true);
+
   const dropRef = useRef(null);
 
-  // Helper function to get status text
   const getStatusText = (status) => {
-    const statusMap = {
+    const m = {
       1: "Submitted",
       2: "Pending",
       3: "Under Review",
       4: "Rejected",
       5: "Approved",
     };
-    return statusMap[status] || "Unknown";
+    return m[status] || "Unknown";
   };
 
-  // Check if application status allows editing (only Pending or Rejected)
+  // Can edit when status is null / Pending / Rejected
   const canEdit =
     applicationStatus === null ||
     applicationStatus === 2 ||
     applicationStatus === 4;
 
+  // Fetch foundational data
   useEffect(() => {
-    const fetchStudentInfo = async () => {
-      if (!authData) return;
+    const load = async () => {
+      if (!authData) {
+        setLoading(false);
+        return;
+      }
       try {
-        const userId = authData["uid"];
-        const res = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
-        const studentId = res.data?.result?.id;
+        const userId = authData.uid;
+        const personalRes = await apiInstance.get(
+          `StudentPersonalInfo/user/${userId}`
+        );
+        const personalInfo = personalRes?.data?.result;
+        const personalId = personalInfo?.id;
+        if (!personalId) {
+          setLoading(false);
+          return;
+        }
+        setStudentPersonalInfoId(personalId);
 
-        if (!studentId) throw new Error("Student ID not found");
-        setAppId(studentId);
-
-        // Fetch application status
-        if (studentId) {
-          try {
-            const appResponse = await apiInstance.get(
-              `StudentApplication/application?StudentPersonalInformationId=${studentId}`
-            );
-
-            if (appResponse?.data?.result) {
-              // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
-              const status = appResponse.data.result.applicationStatus;
-              setApplicationStatus(status);
-            }
-          } catch (err) {
-            console.log(`No application found or error: ${err.message}`);
-            // If no application exists yet, it's effectively pending
-            setApplicationStatus(2); // Pending
+        // Application status
+        try {
+          const appRes = await apiInstance.get(
+            `StudentApplication/application?StudentPersonalInformationId=${personalId}`
+          );
+          if (appRes?.data?.result) {
+            setApplicationStatus(appRes.data.result.applicationStatus);
+          } else {
+            setApplicationStatus(2);
           }
+        } catch {
+          setApplicationStatus(2);
+        }
 
-          // Check if the selected program is PhD
-          try {
-            const academicResponse = await apiInstance.get(
-              `Academic/StudentInformationId?PersonalInformationId=${studentId}`
-            );
-
-            if (academicResponse?.data?.result) {
-              const programData = academicResponse.data.result.program;
-              // Check if program level is PhD (level 2)
-              if (programData && programData.programLevel === 2) {
-                setIsPhDProgram(true);
-                // Add Research Proposal to document types if it's not already there
-                setDocumentTypes((prevTypes) => {
-                  if (!prevTypes.includes("Research Proposal")) {
-                    return [...prevTypes, "Research Proposal"];
-                  }
-                  return prevTypes;
-                });
-              }
-            }
-          } catch (err) {
-            console.warn(`Error checking program level: ${err.message}`);
-          }
-
-          // Also check localStorage as a fallback (in case direct API check fails)
-          if (!isPhDProgram) {
-            const storedPhDStatus = localStorage.getItem("isPhDProgram");
-            if (storedPhDStatus === "true") {
+        // Academic info for PhD detection
+        try {
+          const acadRes = await apiInstance.get(
+            `Academic/StudentInformationId?PersonalInformationId=${personalId}`
+          );
+          if (acadRes?.data?.result) {
+            const level = acadRes.data.result?.program?.programLevel;
+            if (level === 2) {
               setIsPhDProgram(true);
-              setDocumentTypes((prevTypes) => {
-                if (!prevTypes.includes("Research Proposal")) {
-                  return [...prevTypes, "Research Proposal"];
-                }
-                return prevTypes;
-              });
+              setDocumentTypes((prev) =>
+                prev.includes("Research Proposal")
+                  ? prev
+                  : [...prev, "Research Proposal"]
+              );
             }
+          }
+        } catch {
+          // fallback to localStorage flag
+        }
+
+        if (!isPhDProgram) {
+          const lsFlag = localStorage.getItem("isPhDProgram");
+          if (lsFlag === "true") {
+            setIsPhDProgram(true);
+            setDocumentTypes((prev) =>
+              prev.includes("Research Proposal")
+                ? prev
+                : [...prev, "Research Proposal"]
+            );
           }
         }
 
-        // Create an array of promises for all document fetches
-        const documentPromises = [
-          ...baseDocumentTypes,
-          "Research Proposal",
-        ].map(async (type) => {
-          const { uploadUrl, statusUrl, viewKey, downloadKey } =
-            documentAPIMap[type];
+        // Pre-fetch existing documents
+        const allPotentialTypes = [...baseDocumentTypes, "Research Proposal"];
+        const fetches = allPotentialTypes.map(async (type) => {
+          const meta = documentAPIMap[type];
+          if (!meta) return null;
           try {
-            const fileRes = await apiInstance.get(`${uploadUrl}/${studentId}`);
-            const docId = fileRes.data?.result?.id;
-            if (!docId) return null;
-
-            const docDetailsRes = await apiInstance.get(
-              `${statusUrl}?DocId=${docId}`
+            const fileRes = await apiInstance.get(
+              `${meta.uploadUrl}/${personalId}`
             );
-            const data = docDetailsRes.data?.result;
+            const docId = fileRes?.data?.result?.id;
+            if (!docId) return null;
+            const docDetailsRes = await apiInstance.get(
+              `${meta.statusUrl}?DocId=${docId}`
+            );
+            const data = docDetailsRes?.data?.result;
             if (!data) return null;
-
             return {
               type,
-              fileData: {
-                name: data[downloadKey]?.split("/").pop(),
-                url: data[downloadKey],
-                viewUrl: data[viewKey],
+              file: {
+                name: data[meta.downloadKey]?.split("/").pop(),
+                url: data[meta.downloadKey],
+                viewUrl: data[meta.viewKey],
                 docId: data.id,
                 locked: !canEdit,
               },
             };
-          } catch (err) {
-            console.warn(`Error fetching document for ${type}: ${err.message}`);
+          } catch {
             return null;
           }
         });
 
-        // Wait for all document fetches to complete
-        const results = await Promise.all(documentPromises);
-
-        // Update uploaded files state with all results
-        const newUploadedFiles = {};
-        results.forEach((result) => {
-          if (result) {
-            newUploadedFiles[result.type] = result.fileData;
-          }
+        const results = await Promise.all(fetches);
+        const existing = {};
+        results.forEach((r) => {
+          if (r) existing[r.type] = r.file;
         });
-
-        setUploadedFiles(newUploadedFiles);
+        setUploadedFiles(existing);
       } catch (err) {
-        console.error(`Error fetching student data: ${err.message}`);
+        console.warn("Error initializing docs module:", err.message);
       } finally {
         setLoading(false);
       }
     };
+    load();
+  }, [authData, isPhDProgram, canEdit]);
 
-    fetchStudentInfo();
-  }, [authData, isPhDProgram]);
-
-  const handleToggle = (type) => {
+  const handleToggle = (type) =>
     setExpanded((prev) => (prev === type ? null : type));
-  };
+
+  const showBlockingLoader = (title) =>
+    Swal.fire({
+      title,
+      html: "Please wait",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => Swal.showLoading(),
+    });
 
   const uploadFile = async (type, file) => {
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
+        title: `Cannot edit. Status: ${getStatusText(applicationStatus)}`,
       });
       return;
     }
+    const meta = documentAPIMap[type];
+    if (!meta) return;
 
-    const { uploadUrl, downloadKey, viewKey } = documentAPIMap[type];
     const formData = new FormData();
     formData.append("Document", file);
-    formData.append("StudentPersonalInformationId", appId);
+    formData.append("StudentPersonalInformationId", studentPersonalInfoId);
 
     try {
-      setErrors((prev) => ({ ...prev, [type]: null }));
+      setErrors((p) => ({ ...p, [type]: null }));
+      showBlockingLoader(`Uploading ${type}...`);
 
-      // Show upload progress
-      Swal.fire({
-        title: `Uploading ${type}...`,
-        html: "Please wait",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      const res = await apiInstance.post(uploadUrl, formData, {
+      await apiInstance.post(meta.uploadUrl, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (e) => {
-          const percent = Math.round((e.loaded * 100) / e.total);
-          setUploadProgress((prev) => ({ ...prev, [type]: percent }));
+          const pct = Math.round((e.loaded * 100) / e.total);
+          setUploadProgress((prev) => ({ ...prev, [type]: pct }));
         },
       });
 
       Swal.close();
 
-      const result = res.data.result;
-      setUploadedFiles((prev) => ({
-        ...prev,
-        [type]: {
-          name: file.name,
-          url: result[downloadKey],
-          viewUrl: result[viewKey],
-          docId: result.id,
-          locked: false,
-        },
-      }));
-
-      Toast.fire({ icon: "success", title: `${type} uploaded successfully` });
+      // Refetch doc metadata to get final URLs
+      try {
+        const fileRes = await apiInstance.get(
+          `${meta.uploadUrl}/${studentPersonalInfoId}`
+        );
+        const docId = fileRes?.data?.result?.id;
+        if (docId) {
+          const docDetailsRes = await apiInstance.get(
+            `${meta.statusUrl}?DocId=${docId}`
+          );
+          const data = docDetailsRes?.data?.result;
+          if (data) {
+            setUploadedFiles((prev) => ({
+              ...prev,
+              [type]: {
+                name: data[meta.downloadKey]?.split("/").pop() || file.name,
+                url: data[meta.downloadKey],
+                viewUrl: data[meta.viewKey],
+                docId: data.id,
+                locked: !canEdit,
+              },
+            }));
+          }
+        }
+      } catch {
+        // fallback to minimal
+        setUploadedFiles((prev) => ({
+          ...prev,
+          [type]: {
+            name: file.name,
+            url: "#",
+            viewUrl: "#",
+            locked: !canEdit,
+          },
+        }));
+      }
+      Toast.fire({ icon: "success", title: `${type} uploaded` });
     } catch (err) {
       Swal.close();
-      const msg = err?.response?.data?.message || "Upload failed.";
+      const msg =
+        err?.response?.data?.message || "Upload failed. Please try again.";
       setErrors((prev) => ({ ...prev, [type]: msg }));
       Toast.fire({ icon: "error", title: msg });
     } finally {
@@ -292,17 +293,14 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     }
   };
 
-  const handleFileChange = (type, file) => {
+  const validateAndUpload = (type, file) => {
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
+        title: `Cannot edit. Status: ${getStatusText(applicationStatus)}`,
       });
       return;
     }
-
     if (
       file &&
       [
@@ -312,15 +310,9 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     ) {
       uploadFile(type, file);
     } else {
-      setErrors((prev) => ({
-        ...prev,
-        [type]: "Only PDF or DOCX files are allowed.",
-      }));
-
-      Toast.fire({
-        icon: "error",
-        title: "Only PDF or DOCX files are allowed",
-      });
+      const msg = "Only PDF or DOCX files are allowed.";
+      setErrors((p) => ({ ...p, [type]: msg }));
+      Toast.fire({ icon: "error", title: msg });
     }
   };
 
@@ -328,16 +320,13 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     if (!canEdit) {
       Toast.fire({
         icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
+        title: `Cannot edit. Status: ${getStatusText(applicationStatus)}`,
       });
       return;
     }
-
-    const { deleteUrl } = documentAPIMap[type];
+    const meta = documentAPIMap[type];
+    if (!meta) return;
     const docId = uploadedFiles[type]?.docId;
-
     if (!docId) return;
 
     const confirm = await Swal.fire({
@@ -345,67 +334,58 @@ export default function AcademicDocuments({ onContinue, onBack }) {
       text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
+      confirmButtonText: "Yes, delete it",
     });
-
     if (!confirm.isConfirmed) return;
 
     try {
-      await apiInstance.delete(`${deleteUrl}/${docId}`);
+      await apiInstance.delete(`${meta.deleteUrl}/${docId}`);
       setUploadedFiles((prev) => {
-        const updated = { ...prev };
-        delete updated[type];
-        return updated;
+        const cp = { ...prev };
+        delete cp[type];
+        return cp;
       });
       Toast.fire({ icon: "success", title: `${type} deleted` });
     } catch (err) {
-      const msg = err?.response?.data?.message || "Error deleting file.";
-      setErrors((prev) => ({ ...prev, [type]: msg }));
+      const msg =
+        err?.response?.data?.message || "Error deleting document file.";
+      setErrors((p) => ({ ...p, [type]: msg }));
       Toast.fire({ icon: "error", title: msg });
     }
   };
 
   const handleDrop = (e, type) => {
     e.preventDefault();
-    if (!canEdit) {
-      Toast.fire({
-        icon: "warning",
-        title: `Cannot edit. Application status: ${getStatusText(
-          applicationStatus
-        )}`,
-      });
-      return;
-    }
     const file = e.dataTransfer.files[0];
-    handleFileChange(type, file);
+    validateAndUpload(type, file);
   };
-
   const handleDragOver = (e) => e.preventDefault();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Check if Research Proposal is required but not uploaded
     if (isPhDProgram && !uploadedFiles["Research Proposal"]) {
       Swal.fire({
         icon: "warning",
         title: "Research Proposal Required",
-        text: "A Research Proposal document is required for PhD programs. Please upload it before continuing.",
-        confirmButtonText: "OK",
+        text: "Upload the Research Proposal before continuing.",
       });
       return;
     }
-
     onContinue && onContinue();
   };
 
-  // Show loading spinner while fetching data
+  // Mobile summary chips for quick status
+  const mobileSummary = documentTypes.map((t) => {
+    const uploaded = !!uploadedFiles[t];
+    const required = t === "Research Proposal" && isPhDProgram;
+    return { t, uploaded, required };
+  });
+
   if (loading) {
     return (
       <div className="loading-overlay">
         <div className="spinner-container">
-          <div className="loading-spinner"></div>
+          <div className="loading-spinner" />
           <p>Loading your Documents...</p>
         </div>
       </div>
@@ -414,148 +394,197 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
   return (
     <form
-      className="academic-docs-form p-3 p-md-4 mb-4"
+      className="academic-docs-form"
       onSubmit={handleSubmit}
+      noValidate
+      autoComplete="off"
     >
       <h2 className="academic-docs-title">Academic Documents</h2>
 
-      {/* Application Status Display */}
-      {applicationStatus && (
+      {applicationStatus !== null && (
         <div
           className={`application-status ${getStatusText(applicationStatus)
             .toLowerCase()
             .replace(" ", "-")}`}
         >
           <p>
-            Current Application Status:{" "}
-            <strong>{getStatusText(applicationStatus)}</strong>
+            Status: <strong>{getStatusText(applicationStatus)}</strong>
           </p>
         </div>
       )}
 
       <div className="academic-docs-desc">
-        {!canEdit && (
-          <div className="alert alert-primary mb-2 mt-0 p-2">
-            <p>
-              <strong>Notice:</strong> Your application cannot be edited at this
-              time.
-            </p>
-          </div>
-        )}
         {isPhDProgram && (
-          <div className="alert alert-info mb-2 mt-2 p-2">
-            <p>
-              <strong>PhD Program:</strong> Research Proposal document is
-              required for your application.
-            </p>
+          <div className="alert alert-info compact-alert mb-2">
+            <strong>PhD Program:</strong> Research Proposal is required.
           </div>
         )}
-        Click a drop-down to upload/view the document.
-      </div>
-      <div className="divider" />
-
-      {documentTypes.map((type) => (
-        <div key={type} className="accordion-item mb-2">
-          <div
-            className={`accordion-header ${
-              expanded === type ? "expanded" : ""
-            } ${
-              type === "Research Proposal" && isPhDProgram
-                ? "required-document"
-                : ""
-            }`}
-            onClick={() => handleToggle(type)}
-          >
-            <div className="document-type-text">
-              {type}
-              {type === "Research Proposal" && isPhDProgram && (
-                <span className="required-asterisk">*</span>
-              )}
-            </div>
-            <span className="chevron">{expanded === type ? "▲" : "▼"}</span>
+        {!canEdit && (
+          <div className="alert alert-primary compact-alert mb-2">
+            <strong>Notice:</strong> Editing disabled at current status.
           </div>
+        )}
+        Upload each required document as PDF or DOCX. Click a section to expand.
+      </div>
 
-          {expanded === type && (
+      {/* Mobile summary chips */}
+      <div className="docs-summary-chips">
+        {mobileSummary.map(({ t, uploaded, required }) => (
+          <div
+            key={t}
+            className={`doc-chip ${
+              uploaded ? "doc-chip--ok" : "doc-chip--pending"
+            } ${required ? "doc-chip--required" : ""}`}
+            onClick={() => handleToggle(t)}
+          >
+            <span className="doc-chip-label">
+              {t === "Proof of English Proficiency" ? "English Proof" : t}
+            </span>
+            {required && <span className="doc-chip-req">*</span>}
+            <span className="doc-chip-status">
+              {uploaded ? "✓" : required ? "!" : "•"}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="docs-accordion-list">
+        {documentTypes.map((type) => {
+          const isOpen = expanded === type;
+          const meta = uploadedFiles[type];
+          const isRequired = type === "Research Proposal" && isPhDProgram;
+          return (
             <div
-              className="accordion-body"
-              onDrop={(e) => handleDrop(e, type)}
-              onDragOver={handleDragOver}
-              ref={dropRef}
+              className={`accordion-item-doc ${isOpen ? "open" : ""} ${
+                isRequired ? "required-doc" : ""
+              }`}
+              key={type}
             >
-              <label className={`upload-box ${!canEdit ? "disabled" : ""}`}>
-                <input
-                  type="file"
-                  accept=".pdf,.docx"
-                  className="d-none"
-                  onChange={(e) => handleFileChange(type, e.target.files[0])}
-                  disabled={!canEdit}
-                />
-                <div className="upload-area">
-                  {canEdit
-                    ? "📎 Attach file or drag & drop"
-                    : "🔒 Application submitted, you cannot edit this document."}
-                </div>
-              </label>
-
-              {uploadProgress[type] && (
-                <div className="progress-bar mt-2">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${uploadProgress[type]}%` }}
-                  ></div>
-                </div>
-              )}
-
-              {errors[type] && (
-                <div className="error-text mt-2">{errors[type]}</div>
-              )}
-
-              {uploadedFiles[type] && (
-                <div className="uploaded-file mt-2">
-                  <a
-                    href={
-                      uploadedFiles[type].viewUrl || uploadedFiles[type].url
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View {type}
-                  </a>
-                  {!uploadedFiles[type].locked && canEdit && (
-                    <span
-                      className="remove-file"
-                      onClick={() => handleRemoveFile(type)}
-                    >
-                      ✖
+              <button
+                type="button"
+                className="accordion-header-doc"
+                onClick={() => handleToggle(type)}
+                aria-expanded={isOpen}
+              >
+                <span className="acc-title">
+                  {type}
+                  {isRequired && <span className="required-asterisk">*</span>}
+                </span>
+                <span className="acc-state">
+                  {meta ? (
+                    <span className="badge-uploaded">Uploaded</span>
+                  ) : (
+                    <span className="badge-missing">
+                      {isRequired ? "Required" : "Pending"}
                     </span>
+                  )}
+                  <span className="chevron">{isOpen ? "▲" : "▼"}</span>
+                </span>
+              </button>
+
+              {isOpen && (
+                <div
+                  className="accordion-body-doc"
+                  onDrop={(e) => handleDrop(e, type)}
+                  onDragOver={handleDragOver}
+                  ref={dropRef}
+                >
+                  <label
+                    className={`upload-box-doc ${!canEdit ? "disabled" : ""} ${
+                      meta ? "has-file" : ""
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      accept=".pdf,.docx"
+                      disabled={!canEdit}
+                      onChange={(e) =>
+                        validateAndUpload(type, e.target.files[0])
+                      }
+                      className="hidden-input"
+                    />
+                    <div className="upload-prompt">
+                      {canEdit
+                        ? meta
+                          ? "Replace file (PDF / DOCX)"
+                          : "📎 Tap or drag a file here (PDF / DOCX)"
+                        : "🔒 Editing disabled."}
+                    </div>
+                  </label>
+
+                  {uploadProgress[type] && (
+                    <div className="progress-wrapper">
+                      <div className="progress-bar">
+                        <div
+                          className="progress-bar-fill"
+                          style={{ width: `${uploadProgress[type]}%` }}
+                        />
+                      </div>
+                      <span className="progress-text">
+                        {uploadProgress[type]}%
+                      </span>
+                    </div>
+                  )}
+
+                  {errors[type] && (
+                    <div className="error-text mt-1">{errors[type]}</div>
+                  )}
+
+                  {meta && (
+                    <div className="file-card">
+                      <div className="file-info">
+                        <span className="file-name" title={meta.name}>
+                          {meta.name || type}
+                        </span>
+                        <div className="file-actions">
+                          <a
+                            href={meta.viewUrl || meta.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-view-link"
+                          >
+                            View
+                          </a>
+                          {!meta.locked && canEdit && (
+                            <button
+                              type="button"
+                              className="btn-remove-file"
+                              onClick={() => handleRemoveFile(type)}
+                              title="Remove file"
+                            >
+                              ✖
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isRequired && (
+                    <div className="research-hint">
+                      Provide a concise proposal: objectives, methodology,
+                      significance, expected outcomes (PDF/DOCX).
+                    </div>
                   )}
                 </div>
               )}
-
-              {type === "Research Proposal" && isPhDProgram && (
-                <div className="mt-2 research-proposal-info">
-                  <small>
-                    Your research proposal should outline your research topic,
-                    methodology, objectives, and expected outcomes. PDF or DOCX
-                    formats only.
-                  </small>
-                </div>
-              )}
             </div>
-          )}
-        </div>
-      ))}
+          );
+        })}
+      </div>
 
-      <div className="d-flex justify-content-between align-items-center gap-2 p-2 pb-1 academic-docs-footer">
+      {/* Footer buttons (match PersonalInfo / AcademicInfo styles; NOT fixed) */}
+      <div className="docs-footer form-footer non-fixed-footer">
         <button
           type="button"
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary back-btn"
           onClick={onBack}
         >
           ← Back
         </button>
-        <div>
-          <button type="submit" className="btn btn-primary px-4">
+
+        <div className="inline-action-pair">
+          <button type="submit" className="btn btn-primary next-btn">
             Continue →
           </button>
         </div>

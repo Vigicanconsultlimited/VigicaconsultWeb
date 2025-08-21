@@ -1,10 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import "./styles/ApplicationStatus.css";
 
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-08-11 19:06:18
-// Current User's Login: NeduStack
+/*
+  Enhanced, mobile‑friendly & compact ApplicationStatus component
+  Features:
+  - Responsive compact mobile layout (accordion style)
+  - Desktop enhancements: status summary chips, legend, search + filter, view mode toggle (Grid/List)
+  - Consistent status color + icon mapping
+  - Accessibility: role attributes, focus styles, keyboard toggling
+  - Graceful handling of missing docs
+*/
 
 const documentTypes = [
   "Degree Certificate",
@@ -82,223 +89,395 @@ const documentAPIMap = {
   },
 };
 
-// Document status mapping based on API response
-const documentStatusMap = {
+// Status code -> internal key
+const statusKeyMap = {
   1: "uploaded",
-  2: "under review",
+  2: "under-review",
   3: "rejected",
   4: "approved",
 };
 
-// Color mapping for each status
-const statusColorMap = {
-  uploaded: "#198754", // Green
-  "under review": "#0d6efd", // Blue
-  rejected: "#dc3545", // Red
-  approved: "#20c997", // Teal/Green
-  pending: "#ffc107", // Yellow/Orange
+// Colors + icons
+const statusMeta = {
+  uploaded: { label: "Uploaded", color: "#198754", icon: "📤" },
+  "under-review": { label: "Under Review", color: "#0d6efd", icon: "🔍" },
+  rejected: { label: "Rejected", color: "#dc3545", icon: "❌" },
+  approved: { label: "Approved", color: "#20c997", icon: "✅" },
+  pending: { label: "Pending", color: "#ffc107", icon: "⏳" },
 };
 
-// Helper function to get status text with proper casing
-const getStatusText = (statusCode) => {
-  const status = documentStatusMap[statusCode];
-  if (!status) return "pending";
+// Convert API status code to key
+const mapStatusKey = (code) => statusKeyMap[code] || "pending";
 
-  // Convert to proper case for display
-  return status
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
-
-// Helper function to get status class for CSS
-const getStatusClass = (statusCode) => {
-  const status = documentStatusMap[statusCode];
-  if (!status) return "pending";
-
-  // Return lowercase with hyphens for CSS class
-  return status.replace(/\s+/g, "-").toLowerCase();
-};
+// Truncate helper
+const truncate = (str, max = 42) =>
+  !str ? "" : str.length > max ? str.slice(0, max - 1) + "…" : str;
 
 const ApplicationStatus = () => {
-  const authData = useAuthStore((state) => state.allUserData);
-  const [uploadedDocs, setUploadedDocs] = useState([]);
+  const authData = useAuthStore((s) => s.allUserData);
+  const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // UI state
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [viewMode, setViewMode] = useState("grid"); // grid | list
+  const [expandedMobile, setExpandedMobile] = useState(null); // for mobile accordion
+
+  // Fetch
   useEffect(() => {
     const fetchDocuments = async () => {
+      if (!authData?.uid) return;
+      setLoading(true);
       try {
-        const userId = authData?.uid;
-        const res = await apiInstance.get(`StudentPersonalInfo/user/${userId}`);
-        const studentId = res.data?.result?.id;
-
-        const docPromises = documentTypes.map(async (type) => {
-          const { getUrl, statusUrl, viewKey, nameKey } = documentAPIMap[type];
-
-          try {
-            // First, get the document to check if it exists
-            const docRes = await apiInstance.get(`${getUrl}/${studentId}`);
-            console.log(`Document response for ${type}:`, docRes.data);
-
-            const docId = docRes?.data?.result?.id;
-            if (!docId) {
-              console.log(`No document ID found for ${type}`);
-              return {
-                type,
-                status: "pending",
-                statusText: "Pending",
-                statusCode: null,
-              };
-            }
-
-            // Get detailed document information including status
-            const detailsRes = await apiInstance.get(
-              `${statusUrl}?DocId=${docId}`
-            );
-            console.log(`Document details for ${type}:`, detailsRes.data);
-
-            const details = detailsRes?.data?.result;
-
-            if (!details) {
-              console.log(`No details found for ${type}`);
-              return {
-                type,
-                status: "pending",
-                statusText: "Pending",
-                statusCode: null,
-              };
-            }
-
-            const statusCode = details.status;
-            const statusText = getStatusText(statusCode);
-            const statusClass = getStatusClass(statusCode);
-
-            console.log(
-              `${type} - Status Code: ${statusCode}, Status Text: ${statusText}, Status Class: ${statusClass}`
-            );
-
-            return {
-              type,
-              name: details[nameKey]?.split("/").pop() || "View File",
-              url: details[viewKey] || details[nameKey],
-              status: statusClass,
-              statusText: statusText,
-              documentId: docId,
-              createdAt: details.createdAt,
-              updatedAt: details.updatedAt,
-            };
-          } catch (err) {
-            console.log(`Error fetching ${type}:`, err.message);
-            return {
-              type,
-              status: "pending",
-              statusText: "Pending",
-              statusCode: null,
-            };
-          }
-        });
-
-        const results = await Promise.all(docPromises);
-        console.log("All document results:", results);
-        setUploadedDocs(results);
-      } catch (error) {
-        console.error(
-          `Error fetching documents at 2025-08-11 19:06:18 by NeduStack:`,
-          error
+        const personalRes = await apiInstance.get(
+          `StudentPersonalInfo/user/${authData.uid}`
         );
+        const studentId = personalRes?.data?.result?.id;
+        if (!studentId) {
+          setDocs([]);
+          return;
+        }
+
+        const results = await Promise.all(
+          documentTypes.map(async (type) => {
+            const { getUrl, statusUrl, viewKey, nameKey } =
+              documentAPIMap[type];
+            try {
+              const baseRes = await apiInstance.get(`${getUrl}/${studentId}`);
+              const docId = baseRes?.data?.result?.id;
+              if (!docId) {
+                return {
+                  type,
+                  fileName: null,
+                  url: null,
+                  statusKey: "pending",
+                  createdAt: null,
+                  updatedAt: null,
+                };
+              }
+              const detailRes = await apiInstance.get(
+                `${statusUrl}?DocId=${docId}`
+              );
+              const detail = detailRes?.data?.result;
+              if (!detail) {
+                return {
+                  type,
+                  fileName: null,
+                  url: null,
+                  statusKey: "pending",
+                  createdAt: null,
+                  updatedAt: null,
+                };
+              }
+              const statusKey = mapStatusKey(detail.status);
+              return {
+                type,
+                fileName: detail[nameKey]?.split("/").pop() || "View File",
+                url: detail[viewKey] || detail[nameKey] || null,
+                statusKey,
+                createdAt: detail.createdAt,
+                updatedAt: detail.updatedAt,
+              };
+            } catch {
+              return {
+                type,
+                fileName: null,
+                url: null,
+                statusKey: "pending",
+                createdAt: null,
+                updatedAt: null,
+              };
+            }
+          })
+        );
+        setDocs(results);
+      } catch (e) {
+        console.error("Document fetch error:", e.message);
+        setDocs([]);
       } finally {
         setLoading(false);
       }
     };
-
-    if (authData?.uid) {
-      fetchDocuments();
-    }
+    fetchDocuments();
   }, [authData]);
+
+  // Derived counts
+  const statusCounts = useMemo(() => {
+    const base = {
+      uploaded: 0,
+      "under-review": 0,
+      rejected: 0,
+      approved: 0,
+      pending: 0,
+    };
+    docs.forEach((d) => {
+      base[d.statusKey] = (base[d.statusKey] || 0) + 1;
+    });
+    return base;
+  }, [docs]);
+
+  // Filtered docs
+  const filtered = useMemo(() => {
+    return docs.filter((d) => {
+      const matchesText =
+        !search ||
+        d.type.toLowerCase().includes(search.toLowerCase()) ||
+        (d.fileName || "").toLowerCase().includes(search.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || d.statusKey === statusFilter;
+      return matchesText && matchesStatus;
+    });
+  }, [docs, search, statusFilter]);
+
+  const toggleExpandMobile = (type) => {
+    setExpandedMobile((prev) => (prev === type ? null : type));
+  };
 
   if (loading) {
     return (
-      <div className="loading-overlay">
+      <div className="loading-overlay app-status-loading">
         <div className="spinner-container">
-          <div className="loading-spinner"></div>
-          <p>Loading Application Status</p>
+          <div className="loading-spinner" />
+          <p>Loading Application Status...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container">
-      <div className="row g-3">
-        {uploadedDocs.map((doc, index) => (
-          <div key={index} className="col-12 col-sm-6 col-lg-4">
-            <div
-              className="p-3 h-100 bg-white doc-card-hover"
-              style={{
-                borderLeftColor:
-                  statusColorMap[doc.status] || statusColorMap.pending,
-                borderLeftWidth: "4px",
-                borderLeftStyle: "solid",
-                borderRadius: "8px",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              }}
-            >
-              <div className="fs-6 doc-title mb-2 fw-bold">{doc.type}</div>
+    <div className="app-status-wrapper">
+      {/* Header / Summary (desktop & tablet) */}
+      <div className="app-status-header">
+        <h2 className="app-status-title">Application Document Status</h2>
+        <p className="app-status-subtitle">
+          Track each required document’s review progress.
+        </p>
 
-              <div
-                className="text-truncate mb-2"
-                style={{ fontSize: ".99rem" }}
-              >
+        <div className="status-summary-chips">
+          {Object.entries(statusCounts).map(([key, count]) => (
+            <div
+              key={key}
+              className={`status-chip chip-${key}`}
+              title={statusMeta[key].label}
+            >
+              <span className="chip-icon">{statusMeta[key].icon}</span>
+              <span className="chip-label">
+                {statusMeta[key].label}
+                <span className="chip-count">{count}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="toolbar">
+          <div className="toolbar-group search-group">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search document or filename..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <div className="toolbar-group select-group">
+            <select
+              className="filter-select"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="uploaded">Uploaded</option>
+              <option value="under-review">Under Review</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div className="toolbar-group view-toggle-group" role="group">
+            <button
+              type="button"
+              className={`view-toggle-btn ${
+                viewMode === "grid" ? "active" : ""
+              }`}
+              onClick={() => setViewMode("grid")}
+              aria-label="Grid view"
+            >
+              ⬚
+            </button>
+            <button
+              type="button"
+              className={`view-toggle-btn ${
+                viewMode === "list" ? "active" : ""
+              }`}
+              onClick={() => setViewMode("list")}
+              aria-label="List view"
+            >
+              ☰
+            </button>
+          </div>
+        </div>
+
+        <div className="legend-row">
+          {["pending", "uploaded", "under-review", "approved", "rejected"].map(
+            (k) => (
+              <div key={k} className="legend-item">
+                <span
+                  className="legend-dot"
+                  style={{ backgroundColor: statusMeta[k].color }}
+                ></span>
+                <span>{statusMeta[k].label}</span>
+              </div>
+            )
+          )}
+        </div>
+      </div>
+
+      {/* Desktop / tablet view */}
+      <div
+        className={`cards-region ${
+          viewMode === "list" ? "list-mode" : "grid-mode"
+        } desktop-cards`}
+      >
+        {filtered.length === 0 && (
+          <div className="empty-state">
+            <p>No documents match your filter.</p>
+          </div>
+        )}
+        {filtered.map((doc) => {
+          const meta = statusMeta[doc.statusKey];
+          return (
+            <div
+              key={doc.type}
+              className={`doc-card card-status-${doc.statusKey}`}
+              style={{ "--status-color": meta.color }}
+            >
+              <div className="doc-card-top">
+                <div className="doc-type" title={doc.type}>
+                  {meta.icon} {doc.type}
+                </div>
+                <span className={`status-pill pill-${doc.statusKey}`}>
+                  {meta.icon} {meta.label}
+                </span>
+              </div>
+
+              <div className="doc-file-line">
                 {doc.url ? (
                   <a
                     href={doc.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="doc-link text-decoration-none"
-                    style={{ color: "#0d6efd" }}
+                    className="doc-file-link"
                   >
-                    📄 View {doc.type}
+                    {truncate(doc.fileName || `View ${doc.type}`, 38)}
                   </a>
                 ) : (
-                  <span className="fst-italic text-muted">
-                    📭 No file uploaded
-                  </span>
+                  <span className="no-file">No file uploaded</span>
                 )}
               </div>
 
-              <div className="d-flex justify-content-between align-items-center">
-                <span
-                  className={`doc-status badge ${doc.status}`}
-                  style={{
-                    backgroundColor:
-                      statusColorMap[doc.status] || statusColorMap.pending,
-                    color: "white",
-                    fontSize: "0.75rem",
-                    padding: "4px 8px",
-                    borderRadius: "12px",
-                  }}
-                >
-                  {doc.statusText}
+              <div className="doc-meta">
+                <span>
+                  Uploaded:{" "}
+                  {doc.createdAt
+                    ? new Date(doc.createdAt).toLocaleDateString()
+                    : "—"}
                 </span>
-
-                {doc.statusCode && (
-                  <small className="text-muted" style={{ fontSize: "0.7rem" }}>
-                    Code: {doc.statusCode}
-                  </small>
-                )}
+                <span>
+                  Updated:{" "}
+                  {doc.updatedAt
+                    ? new Date(doc.updatedAt).toLocaleDateString()
+                    : "—"}
+                </span>
               </div>
-
-              {/* Optional: Show dates if available */}
-              {doc.createdAt && (
-                <div className="mt-2">
-                  <small className="text-muted" style={{ fontSize: "0.7rem" }}>
-                    Uploaded: {new Date(doc.createdAt).toLocaleDateString()}
-                  </small>
-                </div>
-              )}
             </div>
+          );
+        })}
+      </div>
+
+      {/* Mobile accordion view */}
+      <div className="mobile-accordion">
+        {filtered.length === 0 && (
+          <div className="empty-state mobile">
+            <p>No documents found.</p>
           </div>
-        ))}
+        )}
+        {filtered.map((doc) => {
+          const meta = statusMeta[doc.statusKey];
+          const open = expandedMobile === doc.type;
+          return (
+            <div
+              key={doc.type}
+              className={`acc-item acc-${doc.statusKey} ${open ? "open" : ""}`}
+            >
+              <button
+                className="acc-header"
+                onClick={() => toggleExpandMobile(doc.type)}
+                aria-expanded={open}
+              >
+                <span className="acc-left">
+                  <span
+                    className="acc-status-dot"
+                    style={{ backgroundColor: meta.color }}
+                  />
+                  <span className="acc-title">{doc.type}</span>
+                </span>
+                <span className="acc-right">
+                  <span className={`mini-pill pill-${doc.statusKey}`}>
+                    {meta.label}
+                  </span>
+                  <span className="chevron">{open ? "▲" : "▼"}</span>
+                </span>
+              </button>
+              <div
+                className="acc-body"
+                style={{ maxHeight: open ? "260px" : "0px" }}
+              >
+                <div className="acc-row">
+                  <span className="label">File:</span>
+                  <span className="value">
+                    {doc.url ? (
+                      <a
+                        href={doc.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="acc-link"
+                      >
+                        {truncate(doc.fileName || "View", 26)}
+                      </a>
+                    ) : (
+                      <span className="no-file-inline">None</span>
+                    )}
+                  </span>
+                </div>
+                <div className="acc-row">
+                  <span className="label">Uploaded:</span>
+                  <span className="value">
+                    {doc.createdAt
+                      ? new Date(doc.createdAt).toLocaleDateString()
+                      : "—"}
+                  </span>
+                </div>
+                <div className="acc-row">
+                  <span className="label">Updated:</span>
+                  <span className="value">
+                    {doc.updatedAt
+                      ? new Date(doc.updatedAt).toLocaleDateString()
+                      : "—"}
+                  </span>
+                </div>
+                <div className="acc-row">
+                  <span className="label">Status:</span>
+                  <span
+                    className={`value status-inline status-inline-${doc.statusKey}`}
+                  >
+                    {meta.icon} {meta.label}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
