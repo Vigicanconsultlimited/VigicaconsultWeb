@@ -399,32 +399,3 @@
     }
   }
 }
-
-/* Dark mode (optional) */
-@media (prefers-color-scheme: dark) {
-  .personal-info-form.form-container {
-    background: #1e2530;
-    color: #f1f5f9;
-  }
-  .form-input,
-  .form-select {
-    background: #273140;
-    border-color: #324152;
-    color: #e2e8f0;
-  }
-  .form-input:focus,
-  .form-select:focus {
-    background: #2f3a4c;
-  }
-  .form-footer {
-    background: #2b3544;
-  }
-  .alert-info {
-    background: #2e3b53;
-    color: #bcd2ff;
-    border-left-color: #4b6edc;
-  }
-  .application-status {
-    background: linear-gradient(135deg, #263240, #1f2731 100%);
-  }
-}
