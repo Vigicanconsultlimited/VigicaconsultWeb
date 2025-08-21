@@ -96,10 +96,17 @@ export default function DashboardNavbar() {
 
           {/* Right: Desktop Profile */}
           <div className="dashboard-navbar-right d-flex align-items-center">
+
             <img
               src={profile}
               alt="User"
               className="dashboard-navbar-avatar me-2"
+              style={{
+                width: "40px",
+                height: "40px",
+                objectFit: "cover",
+                borderRadius: "50%",
+              }}
             />
             <div className="text-white">
               <span className="dashboard-navbar-user fw-medium">
@@ -157,6 +164,7 @@ export default function DashboardNavbar() {
           </div>
         </div>
         {/* End Mobile Section */}
+
       </div>
     </nav>
   );
