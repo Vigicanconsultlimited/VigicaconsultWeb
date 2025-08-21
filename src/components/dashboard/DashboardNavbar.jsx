@@ -5,18 +5,6 @@ import "./styles/DashboardNavbar.css";
 import { useAuthStore } from "../../store/auth";
 import apiInstance from "../../utils/axios";
 
-/*
-  Fixes implemented for missing / centered mobile logo:
-
-  - Added a dedicated mobile tri‑section: .nav-mobile-left (slot / menu), .nav-mobile-center (absolute centered logo), .nav-mobile-right (profile).
-  - .nav-mobile-center uses position:absolute; left:50%; transform:translateX(-50%); to stay centered regardless of left/right widths.
-  - Ensured the mobile logo container has display:flex !important and higher z-index so it cannot be collapsed or hidden by ms-auto.
-  - Removed reliance on Bootstrap's d-flex + ms-auto that previously pushed content and could compress the center.
-  - Kept desktop view intact (desktop logo bigger at 56px).
-  - Kept original small mobile logo height (35px).
-  - Added defensive onError handler + fallback text.
-  - Ensured no duplicate CSS blocks or conflicting media queries hide .dashboard-mobile-logo.
-*/
 
 export default function DashboardNavbar() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
@@ -109,10 +97,17 @@ export default function DashboardNavbar() {
 
           {/* Right: Desktop Profile */}
           <div className="dashboard-navbar-right d-flex align-items-center">
+
             <img
               src={profile}
               alt="User"
               className="dashboard-navbar-avatar me-2"
+              style={{
+                width: "40px",
+                height: "40px",
+                objectFit: "cover",
+                borderRadius: "50%",
+              }}
             />
             <div className="text-white">
               <span className="dashboard-navbar-user fw-medium">
@@ -170,6 +165,7 @@ export default function DashboardNavbar() {
           </div>
         </div>
         {/* End Mobile Section */}
+
       </div>
     </nav>
   );
