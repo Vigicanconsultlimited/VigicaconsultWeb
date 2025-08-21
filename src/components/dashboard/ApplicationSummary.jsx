@@ -22,98 +22,76 @@ function ApplicationSummary({ setCurrentStep }) {
   const [submissionDate, setSubmissionDate] = useState("");
   const [isResubmitting, setIsResubmitting] = useState(false);
 
-  // Get current datetime - using the format you specified
-  const getCurrentDateTime = () => {
-    return "2025-08-19 17:17:36";
-  };
+  // Mobile collapsible states
+  const [showInstructionsMobile, setShowInstructionsMobile] = useState(false);
+  const [showNextStepsMobile, setShowNextStepsMobile] = useState(false);
 
-  // Get current user login as specified
-  const getCurrentUser = () => {
-    return "NeduStack";
-  };
+  const getCurrentDateTime = () => "2025-08-19 17:17:36";
+  const getCurrentUser = () => "NeduStack";
 
-  // Fetch personal information ID and application status
   useEffect(() => {
     const fetchPersonalInfo = async () => {
-      if (authData) {
-        const userId = authData["uid"];
-        try {
-          const response = await apiInstance.get(
-            `StudentPersonalInfo/user/${userId}`
-          );
+      if (!authData) return;
+      const userId = authData["uid"];
+      try {
+        const response = await apiInstance.get(
+          `StudentPersonalInfo/user/${userId}`
+        );
+        if (response?.data?.result) {
+          const savedData = response.data.result;
+          const studentId = savedData.id || "";
+          setPersonalInfoId(studentId);
 
-          if (response?.data?.result) {
-            const savedData = response.data.result;
-            const studentId = savedData.id || "";
+          const fullName = [
+            savedData.firstName || "",
+            savedData.middleName ? savedData.middleName + " " : "",
+            savedData.lastName || "",
+          ]
+            .join(" ")
+            .trim();
+          setUserName(fullName || "");
 
-            // Set personal info ID
-            setPersonalInfoId(studentId);
-
-            // Set user name from personal info
-            const fullName = [
-              savedData.firstName || "",
-              savedData.middleName ? savedData.middleName + " " : "",
-              savedData.lastName || "",
-            ]
-              .join(" ")
-              .trim();
-
-            setUserName(fullName || "");
-
-            // Now fetch application status if we have a personal info ID
-            if (studentId) {
-              try {
-                const appResponse = await apiInstance.get(
-                  `StudentApplication/application?StudentPersonalInformationId=${studentId}`
-                );
-
-                if (appResponse?.data?.result) {
-                  // Status codes: 1=Submitted, 2=Pending, 3=UnderReview, 4=Rejected, 5=Approved
-                  const status = appResponse.data.result.applicationStatus;
-                  setApplicationStatus(status);
-
-                  // Store submission date if available
-                  if (appResponse.data.result.createdAt) {
-                    setSubmissionDate(appResponse.data.result.createdAt);
-                  } else {
-                    setSubmissionDate(getCurrentDateTime());
-                  }
-
-                  // If status is already Submitted (1) or higher, show the success view
-                  // BUT make an exception for Rejected (4) and Pending (2) status
-                  if (status >= 1 && status !== 4 && status !== 2) {
-                    setIsSubmitted(true);
-                  } else if (status === 4 || status === 2) {
-                    // For Rejected or Pending, show the submission form
-                    setIsSubmitted(false);
-                  }
+          if (studentId) {
+            try {
+              const appResponse = await apiInstance.get(
+                `StudentApplication/application?StudentPersonalInformationId=${studentId}`
+              );
+              if (appResponse?.data?.result) {
+                const status = appResponse.data.result.applicationStatus;
+                setApplicationStatus(status);
+                if (appResponse.data.result.createdAt) {
+                  setSubmissionDate(appResponse.data.result.createdAt);
+                } else {
+                  setSubmissionDate(getCurrentDateTime());
                 }
-              } catch (err) {
-                console.log(
-                  `No application found or error: ${
-                    err.message
-                  } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-                );
-                // If no application exists yet, it's effectively pending
-                setApplicationStatus(2); // Pending
+                if (status >= 1 && status !== 4 && status !== 2) {
+                  setIsSubmitted(true);
+                } else {
+                  setIsSubmitted(false);
+                }
               }
+            } catch (err) {
+              console.log(
+                `No application found or error: ${
+                  err.message
+                } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+              );
+              setApplicationStatus(2);
             }
           }
-        } catch (error) {
-          console.error(
-            `Error fetching personal info: ${
-              error.message
-            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-          setUserName(""); // Fallback user name
         }
+      } catch (error) {
+        console.error(
+          `Error fetching personal info: ${
+            error.message
+          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+        );
+        setUserName("");
       }
     };
-
     fetchPersonalInfo();
   }, [authData]);
 
-  // Helper function to get status text
   const getStatusText = (status) => {
     const statusMap = {
       1: "Submitted",
@@ -125,324 +103,236 @@ function ApplicationSummary({ setCurrentStep }) {
     return statusMap[status] || "Unknown";
   };
 
-  // Get status-dependent messages and instructions
   const getStatusContent = (status) => {
     switch (status) {
-      case 1: // Submitted
+      case 1:
         return {
           message:
             "Your application has been successfully submitted and is awaiting initial review.",
           instructions: [
-            "Your application is in the submission queue",
-            "Application processing will begin shortly",
-            "No further action is required from you at this time",
+            "Application queued",
+            "Processing will begin shortly",
+            "No further action required",
           ],
         };
-
-      case 2: // Pending
+      case 2:
         return {
           message:
-            "You have completed all the necessary steps for your application. Please review your information before final submission.",
+            "Review all sections of your application before final submission.",
           instructions: [
-            "You will not be able to make changes after submission",
-            "Our team will begin reviewing your application immediately",
-            "You will receive email notifications for any status updates",
+            "Changes locked after submission",
+            "Review starts immediately",
+            "Email updates will be sent",
           ],
-          note: "Make sure all your information is accurate before submitting, as changes cannot be made afterwards.",
+          note: "Ensure accuracy—changes are not possible after submission.",
         };
-
-      case 3: // Under Review
+      case 3:
         return {
-          message: "Your application is currently being reviewed.",
+          message: "Your application is currently under review.",
           instructions: [
-            "Our team is carefully evaluating your application",
-            "You may be contacted if additional information is required",
-            "Please check your email regularly for any updates",
+            "Team evaluating details",
+            "We may request more info",
+            "Monitor your email",
           ],
-          note: "The review process is thorough and may take some time. We appreciate your patience during this period.",
+          note: "Thorough review may take time. Thank you for your patience.",
         };
-
-      case 4: // Rejected
+      case 4:
         return {
           message:
-            "We regret to inform you that your application was not successful this time.",
+            "Your application was not successful. You may edit and resubmit.",
           instructions: [
-            "Review the feedback provided in your rejection email carefully",
-            "Update your application materials based on the feedback",
-            "Strengthen areas mentioned in the rejection notice",
-            "Ensure all required documents are complete and accurate",
-            "You can resubmit your improved application using the resubmit button",
+            "Read rejection feedback",
+            "Improve weak areas",
+            "Update documents/details",
+            "Resubmit when ready",
           ],
-          note: "Use this as an opportunity to strengthen your application.",
+          note: "Use the feedback to strengthen your resubmission.",
         };
-
-      case 5: // Approved
+      case 5:
         return {
           message: "Congratulations! Your application has been approved.",
           instructions: [
-            "Check your email for detailed next steps and enrollment information",
-            "Complete any required enrollment procedures by the deadline",
+            "Check email for next steps",
+            "Complete enrollment tasks",
           ],
           note: "",
         };
-
       default:
         return {
           message:
-            "Please complete all required sections before submitting your application.",
+            "Complete all required sections before submitting your application.",
           instructions: [
-            "Ensure all forms are completed",
-            "Upload all required documents",
-            "Review your information for accuracy",
-            "Submit your application when ready",
+            "Fill required forms",
+            "Upload documents",
+            "Review details",
+            "Submit when ready",
           ],
-          note: "Take your time to provide complete and accurate information.",
+          note: "Provide accurate information to avoid delays.",
         };
     }
   };
 
-  // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return getCurrentDateTime();
-
     try {
       if (dateString.includes(" ")) return dateString;
       const date = new Date(dateString);
       return date.toISOString().replace("T", " ").slice(0, 19);
-    } catch (e) {
-      console.log(`Error formatting date: ${e.message}`);
+    } catch {
       return dateString;
     }
   };
 
-  // Handle resubmit for rejected applications in submitted view
   const handleResubmitRejected = async () => {
     if (!personalInfoId) {
       Swal.fire({
         title: "Error",
-        text: "Unable to find your personal information. Please try again later.",
+        text: "Missing personal information.",
         icon: "error",
-        confirmButtonText: "OK",
       });
       return;
     }
-
     Swal.fire({
       title: "Resubmit Application",
-      text: "Are you sure you want to resubmit your application? Please ensure you have addressed all feedback from the rejection notice.",
+      text: "Confirm you have addressed feedback before resubmitting.",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Yes, Resubmit",
-      cancelButtonText: "Cancel",
-      reverseButtons: true,
     }).then(async (result) => {
-      if (result.isConfirmed) {
-        setIsResubmitting(true);
-
-        try {
-          console.log(
-            `Resubmitting application at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
-          // Show loading overlay
-          Swal.fire({
-            title: "Resubmitting Application...",
-            text: "Please wait while we process your resubmission.",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-          });
-
-          // Call the resubmission API
-          const response = await apiInstance.post(
-            `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
-          );
-
-          console.log(
-            `Application resubmitted successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
-          Swal.close();
-          setApplicationStatus(1); // Update to Submitted status
-          setSubmissionDate(getCurrentDateTime());
-          setIsSubmitted(true); // Show submitted view after successful submission
-
-          // Success message
-          Toast.fire({
-            title: "Success!",
-            text: "Document successfully re-submitted. Your application will be reviewed again.",
-            icon: "success",
-          });
-        } catch (error) {
-          console.error(
-            `Resubmission failed: ${
-              error.message
-            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-          Swal.close();
-
-          // Show error message
-          Swal.fire({
-            title: "Resubmission Failed",
-            text:
-              error.response?.data?.message ||
-              "There was an error resubmitting your application. Please try again.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-        } finally {
-          setIsResubmitting(false);
-        }
+      if (!result.isConfirmed) return;
+      setIsResubmitting(true);
+      try {
+        Swal.fire({
+          title: "Resubmitting...",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+        await apiInstance.post(
+          `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+        );
+        Swal.close();
+        setApplicationStatus(1);
+        setSubmissionDate(getCurrentDateTime());
+        setIsSubmitted(true);
+        Toast.fire({ icon: "success", title: "Application resubmitted" });
+      } catch (error) {
+        Swal.close();
+        Swal.fire({
+          title: "Resubmission Failed",
+          text:
+            error.response?.data?.message ||
+            "An error occurred. Please try again.",
+          icon: "error",
+        });
+      } finally {
+        setIsResubmitting(false);
       }
     });
   };
 
-  // Handle final submission
   const handleFinalSubmit = async () => {
     if (!personalInfoId) {
       Swal.fire({
         title: "Error",
-        text: "Unable to find your personal information. Please try again later.",
+        text: "Missing personal information.",
         icon: "error",
-        confirmButtonText: "OK",
       });
       return;
     }
-
-    // Check if application status allows submission
     if (applicationStatus && ![2, 4].includes(applicationStatus)) {
       Swal.fire({
         title: "Cannot Submit",
-        text: `Your application is already ${getStatusText(
+        text: `Current status: ${getStatusText(
           applicationStatus
-        )}. Only Pending or Rejected applications can be submitted.`,
+        )}. Only Pending or Rejected can submit.`,
         icon: "warning",
-        confirmButtonText: "OK",
       });
       return;
     }
-
     const isResubmission = applicationStatus === 4;
-
     Swal.fire({
       title: isResubmission ? "Resubmit Application" : "Submit Application",
       text: isResubmission
-        ? "Are you sure you want to resubmit your corrected application? Please ensure you have addressed all feedback from the previous review."
-        : "Are you sure you want to submit your application? You won't be able to make changes after submission.",
+        ? "Confirm your corrections before resubmitting."
+        : "You cannot edit after final submission. Proceed?",
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: isResubmission ? "Yes, Resubmit" : "Yes, Submit",
-      cancelButtonText: "Cancel",
-      reverseButtons: true,
+      confirmButtonText: isResubmission ? "Resubmit" : "Submit",
     }).then(async (result) => {
-      if (result.isConfirmed) {
-        setIsSubmitting(true);
-
-        try {
-          console.log(
-            `${
-              isResubmission ? "Resubmitting" : "Submitting"
-            } application at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
-          // Show loading overlay
-          Swal.fire({
-            title: isResubmission
-              ? "Resubmitting Application..."
-              : "Submitting Application...",
-            text: "Please wait while we process your submission.",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-          });
-
-          // Call the submission API
-          const response = await apiInstance.post(
-            `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
-          );
-
-          console.log(
-            `Application ${
-              isResubmission ? "resubmitted" : "submitted"
-            } successfully at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-
-          Swal.close();
-          setIsSubmitted(true);
-          setApplicationStatus(1); // Update to Submitted status
-          setSubmissionDate(getCurrentDateTime());
-
-          // Success message
-          Toast.fire({
-            title: "Success!",
-            text: isResubmission
-              ? "Document successfully re-submitted. Your application will be reviewed again."
-              : "Your application has been submitted successfully.",
-            icon: "success",
-            confirmButtonText: "OK",
-          });
-        } catch (error) {
-          console.error(
-            `${isResubmission ? "Resubmission" : "Submission"} failed: ${
-              error.message
-            } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-          );
-          Swal.close();
-
-          // Show error message
-          Toast.fire({
-            title: `${isResubmission ? "Resubmission" : "Submission"} Failed`,
-            text:
-              error.response?.data?.message ||
-              `There was an error ${
-                isResubmission ? "resubmitting" : "submitting"
-              } your application. Please try again.`,
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-        } finally {
-          setIsSubmitting(false);
-        }
+      if (!result.isConfirmed) return;
+      setIsSubmitting(true);
+      try {
+        Swal.fire({
+          title: isResubmission ? "Resubmitting..." : "Submitting...",
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading(),
+        });
+        await apiInstance.post(
+          `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+        );
+        Swal.close();
+        setIsSubmitted(true);
+        setApplicationStatus(1);
+        setSubmissionDate(getCurrentDateTime());
+        Toast.fire({
+          icon: "success",
+          title: isResubmission ? "Resubmitted" : "Submitted",
+        });
+      } catch (error) {
+        Swal.close();
+        Toast.fire({
+          icon: "error",
+          title: isResubmission ? "Resubmission failed" : "Submission failed",
+        });
+      } finally {
+        setIsSubmitting(false);
       }
     });
   };
 
-  // Handle edit application for rejected status
   const handleEditApplication = () => {
     Swal.fire({
       title: "Edit Application",
-      text: "You will be taken to the application form to make corrections. Please review the feedback from your rejection email and update your information accordingly.",
+      text: "You will return to the form to make corrections.",
       icon: "info",
       showCancelButton: true,
-      confirmButtonText: "Continue to Edit",
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Navigate to personal info step to start editing
-        setCurrentStep("personal-info");
-      }
+      confirmButtonText: "Proceed",
+    }).then((r) => {
+      if (r.isConfirmed) setCurrentStep("personal-info");
     });
   };
 
-  // Get current status content
   const statusContent = getStatusContent(applicationStatus);
-
-  // Determine if we should show the submission form or the submitted view
-  // Now, explicitly check if status is 2 (Pending) or 4 (Rejected) to show the form
   const shouldShowSubmissionForm =
     !isSubmitted || applicationStatus === 2 || applicationStatus === 4;
 
+  // Meta detail block (shown for Rejected above instructions)
+  const resubmissionMetaBlock =
+    applicationStatus === 4 && shouldShowSubmissionForm ? (
+      <div className="resubmission-meta-block">
+        <div className="meta-row">
+          <span className="meta-label">Status:</span>
+          <span className="meta-value">{getStatusText(applicationStatus)}</span>
+        </div>
+        <div className="meta-row">
+          <span className="meta-label">Rejection Date:</span>
+          <span className="meta-value">{formatDate(submissionDate)}</span>
+        </div>
+        <div className="meta-row">
+          <span className="meta-label">Applicant:</span>
+          <span className="meta-value">{userName || getCurrentUser()}</span>
+        </div>
+      </div>
+    ) : null;
+
   return (
     <div className="application-summary-container">
+      {/* Removed mobile meta chips per user request */}
+
       {shouldShowSubmissionForm ? (
         <>
-          <h2 className="application-summary-title">Review & Submit</h2>
+          <h2 className="application-summary-title">Review &amp; Submit</h2>
 
-          {/* Application Status Display */}
           {applicationStatus && (
             <div
               className={`application-status ${getStatusText(applicationStatus)
@@ -457,37 +347,89 @@ function ApplicationSummary({ setCurrentStep }) {
           )}
 
           <div className="summary-message">
-            <p>{statusContent.message}</p>
+            <p className="compact-text">{statusContent.message}</p>
           </div>
 
-          <div className="summary-instructions">
-            <p>
-              {applicationStatus === 2
-                ? "Once you submit your application:"
-                : applicationStatus === 4
-                ? "To resubmit your application:"
-                : "Current status information:"}
-            </p>
-            <ul>
-              {statusContent.instructions.map((instruction, index) => (
-                <li key={index}>{instruction}</li>
-              ))}
-            </ul>
-          </div>
+          {resubmissionMetaBlock}
 
-          {statusContent.note && (
-            <div
-              className={`status-specific-note ${getStatusText(
-                applicationStatus
-              )
-                .toLowerCase()
-                .replace(" ", "-")}`}
+          {/* Mobile collapsible instructions */}
+          <div className="mobile-collapse-wrapper">
+            <button
+              type="button"
+              className="collapse-toggle"
+              onClick={() => setShowInstructionsMobile((prev) => !prev)}
+              aria-expanded={showInstructionsMobile}
             >
-              <strong>Important:</strong> {statusContent.note}
+              {showInstructionsMobile ? "−" : "+"}{" "}
+              {applicationStatus === 4
+                ? "Resubmission Instructions"
+                : applicationStatus === 2
+                ? "Submission Instructions"
+                : "Status Notes"}
+            </button>
+            <div
+              className={`collapse-content ${
+                showInstructionsMobile ? "open" : ""
+              }`}
+            >
+              <div className="summary-instructions">
+                <p className="mobile-heading">
+                  {applicationStatus === 2
+                    ? "Once you submit:"
+                    : applicationStatus === 4
+                    ? "To resubmit:"
+                    : "Information:"}
+                </p>
+                <ul>
+                  {statusContent.instructions.map((instruction, index) => (
+                    <li key={index}>{instruction}</li>
+                  ))}
+                </ul>
+              </div>
+              {statusContent.note && (
+                <div
+                  className={`status-specific-note mobile-note ${getStatusText(
+                    applicationStatus
+                  )
+                    .toLowerCase()
+                    .replace(" ", "-")}`}
+                >
+                  <strong>Important:</strong> {statusContent.note}
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
-          <div className="button-group">
+          {/* Desktop instructions */}
+          <div className="desktop-only">
+            <div className="summary-instructions">
+              <p>
+                {applicationStatus === 2
+                  ? "Once you submit your application:"
+                  : applicationStatus === 4
+                  ? "To resubmit your application:"
+                  : "Current status information:"}
+              </p>
+              <ul>
+                {statusContent.instructions.map((instruction, index) => (
+                  <li key={index}>{instruction}</li>
+                ))}
+              </ul>
+            </div>
+            {statusContent.note && (
+              <div
+                className={`status-specific-note ${getStatusText(
+                  applicationStatus
+                )
+                  .toLowerCase()
+                  .replace(" ", "-")}`}
+              >
+                <strong>Important:</strong> {statusContent.note}
+              </div>
+            )}
+          </div>
+
+          <div className="button-group non-mobile">
             <button
               onClick={() => setCurrentStep("supporting-documents")}
               className="btn btn-outline-primary application-summary-button"
@@ -506,8 +448,6 @@ function ApplicationSummary({ setCurrentStep }) {
                   ✏️ Edit Application
                 </button>
               )}
-
-              {/* Always show submit button for Pending (2) or Rejected (4) status */}
               {(applicationStatus === 2 || applicationStatus === 4) && (
                 <button
                   onClick={handleFinalSubmit}
@@ -534,6 +474,41 @@ function ApplicationSummary({ setCurrentStep }) {
               )}
             </div>
           </div>
+
+          {/* Mobile stacked buttons */}
+          <div className="mobile-button-stack">
+            <button
+              onClick={() => setCurrentStep("supporting-documents")}
+              className="btn btn-outline-primary"
+              disabled={isSubmitting}
+            >
+              ⬅ Documents
+            </button>
+            {applicationStatus === 4 && (
+              <button
+                onClick={handleEditApplication}
+                className="btn btn-outline-secondary"
+                disabled={isSubmitting}
+              >
+                ✏️ Edit
+              </button>
+            )}
+            {(applicationStatus === 2 || applicationStatus === 4) && (
+              <button
+                onClick={handleFinalSubmit}
+                className="btn btn-primary"
+                disabled={isSubmitting}
+              >
+                {isSubmitting
+                  ? applicationStatus === 4
+                    ? "Resubmitting..."
+                    : "Submitting..."
+                  : applicationStatus === 4
+                  ? "Resubmit 🔄"
+                  : "Submit 🚀"}
+              </button>
+            )}
+          </div>
         </>
       ) : (
         <>
@@ -541,13 +516,12 @@ function ApplicationSummary({ setCurrentStep }) {
             {applicationStatus === 5
               ? "Application Approved! 🎉"
               : applicationStatus === 4
-              ? "Application Status: Rejected"
+              ? "Application Rejected"
               : applicationStatus === 3
               ? "Application Under Review 🔍"
               : "Application Submitted ✅"}
           </h2>
 
-          {/* Application Status Display for submitted view */}
           <div
             className={`application-status ${getStatusText(
               applicationStatus || 1
@@ -561,11 +535,56 @@ function ApplicationSummary({ setCurrentStep }) {
             </p>
           </div>
 
-          <p className="application-summary-text">
+          <p className="application-summary-text compact-text">
             {getStatusContent(applicationStatus || 1).message}
           </p>
 
-          <div className="submission-details">
+          <div className="mobile-collapse-wrapper">
+            <button
+              type="button"
+              className="collapse-toggle"
+              onClick={() => setShowNextStepsMobile((prev) => !prev)}
+              aria-expanded={showNextStepsMobile}
+            >
+              {showNextStepsMobile ? "−" : "+"} Next Steps
+            </button>
+            <div
+              className={`collapse-content ${
+                showNextStepsMobile ? "open" : ""
+              }`}
+            >
+              <ul className="compact-ul">
+                {getStatusContent(applicationStatus || 1).instructions.map(
+                  (instruction, index) => (
+                    <li key={index}>{instruction}</li>
+                  )
+                )}
+              </ul>
+            </div>
+          </div>
+
+          <div className="desktop-only">
+            <div className="next-steps-section">
+              <h3>
+                {applicationStatus === 5
+                  ? "Enrollment Steps"
+                  : applicationStatus === 4
+                  ? "Resubmission Options"
+                  : applicationStatus === 3
+                  ? "What Happens Next"
+                  : "Next Steps"}
+              </h3>
+              <ul>
+                {getStatusContent(applicationStatus || 1).instructions.map(
+                  (instruction, index) => (
+                    <li key={index}>{instruction}</li>
+                  )
+                )}
+              </ul>
+            </div>
+          </div>
+
+          <div className="submission-details compact-details">
             <p>
               <strong>Applicant:</strong> {userName || getCurrentUser()}
             </p>
@@ -575,25 +594,6 @@ function ApplicationSummary({ setCurrentStep }) {
               </strong>{" "}
               {formatDate(submissionDate)}
             </p>
-          </div>
-
-          <div className="next-steps-section">
-            <h3>
-              {applicationStatus === 5
-                ? "Enrollment Steps"
-                : applicationStatus === 4
-                ? "Resubmission Options"
-                : applicationStatus === 3
-                ? "What Happens Next"
-                : "Next Steps"}
-            </h3>
-            <ul>
-              {getStatusContent(applicationStatus || 1).instructions.map(
-                (instruction, index) => (
-                  <li key={index}>{instruction}</li>
-                )
-              )}
-            </ul>
           </div>
 
           {getStatusContent(applicationStatus || 1).note && (
@@ -609,33 +609,38 @@ function ApplicationSummary({ setCurrentStep }) {
             </div>
           )}
 
-          <div className="submitted-action-buttons">
+          <div className="submitted-action-buttons non-mobile">
             <button
               onClick={() => setCurrentStep("dashboard-home")}
               className="btn btn-primary application-summary-button"
             >
               ⬅ Back to Dashboard
             </button>
-
-            {/* Resubmit button for rejected applications */}
             {applicationStatus === 4 && (
               <button
                 onClick={handleResubmitRejected}
-                className="btn btn-warning application-summary-button resubmit-button"
+                className="btn resubmit-button application-summary-button submit-button"
                 disabled={isResubmitting}
               >
-                {isResubmitting ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    Resubmitting...
-                  </>
-                ) : (
-                  "🔄 Resubmit Application"
-                )}
+                {isResubmitting ? "Resubmitting..." : "🔄 Resubmit Application"}
+              </button>
+            )}
+          </div>
+
+          <div className="mobile-button-stack">
+            <button
+              onClick={() => setCurrentStep("dashboard-home")}
+              className="btn btn-primary"
+            >
+              Dashboard
+            </button>
+            {applicationStatus === 4 && (
+              <button
+                onClick={handleResubmitRejected}
+                className="btn resubmit-button"
+                disabled={isResubmitting}
+              >
+                {isResubmitting ? "Resubmitting..." : "Resubmit 🔄"}
               </button>
             )}
           </div>
