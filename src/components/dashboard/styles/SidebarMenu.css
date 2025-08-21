@@ -28,10 +28,7 @@
 /* Sidebar overlay for mobile */
 .sidebar-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1900; /* Below hamburger but above everything else */
   backdrop-filter: blur(3px);
@@ -41,7 +38,9 @@
 .sidebar-menu {
   width: 280px;
   background: linear-gradient(135deg, #2135b0 0%, #1b2b9a 100%);
-  height: 100vh !important;
+  /* Use dynamic viewport height so it never exceeds the visible screen */
+  height: 100vh; /* fallback */
+  max-height: 100vh;
   overflow-y: auto;
   position: fixed;
   color: #fff;
@@ -51,6 +50,25 @@
   transition: transform 0.3s ease-in-out;
   z-index: 1950; /* Above overlay but below hamburger */
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+  /* Smooth scrolling on iOS + contain overscroll bounce inside drawer */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  /* Avoid content hidden behind iPhone home indicator */
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+@supports (height: 100svh) {
+  .sidebar-menu {
+    height: 100svh;
+    max-height: 100svh;
+  }
+}
+
+@supports (height: 100dvh) {
+  .sidebar-menu {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
 }
 
 /* Ensure navbar has proper z-index */
@@ -59,9 +77,45 @@
   position: relative;
 }
 
-/* Mobile menu dropdown */
+/* Mobile menu dropdown (if used elsewhere) */
 .mobile-menu-dropdown {
+  /* Make dropdown fill available screen below navbar and scroll */
+  position: fixed;
+  left: 0 !important;
+  right: 0;
+  top: var(--navbar-height, 56px); /* adjust if your navbar height differs */
+  bottom: 0;
+  max-height: none; /* allow full viewport usage */
+  overflow-y: auto;
   z-index: 1850 !important; /* Above navbar but below sidebar */
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background-color: #fff !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+/* Add this to ensure the time/user info section is visible */
+.mobile-menu-dropdown .bg-light {
+  background-color: #f8f9fa !important;
+  border: 1px solid #e9ecef;
+}
+
+/* Ensure text is visible in the dropdown */
+.mobile-menu-dropdown .text-dark {
+  color: #333 !important;
+}
+
+/* Ensure menu items are visible */
+.mobile-menu-item {
+  background-color: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+.mobile-menu-item:hover {
+  background-color: #f8f9fa !important;
 }
 
 /* Sidebar header */
@@ -137,41 +191,6 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Ensure mobile menu dropdown has proper z-index and visibility */
-.mobile-menu-dropdown {
-  left: 0 !important;
-  right: 0;
-  border-top: 1px solid #dee2e6;
-  animation: slideDown 0.3s ease-out;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  background-color: #fff !important;
-  position: absolute;
-}
-
-/* Add this to ensure the time/user info section is visible */
-.mobile-menu-dropdown .bg-light {
-  background-color: #f8f9fa !important; /* Force this to ensure visibility */
-  border: 1px solid #e9ecef;
-}
-
-/* Ensure text is visible in the dropdown */
-.mobile-menu-dropdown .text-dark {
-  color: #333 !important; /* Force color to ensure visibility */
-}
-
-/* Ensure menu items are visible */
-.mobile-menu-item {
-  background-color: transparent;
-  position: relative;
-  z-index: 1;
-}
-
-.mobile-menu-item:hover {
-  background-color: #f8f9fa !important;
-}
-
 /* Hide on small screens by default */
 @media (max-width: 767.98px) {
   .sidebar-menu {
@@ -186,6 +205,9 @@
   /* Prevent body scrolling when sidebar is open */
   body.sidebar-open {
     overflow: hidden;
+    /* Optional: lock position to avoid iOS rubber band scrolling behind */
+    position: relative;
+    width: 100%;
   }
 }
 
@@ -207,8 +229,11 @@
     transform: translateX(0) !important;
     position: relative;
     box-shadow: none;
+    /* Desktop: let it grow with container */
     height: 100% !important;
+    max-height: none;
     z-index: 1; /* Normal flow on desktop */
+    overscroll-behavior: auto;
   }
 
   /* Reset navbar z-index on desktop */
