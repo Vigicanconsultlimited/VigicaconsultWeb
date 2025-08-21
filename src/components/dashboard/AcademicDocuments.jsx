@@ -92,6 +92,12 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     applicationStatus === 2 ||
     applicationStatus === 4;
 
+  // Use same "View <Doc>" label pattern as SupportingDocuments
+  const getViewLabel = (type) => {
+    if (type === "Proof of English Proficiency") return "View English Proof";
+    return `View ${type}`;
+  };
+
   // Fetch foundational data
   useEffect(() => {
     const load = async () => {
@@ -143,7 +149,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
             }
           }
         } catch {
-          // fallback to localStorage flag
+          // ignore
         }
 
         if (!isPhDProgram) {
@@ -270,7 +276,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
           }
         }
       } catch {
-        // fallback to minimal
+        // fallback
         setUploadedFiles((prev) => ({
           ...prev,
           [type]: {
@@ -374,7 +380,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
     onContinue && onContinue();
   };
 
-  // Mobile summary chips for quick status
+  // Mobile summary chips
   const mobileSummary = documentTypes.map((t) => {
     const uploaded = !!uploadedFiles[t];
     const required = t === "Research Proposal" && isPhDProgram;
@@ -531,26 +537,32 @@ export default function AcademicDocuments({ onContinue, onBack }) {
                   )}
 
                   {meta && (
-                    <div className="file-card">
-                      <div className="file-info">
-                        <span className="file-name" title={meta.name}>
-                          {meta.name || type}
+                    /* Reuse SupportingDocuments view style classes */
+                    <div className="sup-file-card acad-file-card">
+                      <div className="sup-file-info">
+                        <span
+                          className="sup-file-name"
+                          title={getViewLabel(type)}
+                        >
+                          {getViewLabel(type)}
                         </span>
-                        <div className="file-actions">
+                        <div className="sup-file-actions">
                           <a
                             href={meta.viewUrl || meta.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-view-link"
+                            className="sup-view-link"
+                            aria-label={getViewLabel(type)}
                           >
-                            View
+                            Open
                           </a>
                           {!meta.locked && canEdit && (
                             <button
                               type="button"
-                              className="btn-remove-file"
+                              className="sup-remove-btn"
                               onClick={() => handleRemoveFile(type)}
-                              title="Remove file"
+                              title={`Remove ${type}`}
+                              aria-label={`Remove ${type}`}
                             >
                               ✖
                             </button>
@@ -573,7 +585,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         })}
       </div>
 
-      {/* Footer buttons (match PersonalInfo / AcademicInfo styles; NOT fixed) */}
+      {/* Footer buttons */}
       <div className="docs-footer form-footer non-fixed-footer">
         <button
           type="button"
