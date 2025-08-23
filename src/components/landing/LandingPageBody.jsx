@@ -11,6 +11,7 @@ import lolo from "../../assets/images/lolo.webp";
 import kelvin from "../../assets/images/Kelvin.png";
 import john from "../../assets/images/john.jpg";
 import RentalHouse from "../../assets/images/houserental.jpg";
+import Modal from "./Modal";
 import OrlandoSilver from "../../assets/images/OrlandoSilverRooms.webp";
 import OrlandoBronze from "../../assets/images/OrlandoVillageBronzePlus.webp";
 import OrlandoExternal from "../../assets/images/OrlandoVillageExternal.webp";
@@ -496,68 +497,6 @@ const FlightBookingForm = () => {
             </div>
           </div>
         </div>
-
-        {/* Options */}
-        {/*
-        <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-          <div className="flex flex-wrap items-center gap-6">
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="fare-type"
-                value="regular"
-                checked={fareType === "regular"}
-                onChange={() => setFareType("regular")}
-                className="form-radio h-5 w-5 text-blue-600"
-              />
-              <span className="ml-2 text-gray-700">Regular Fare</span>
-            </label>
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="fare-type"
-                value="student"
-                checked={fareType === "student"}
-                onChange={() => setFareType("student")}
-                className="form-radio h-5 w-5 text-blue-600"
-              />
-              <span className="ml-2 text-gray-700">Student Fare</span>
-            </label>
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={directOnly}
-                onChange={() => setDirectOnly(!directOnly)}
-                className="form-checkbox h-5 w-5 text-blue-600"
-              />
-              <span className="ml-2 text-gray-700">Direct flights only</span>
-            </label>
-          </div>
-
-          <div className="flex items-center">
-            <button
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                />
-              </svg>
-              Advanced Options
-            </button>
-          </div>
-        </div>
-        */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
@@ -660,6 +599,7 @@ const FlightBookingForm = () => {
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
+  const [showAccomForm, setShowAccomForm] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -1280,20 +1220,20 @@ export default function Home() {
                     title: "Student Hostels",
                     image: OrlandoExternal,
                     desc: "Affordable accommodation options specially designed for students near universities.",
-                    price: "From $300/month",
+                    //price: "From £300/month",
                   },
                   {
                     title: "Serviced Apartments",
                     image:
                       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=250&fit=crop",
                     desc: "Fully furnished apartments with amenities for short or long-term stays.",
-                    price: "From $80/night",
+                    //price: "From $80/night",
                   },
                   {
                     title: "Student Apartments",
                     image: OrlandoSilver,
                     desc: "Luxury accommodations with premium services for business travelers.",
-                    price: "From $250/month",
+                    //price: "From £250/month",
                   },
                 ].map((item, index) => (
                   <motion.div
@@ -1339,109 +1279,30 @@ export default function Home() {
               >
                 <div className="grid md:grid-cols-2">
                   <div className="p-8 md:p-12">
-                    <h3 className="text-2xl font-bold mb-4">
-                      Accommodation Booking Assistance
-                    </h3>
-                    <p className="text-gray-600 mb-6">
-                      Our team work with local estate agents and landlords to
-                      ensure we meet all your accommodation needs. All you need
-                      to do is to complete the accommodation form.
-                    </p>
+                    <div className="p-8 md:p-12">
+                      <h3 className="text-2xl font-bold mb-4">
+                        Accommodation Booking Assistance
+                      </h3>
+                      <p className="text-gray-600 mb-6">
+                        Our team work with local estate agents and landlords to
+                        ensure we meet all your accommodation needs. All you
+                        need to do is to complete the accommodation form.
+                      </p>
 
-                    <form className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Full Name
-                        </label>
-                        <Input type="text" className="w-full mb-2" />
-
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Gender
-                        </label>
-                        <select className="w-full mb-2 rounded-md border-gray-300 focus:border-purple-500 focus:ring-purple-500">
-                          <option>Select Gender</option>
-                          <option>Male</option>
-                          <option>Female</option>
-                          <option>Other</option>
-                        </select>
-
-                        <label className="block text-sm font-medium text-gray-700 mt-2">
-                          Contact Telephone
-                        </label>
-                        <Input type="tel" className="w-full mb-2" />
-
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Email
-                        </label>
-                        <Input type="email" className="w-full mb-2" />
-
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Destination
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="City, Country"
-                          className="w-full mb-2"
-                        />
-                      </div>
-                      {/*
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Check-in Date
-                          </label>
-                          <Input type="date" className="w-full" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Check-out Date
-                          </label>
-                          <Input type="date" className="w-full" />
-                        </div>
-                      </div>
-                      */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Accommodation Type
-                        </label>
-                        <select className="w-full mb-2 rounded-md border-gray-300 focus:border-purple-500 focus:ring-purple-500">
-                          <option>Select Accommodation Type</option>
-                          <option>Student Hostel (10 months) tenor</option>
-                          <option>
-                            1-Bedroom apartment (6 months) assured tenancy (AST)
-                          </option>
-                          <option>
-                            2-Bedroom apartments (6 months) assured tenancy
-                            (AST)
-                          </option>
-                          <option>
-                            3-Bedroom apartments (6 months) assured tenancy
-                            (AST)
-                          </option>
-                          <option>Service accommodation (short stay)</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Budget (per night/month)
-                        </label>
-                        <Input
-                          type="text"
-                          placeholder="Budget range"
-                          className="w-full"
-                        />
-                      </div>
-                      <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5">
-                        Request Options
+                      <Button
+                        onClick={() => setShowAccomForm(true)}
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5"
+                      >
+                        Book Accommodation Now
                       </Button>
-                    </form>
+                    </div>
                   </div>
 
-                  <div className="relative hidden md:block">
+                  <div className="relative desktop-only-block md:min-h-[360px] lg:min-h-[420px]">
                     <img
                       src={RentalHouse}
                       alt="Accommodation"
-                      className="h-full w-full object-cover"
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-indigo-600/40 flex items-center justify-center">
                       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 max-w-sm mx-8 text-center">
@@ -1459,6 +1320,115 @@ export default function Home() {
               </motion.div>
             </div>
           </section>
+
+          {/* Accommodation Form Modal */}
+          <Modal
+            open={showAccomForm}
+            onClose={() => setShowAccomForm(false)}
+            title="Accommodation Booking Assistance"
+            size="md"
+          >
+            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <Input type="text" className="w-full mb-2" />
+
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Gender
+                </label>
+                <select className="w-full mb-2 rounded-md border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                  <option>Select Gender</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </select>
+
+                <label className="block text-sm font-medium text-gray-700 mt-2">
+                  Contact Telephone
+                </label>
+                <Input type="tel" className="w-full mb-2" />
+
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <Input type="email" className="w-full mb-2" />
+
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Destination
+                </label>
+                <Input
+                  type="text"
+                  placeholder="City, Country"
+                  className="w-full mb-2"
+                />
+              </div>
+
+              {/* Optional date range (kept commented as in your original) */}
+              {/*
+    <div className="grid grid-cols-2 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Check-in Date
+        </label>
+        <Input type="date" className="w-full" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Check-out Date
+        </label>
+        <Input type="date" className="w-full" />
+      </div>
+    </div>
+    */}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Accommodation Type
+                </label>
+                <select className="w-full mb-2 rounded-md border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                  <option>Select Accommodation Type</option>
+                  <option>Student Hostel (10 months) tenor</option>
+                  <option>
+                    1-Bedroom apartment (6 months) assured tenancy (AST)
+                  </option>
+                  <option>
+                    2-Bedroom apartments (6 months) assured tenancy (AST)
+                  </option>
+                  <option>
+                    3-Bedroom apartments (6 months) assured tenancy (AST)
+                  </option>
+                  <option>Service accommodation (short stay)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Budget (per night/month)
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Budget range"
+                  className="w-full"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <Button className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5">
+                  Request Options
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowAccomForm(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Modal>
 
           {/* Testimonials Section */}
           <section className="py-20 bg-gradient-to-br from-blue-600 to-indigo-700 overflow-hidden">

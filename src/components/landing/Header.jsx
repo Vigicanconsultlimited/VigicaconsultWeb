@@ -17,7 +17,8 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuthStore } from "../../store/auth"; // Import the auth store
+import { useAuthStore } from "../../store/auth";
+import "./styles/Header.css";
 
 const navItems = [
   { id: "home", label: "Home" },
@@ -26,7 +27,6 @@ const navItems = [
   { id: "study", label: "Study Abroad" },
   { id: "flights", label: "Flights" },
   { id: "accommodation", label: "Accommodation" },
-  //{ id: "visa", label: "Visa" },
   { id: "contact", label: "Contact" },
 ];
 
@@ -36,72 +36,51 @@ function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [displayName, setDisplayName] = useState("");
 
-  // Use the same auth store as in DashboardNavbar
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const user = useAuthStore((state) => state.allUserData);
 
-  // Get user ID and email from auth store
   const email =
     user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
   const userId = user?.uid;
 
-  // Fetch user's name when component mounts if user is logged in
   useEffect(() => {
     const fetchName = async () => {
       if (!userId) return;
-
       try {
         const apiInstance = (await import("../../utils/axios")).default;
         const personalRes = await apiInstance.get(
           `StudentPersonalInfo/user/${userId}`
         );
         const personalInfoId = personalRes?.data?.result?.id;
-
         if (personalInfoId) {
           const submittedAppRes = await apiInstance.get(
             `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
           );
           const personalData =
             submittedAppRes?.data?.result?.personalInformation;
-
-          if (personalData?.firstName) {
+          if (personalData?.firstName)
             setDisplayName(`${personalData.firstName}`);
-          }
         }
       } catch (error) {
         console.warn("Failed to fetch display name:", error);
       }
     };
-
     if (userId) fetchName();
   }, [userId]);
 
-  // Handle scrolling effect for the fixed header
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 100) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 100);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Update current section based on scroll position
   useEffect(() => {
     const handleScrollSpy = () => {
       const sections = navItems
         .map((item) => document.getElementById(item.id))
         .filter(Boolean);
-
       if (sections.length > 0) {
-        const scrollPosition = window.scrollY + 100; // Add offset for header height
-
+        const scrollPosition = window.scrollY + 100;
         for (let i = sections.length - 1; i >= 0; i--) {
           const section = sections[i];
           if (section.offsetTop <= scrollPosition) {
@@ -111,33 +90,21 @@ function Header() {
         }
       }
     };
-
     window.addEventListener("scroll", handleScrollSpy);
-    return () => {
-      window.removeEventListener("scroll", handleScrollSpy);
-    };
+    return () => window.removeEventListener("scroll", handleScrollSpy);
   }, []);
 
   const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      // Calculate offset to account for fixed header height
-      const headerHeight = document.querySelector("header").offsetHeight;
-      const elementPosition =
-        element.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementPosition - headerHeight;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-
-      setCurrentSection(sectionId);
-      setIsMenuOpen(false);
-    }
+    const el = document.getElementById(sectionId);
+    if (!el) return;
+    const header = document.querySelector("header");
+    const headerHeight = header ? header.offsetHeight : 0;
+    const y = el.getBoundingClientRect().top + window.scrollY - headerHeight;
+    window.scrollTo({ top: y, behavior: "smooth" });
+    setCurrentSection(sectionId);
+    setIsMenuOpen(false);
   };
 
-  // Render Auth Button based on authentication status
   const renderAuthButton = () => {
     if (isLoggedIn && isLoggedIn()) {
       return (
@@ -148,18 +115,16 @@ function Header() {
           </Button>
         </Link>
       );
-    } else {
-      return (
-        <Link to="/register" className="text-decoration-none">
-          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            Get Started
-          </Button>
-        </Link>
-      );
     }
+    return (
+      <Link to="/register" className="text-decoration-none">
+        <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          Get Started
+        </Button>
+      </Link>
+    );
   };
 
-  // Render Mobile Auth Button based on authentication status
   const renderMobileAuthButton = () => {
     if (isLoggedIn && isLoggedIn()) {
       return (
@@ -169,45 +134,115 @@ function Header() {
           </Button>
         </Link>
       );
-    } else {
-      return (
-        <Link to="/register" className="block w-full">
-          <Button className="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
-            Get Started
-          </Button>
-        </Link>
-      );
     }
+    return (
+      <Link to="/register" className="block w-full">
+        <Button className="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
+          Get Started
+        </Button>
+      </Link>
+    );
   };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full">
       {/* Contact Bar */}
       <div
-        className={`bg-blue-600 text-white py-2 transition-all duration-300 ${
-          scrolled ? "opacity-0 h-0 py-0 overflow-hidden" : "opacity-100"
+        className={`bg-blue-600 text-white transition-all duration-300 ${
+          scrolled
+            ? "opacity-0 h-0 py-0 overflow-hidden"
+            : "opacity-100 py-1 md:py-2"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-2">
-            {/* Address */}
-            <div className="flex items-center justify-center md:justify-start mb-2 md:mb-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          {/* Mobile: two lines, compact, no scrolling */}
+          <div className="md:hidden py-1">
+            {/* Line 1: Phone • Email */}
+            <div className="mobile-contact-row">
+              <a href="tel:+2349014456659" className="mc-link">
+                <FaPhone className="mc-icon" />
+                <span className="mc-text">+234 901 445 6659</span>
+              </a>
+              <span className="mc-dot" aria-hidden="true">
+                |
+              </span>
+              <a href="mailto:info@vigicaconsult.com" className="mc-link">
+                <FaEnvelope className="mc-icon" />
+                <span className="mc-text">info@vigicaconsult.com</span>
+              </a>
+            </div>
+            {/* Line 2: Social icons */}
+            <div className="mobile-contact-row">
+              <div className="mc-socials">
+                <a
+                  href="http://t.me/vigica_1"
+                  className="mc-social"
+                  aria-label="Telegram"
+                  title="Telegram"
+                >
+                  <FaTelegramPlane />
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true"
+                  className="mc-social"
+                  aria-label="LinkedIn"
+                  title="LinkedIn"
+                >
+                  <FaLinkedin />
+                </a>
+                <a
+                  href="https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09"
+                  className="mc-social"
+                  aria-label="Twitter/X"
+                  title="Twitter/X"
+                >
+                  <FaTwitter />
+                </a>
+                <a
+                  href="https://www.instagram.com/vigicaconsult/"
+                  className="mc-social"
+                  aria-label="Instagram"
+                  title="Instagram"
+                >
+                  <FaInstagram />
+                </a>
+                <a
+                  href="https://www.facebook.com/profile.php?id=61579196807381"
+                  className="mc-social"
+                  aria-label="Facebook"
+                  title="Facebook"
+                >
+                  <FaFacebook />
+                </a>
+                <a
+                  href="http://tiktok.com/@vigicaconsult"
+                  className="mc-social"
+                  aria-label="TikTok"
+                  title="TikTok"
+                >
+                  <FaTiktok />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop: full contact bar */}
+          <div className="desktop-only justify-between items-center py-2">
+            <div className="flex items-center">
               <FaMapMarkerAlt className="mr-2" />
               <span className="text-sm">
                 Plot 114/115, Okay Water, Lugbe, Abuja
               </span>
             </div>
 
-            {/* Contact Info */}
-            <div className="flex flex-wrap justify-center gap-4 mb-2 md:mb-0">
+            <div className="flex items-center gap-4">
               <a
-                href="tel:+2348186482048"
+                href="tel:+2349014456659"
                 className="text-white no-underline flex items-center text-sm"
               >
                 <FaPhone className="mr-2" />
                 <span>+234 901 445 6659</span>
               </a>
-
               <a
                 href="mailto:info@vigicaconsult.com"
                 className="text-white no-underline flex items-center text-sm"
@@ -217,14 +252,12 @@ function Header() {
               </a>
             </div>
 
-            {/* Hours & Social */}
-            <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="flex items-center gap-4">
               <div className="flex items-center text-sm">
                 <FaClock className="mr-2" />
                 <span>Mon. - Sat: 9:00am-6:00pm</span>
               </div>
-
-              <div className="flex gap-3">
+              <div className="flex gap-3 text-base">
                 <a
                   href="http://t.me/vigica_1"
                   className="text-white hover:text-blue-200 transition-colors"
@@ -249,7 +282,6 @@ function Header() {
                 >
                   <FaInstagram />
                 </a>
-
                 <a
                   href="https://www.facebook.com/profile.php?id=61579196807381"
                   className="text-white hover:text-blue-200 transition-colors"
@@ -291,19 +323,18 @@ function Header() {
               </motion.div>
             </div>
 
-            {/* Desktop Navigation - Properly spaced with underline hover effect */}
-            <div className="hidden md:flex flex-1 items-center justify-center">
+            {/* Desktop Navigation */}
+            <div className="desktop-only flex-1 items-center justify-center">
               <div className="flex items-center">
                 {navItems.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
-                    className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300
-                      hover:text-blue-600 group ${
-                        currentSection === item.id
-                          ? "text-blue-600 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600"
-                          : "text-gray-600"
-                      }`}
+                    className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 group ${
+                      currentSection === item.id
+                        ? "text-blue-600 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600"
+                        : "text-gray-600"
+                    }`}
                   >
                     {item.label}
                     <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
@@ -312,12 +343,12 @@ function Header() {
               </div>
             </div>
 
-            {/* Auth Button - Changes based on authentication status */}
-            <div className="hidden md:flex items-center justify-end w-48">
+            {/* Auth Button */}
+            <div className="desktop-only items-center justify-end w-48">
               {renderAuthButton()}
             </div>
 
-            {/* Mobile menu button - always visible on small screens */}
+            {/* Mobile menu button */}
             <div className="md:hidden flex items-center justify-end flex-1">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -356,7 +387,6 @@ function Header() {
                     {item.label}
                   </button>
                 ))}
-                {/* Mobile Auth Button - Changes based on authentication status */}
                 {renderMobileAuthButton()}
               </div>
             </motion.div>
