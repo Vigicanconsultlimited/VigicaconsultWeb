@@ -1,0 +1,95 @@
+/* Force desktop sections to show on md+ even if a global .hidden is present */
+.desktop-only {
+  display: none;
+}
+@media (min-width: 768px) {
+  .desktop-only {
+    display: flex !important;
+  }
+}
+
+/* Compact, two-line mobile contact bar (no scrolling) */
+.mobile-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+  overflow: hidden;
+}
+
+.mc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  line-height: 1;
+  min-width: 0;
+}
+
+.mc-dot {
+  opacity: 0.9;
+  margin: 0 2px;
+}
+
+.mc-icon {
+  font-size: 12px;
+  opacity: 0.95;
+  flex-shrink: 0;
+}
+
+.mc-text {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 42vw;
+}
+
+.mc-socials {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+
+.mc-social {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.mc-social:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Center socials when they're the only item on the row (no address) */
+@media (max-width: 767.98px) {
+  .mobile-contact-row > .mc-socials:only-child {
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+  }
+}
+
+/* Tiny phones adjustments */
+@media (max-width: 360px) {
+  .mc-text {
+    max-width: 38vw;
+    font-size: 11.5px;
+  }
+  .mc-link {
+    font-size: 11.5px;
+  }
+  .mc-icon {
+    font-size: 11.5px;
+  }
+}

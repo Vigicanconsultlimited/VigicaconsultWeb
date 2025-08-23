@@ -496,68 +496,6 @@ const FlightBookingForm = () => {
             </div>
           </div>
         </div>
-
-        {/* Options */}
-        {/*
-        <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-          <div className="flex flex-wrap items-center gap-6">
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="fare-type"
-                value="regular"
-                checked={fareType === "regular"}
-                onChange={() => setFareType("regular")}
-                className="form-radio h-5 w-5 text-blue-600"
-              />
-              <span className="ml-2 text-gray-700">Regular Fare</span>
-            </label>
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="fare-type"
-                value="student"
-                checked={fareType === "student"}
-                onChange={() => setFareType("student")}
-                className="form-radio h-5 w-5 text-blue-600"
-              />
-              <span className="ml-2 text-gray-700">Student Fare</span>
-            </label>
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={directOnly}
-                onChange={() => setDirectOnly(!directOnly)}
-                className="form-checkbox h-5 w-5 text-blue-600"
-              />
-              <span className="ml-2 text-gray-700">Direct flights only</span>
-            </label>
-          </div>
-
-          <div className="flex items-center">
-            <button
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                />
-              </svg>
-              Advanced Options
-            </button>
-          </div>
-        </div>
-        */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
           className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
@@ -1280,20 +1218,20 @@ export default function Home() {
                     title: "Student Hostels",
                     image: OrlandoExternal,
                     desc: "Affordable accommodation options specially designed for students near universities.",
-                    price: "From $300/month",
+                    //price: "From £300/month",
                   },
                   {
                     title: "Serviced Apartments",
                     image:
                       "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=250&fit=crop",
                     desc: "Fully furnished apartments with amenities for short or long-term stays.",
-                    price: "From $80/night",
+                    //price: "From $80/night",
                   },
                   {
                     title: "Student Apartments",
                     image: OrlandoSilver,
                     desc: "Luxury accommodations with premium services for business travelers.",
-                    price: "From $250/month",
+                    //price: "From £250/month",
                   },
                 ].map((item, index) => (
                   <motion.div
