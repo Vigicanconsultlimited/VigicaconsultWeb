@@ -94,15 +94,32 @@ function Header() {
     return () => window.removeEventListener("scroll", handleScrollSpy);
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    const el = document.getElementById(sectionId);
-    if (!el) return;
-    const header = document.querySelector("header");
-    const headerHeight = header ? header.offsetHeight : 0;
-    const y = el.getBoundingClientRect().top + window.scrollY - headerHeight;
-    window.scrollTo({ top: y, behavior: "smooth" });
-    setCurrentSection(sectionId);
-    setIsMenuOpen(false);
+  //scrollToSection
+  const scrollToSection = async (sectionId) => {
+    const doScroll = () => {
+      const el = document.getElementById(sectionId);
+      if (!el) return;
+
+      // Compute the current header height after menu has closed
+      const headerEl = document.querySelector("header");
+      const headerHeight = headerEl ? headerEl.offsetHeight : 0;
+
+      // Use scroll-margin-top so smooth scroll positions correctly under a fixed header
+      el.style.scrollMarginTop = `${headerHeight + 8}px`; // +8px breathing room
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      setCurrentSection(sectionId);
+    };
+
+    // If on mobile and menu is open, close it first and wait for the collapse animation
+    const isMobile = window.innerWidth < 768;
+    if (isMobile && isMenuOpen) {
+      setIsMenuOpen(false);
+      // Wait for your duration-300 collapse animation to finish before measuring header height
+      setTimeout(doScroll, 320);
+    } else {
+      doScroll();
+    }
   };
 
   const renderAuthButton = () => {
