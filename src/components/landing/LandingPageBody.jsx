@@ -1277,39 +1277,56 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                <div className="grid md:grid-cols-2">
-                  <div className="p-8 md:p-12">
-                    <div className="p-8 md:p-12">
-                      <h3 className="text-2xl font-bold mb-4">
-                        Accommodation Booking Assistance
-                      </h3>
-                      <p className="text-gray-600 mb-6">
-                        Our team work with local estate agents and landlords to
-                        ensure we meet all your accommodation needs. All you
-                        need to do is to complete the accommodation form.
-                      </p>
-
-                      <Button
-                        onClick={() => setShowAccomForm(true)}
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5"
-                      >
-                        Book Accommodation Now
-                      </Button>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2">
+                  {/* Text column (no nested padding; responsive spacing) */}
+                  <div className="p-6 sm:p-8 md:p-12">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
+                      Accommodation Booking Assistance
+                    </h3>
+                    <p className="text-gray-600 mb-5 sm:mb-6 text-sm sm:text-base">
+                      Our team work with local estate agents and landlords to
+                      ensure we meet all your accommodation needs. All you need
+                      to do is to complete the accommodation form.
+                    </p>
+                    <Button
+                      onClick={() => setShowAccomForm(true)}
+                      className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white py-2.5"
+                    >
+                      Book Accommodation Now
+                    </Button>
                   </div>
 
-                  <div className="relative desktop-only-block md:min-h-[360px] lg:min-h-[420px]">
-                    <img
-                      src={RentalHouse}
-                      alt="Accommodation"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-indigo-600/40 flex items-center justify-center">
-                      <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 max-w-sm mx-8 text-center">
-                        <h4 className="text-xl font-bold text-gray-900 mb-2">
+                  {/* Image column (now visible on mobile, fixed mobile height, overlay adjusts) */}
+                  <div className="flex flex-col">
+                    <div className="relative h-48 sm:h-64 md:min-h-[360px] lg:min-h-[420px]">
+                      <img
+                        src={RentalHouse}
+                        alt="Accommodation"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-indigo-600/40" />
+
+                      {/* Overlay card: show on sm+ to avoid cramped mobile overlay */}
+                      <div className="absolute inset-0 hidden sm:flex items-center justify-center">
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-5 sm:p-6 max-w-sm mx-6 text-center">
+                          <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+                            Need Special Arrangements?
+                          </h4>
+                          <p className="text-gray-700 text-sm sm:text-base">
+                            We can arrange family accommodations, accessible
+                            rooms, or group bookings with special requirements.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mobile-only caption card (replaces overlay card on small screens) */}
+                    <div className="sm:hidden px-4 py-3">
+                      <div className="bg-white border border-gray-200 rounded-xl p-4 text-center shadow-sm">
+                        <h4 className="text-base font-semibold text-gray-900 mb-1.5">
                           Need Special Arrangements?
                         </h4>
-                        <p className="text-gray-700">
+                        <p className="text-gray-700 text-sm">
                           We can arrange family accommodations, accessible
                           rooms, or group bookings with special requirements.
                         </p>
@@ -1450,15 +1467,6 @@ export default function Home() {
                     />
                   ))}
                   <span className="text-white ml-2 text-lg">4.9/5 Rating</span>
-                </div>
-
-                {/* User and Date Info - Exactly as specified */}
-                <div className="text-blue-100 text-sm mb-8">
-                  <span>Current User's Login: NeduStack | </span>
-                  <span>
-                    Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted):
-                    2025-08-19 18:57:58
-                  </span>
                 </div>
               </motion.div>
 
