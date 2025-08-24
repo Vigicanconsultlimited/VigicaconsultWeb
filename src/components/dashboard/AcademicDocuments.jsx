@@ -65,6 +65,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
   const [studentPersonalInfoId, setStudentPersonalInfoId] = useState("");
   const [applicationStatus, setApplicationStatus] = useState(null);
   const [isPhDProgram, setIsPhDProgram] = useState(false);
+  const phdRequiredTypes = ["Research Proposal", "Official Transcript"];
 
   const [documentTypes, setDocumentTypes] = useState([...baseDocumentTypes]);
   const [expanded, setExpanded] = useState("Degree Certificate");
@@ -369,21 +370,25 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isPhDProgram && !uploadedFiles["Research Proposal"]) {
-      Swal.fire({
-        icon: "warning",
-        title: "Research Proposal Required",
-        text: "Upload the Research Proposal before continuing.",
-      });
-      return;
+    if (isPhDProgram) {
+      const missing = phdRequiredTypes.filter((t) => !uploadedFiles[t]);
+      if (missing.length > 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Required Documents Missing",
+          text: `Please upload: ${missing.join(", ")}`,
+        });
+        return;
+      }
     }
+
     onContinue && onContinue();
   };
 
   // Mobile summary chips
   const mobileSummary = documentTypes.map((t) => {
     const uploaded = !!uploadedFiles[t];
-    const required = t === "Research Proposal" && isPhDProgram;
+    const required = isPhDProgram && phdRequiredTypes.includes(t);
     return { t, uploaded, required };
   });
 
@@ -422,7 +427,8 @@ export default function AcademicDocuments({ onContinue, onBack }) {
       <div className="academic-docs-desc">
         {isPhDProgram && (
           <div className="alert alert-info compact-alert mb-2">
-            <strong>PhD Program:</strong> Research Proposal is required.
+            <strong>PhD Program:</strong> Research Proposal and Official
+            Transcript are required.
           </div>
         )}
         {!canEdit && (
@@ -458,7 +464,8 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         {documentTypes.map((type) => {
           const isOpen = expanded === type;
           const meta = uploadedFiles[type];
-          const isRequired = type === "Research Proposal" && isPhDProgram;
+          const isRequired = isPhDProgram && phdRequiredTypes.includes(type);
+
           return (
             <div
               className={`accordion-item-doc ${isOpen ? "open" : ""} ${
@@ -572,7 +579,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
                     </div>
                   )}
 
-                  {isRequired && (
+                  {type === "Research Proposal" && isRequired && (
                     <div className="research-hint">
                       Provide a concise proposal: objectives, methodology,
                       significance, expected outcomes (PDF/DOCX).
