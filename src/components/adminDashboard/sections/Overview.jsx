@@ -56,14 +56,9 @@ const analytics = [
 ];
 
 export default function Overview() {
-  // Current date/time and user as specified
-  const getCurrentDateTime = () => {
-    return "2025-08-08 22:15:43";
-  };
-
-  const getCurrentUser = () => {
-    return "NeduStack";
-  };
+  // Current date/time and user (stubbed)
+  const getCurrentDateTime = () => "2025-08-08 22:15:43";
+  const getCurrentUser = () => "NeduStack";
 
   // States for API-driven stats
   const [statCards, setStatCards] = useState([
@@ -103,14 +98,12 @@ export default function Overview() {
 
   // Calculate percentage changes (mock calculation since we don't have historical data)
   const calculateChangePercent = (current, type) => {
-    // Mock calculation - you can replace this with actual historical data comparison
     const mockPrevious = {
       total: Math.max(0, current - Math.floor(Math.random() * 5)),
       approved: Math.max(0, current - Math.floor(Math.random() * 3)),
       rejected: Math.max(0, current - Math.floor(Math.random() * 2)),
       pending: Math.max(0, current - Math.floor(Math.random() * 4)),
     };
-
     const previous = mockPrevious[type] || 1;
     if (previous === 0) return current > 0 ? 100 : 0;
     return Math.round(((current - previous) / previous) * 100);
@@ -119,13 +112,8 @@ export default function Overview() {
   // Update acquisitions data based on API response
   const updateAcquisitionsData = (apiData) => {
     const total = apiData.totalNumOfApplications || 1; // Avoid division by zero
-
     return [
-      {
-        label: "Applications",
-        color: "blue",
-        value: 100, // Always 100% as it represents the total
-      },
+      { label: "Applications", color: "blue", value: 100 },
       {
         label: "Pending",
         color: "gray",
@@ -136,11 +124,7 @@ export default function Overview() {
         color: "red",
         value: Math.round((apiData.rejectedApplications / total) * 100),
       },
-      {
-        label: "On Hold",
-        color: "brown",
-        value: 0, // Not provided by API, keeping as 0
-      },
+      { label: "On Hold", color: "brown", value: 0 },
       {
         label: "Approved",
         color: "green",
@@ -154,14 +138,9 @@ export default function Overview() {
     async function fetchApplicationStats() {
       try {
         setLoading(true);
-        //console.log(
-        //`Overview: Fetching application statistics at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        //);
-
         const response = await apiInstance.get(
           "StudentApplication/allapplications"
         );
-
         if (response?.data?.statusCode === 200 && response?.data?.result) {
           const {
             totalNumOfApplications = 0,
@@ -172,7 +151,6 @@ export default function Overview() {
             numberOfFemale = 0,
           } = response.data.result;
 
-          // Calculate change percentages
           const totalChange = calculateChangePercent(
             totalNumOfApplications,
             "total"
@@ -190,7 +168,6 @@ export default function Overview() {
             "pending"
           );
 
-          // Update stat cards with API data
           setStatCards([
             {
               title: "Total Applications",
@@ -230,12 +207,7 @@ export default function Overview() {
             },
           ]);
 
-          // Update gender data
-          setGenderData({
-            male: numberOfMale,
-            female: numberOfFemale,
-          });
-
+          setGenderData({ male: numberOfMale, female: numberOfFemale });
           setError(null);
         } else {
           throw new Error("Invalid response format from API");
@@ -247,16 +219,10 @@ export default function Overview() {
           } at ${getCurrentDateTime()} by ${getCurrentUser()}`
         );
         setError("Failed to load application statistics");
-
-        // Keep default values on error
-        //console.log(
-        //  `Overview: Using default values due to API error at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        //);
       } finally {
         setLoading(false);
       }
     }
-
     fetchApplicationStats();
   }, []);
 
@@ -296,7 +262,7 @@ export default function Overview() {
 
       {/* Stat Cards */}
       <div className="stat-cards-row">
-        {statCards.map((stat, i) => (
+        {statCards.map((stat) => (
           <div key={stat.title} className={`stat-card ${stat.color}`}>
             <div className="stat-card-header">
               <span>{stat.title}</span>
@@ -368,10 +334,8 @@ export default function Overview() {
                     <div className="breakdown-chart-bar-stack">
                       <div
                         className="breakdown-bar-app"
-                        style={{
-                          height: `${(d.application / max) * 100}%`,
-                        }}
-                      ></div>
+                        style={{ height: `${(d.application / max) * 100}%` }}
+                      />
                     </div>
                     <span className="breakdown-bar-label">{d.day}</span>
                   </div>
@@ -404,61 +368,82 @@ export default function Overview() {
                   <div
                     className={`acq-bar-fill ${a.color}`}
                     style={{ width: `${a.value}%` }}
-                  ></div>
+                  />
                 </div>
                 <span className={`acq-value ${a.color}`}>{a.value}%</span>
               </div>
             ))}
           </div>
         </div>
+
         {/* Audience Satisfaction */}
+        {/* Audience Satisfaction (REPLACE THIS WHOLE CARD) */}
         <div className="insights-card satisfaction">
           <div className="insights-card-header">
             <span>Audience Satisfaction</span>
             <MoreHorizontal size={18} />
           </div>
-          <div className="audience-satisfaction-content">
-            <div className="audience-arc">
-              <svg width={120} height={60}>
+
+          <div className="audience-layout">
+            {/* Left: Gauge */}
+            <div className="aud-gauge">
+              <svg viewBox="0 0 120 60" className="aud-gauge-svg">
+                {/* background arc */}
+                <path
+                  d="M10,55 A50,50 0 0,1 110,55"
+                  fill="none"
+                  stroke="#e5e7eb"
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                />
+                {/* foreground arc */}
                 <path
                   d="M10,55 A50,50 0 0,1 110,55"
                   fill="none"
                   stroke="#1976d2"
                   strokeWidth="10"
-                />
-                <path
-                  d="M10,55 A50,50 0 0,1 110,55"
-                  fill="none"
-                  stroke="#eee"
-                  strokeWidth="10"
+                  strokeLinecap="round"
                   strokeDasharray="120"
                   strokeDashoffset={120 - satisfaction.percentage}
                 />
+                {/* number */}
                 <text
                   x="60"
-                  y="45"
+                  y="42"
                   textAnchor="middle"
-                  fontSize="2rem"
-                  fontWeight="bold"
+                  fontSize="24"
+                  fontWeight="800"
                   fill="#1976d2"
                 >
                   {satisfaction.percentage}%
                 </text>
               </svg>
-              <span className="audience-arc-caption">
-                0%&nbsp;Based on Star Rating&nbsp;100%
+
+              <span className="aud-gauge-caption">
+                0% Based on Star Rating 100%
               </span>
             </div>
-            <div className="audience-stars">
+
+            {/* Right: Rows */}
+            <div className="aud-rows">
               {satisfaction.stars.map((s) => (
-                <div key={s.star} className="audience-stars-row">
-                  <span className="audience-star-label">{s.star} Stars</span>
-                  <span>
-                    {[...Array(s.star)].map((_, i) => (
-                      <Star key={i} size={18} className="star-yellow" />
+                <div key={s.star} className="aud-row">
+                  <span className="aud-label">{s.star} Stars</span>
+
+                  {/* Always render 5 stars horizontally, color first N */}
+                  <span className="aud-stars" aria-label={`${s.star} star row`}>
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <Star
+                        key={n}
+                        size={18}
+                        className={`aud-star ${n <= s.star ? "is-filled" : ""}`}
+                      />
                     ))}
                   </span>
-                  <span className="audience-votes">{s.votes} votes</span>
+
+                  <span className="aud-votes">
+                    {s.votes.toLocaleString()} votes
+                  </span>
                 </div>
               ))}
             </div>
@@ -532,7 +517,7 @@ export default function Overview() {
                       : 2
                   }px`,
                 }}
-              ></div>
+              />
               <div className="gender-label">Male</div>
               <div className="gender-value">{genderData.male}</div>
             </div>
@@ -551,7 +536,7 @@ export default function Overview() {
                       : 2
                   }px`,
                 }}
-              ></div>
+              />
               <div className="gender-label">Female</div>
               <div className="gender-value">{genderData.female}</div>
             </div>
