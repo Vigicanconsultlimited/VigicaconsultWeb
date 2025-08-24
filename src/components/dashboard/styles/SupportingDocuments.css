@@ -149,6 +149,11 @@
   align-items: center;
   gap: 8px;
 }
+.doc-chip-req {
+  color: #dc2626;
+  font-weight: 700;
+  margin-left: 2px;
+}
 
 .badge-uploaded,
 .badge-missing {

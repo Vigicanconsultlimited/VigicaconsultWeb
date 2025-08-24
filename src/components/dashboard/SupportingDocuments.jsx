@@ -58,6 +58,12 @@ const DOCUMENTS = {
   },
 };
 
+const PHD_REQUIRED = [
+  "Personal Statement (PS) or SOP",
+  "CV/Resume",
+  "Academic References",
+];
+
 // Helper: map label to display "View <Something>"
 const getViewLabel = (label) => {
   switch (label) {
@@ -87,6 +93,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
   const [progress, setProgress] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isPhDProgram, setIsPhDProgram] = useState(false);
 
   const getStatusText = (status) => {
     const map = {
@@ -129,6 +136,23 @@ export default function SupportingDocuments({ onContinue, onBack }) {
           }
         } catch {
           setApplicationStatus(2);
+        }
+
+        // Check if PhD program
+        try {
+          const acadRes = await apiInstance.get(
+            `Academic/StudentInformationId?PersonalInformationId=${sid}`
+          );
+          if (acadRes?.data?.result?.program?.programLevel === 2) {
+            setIsPhDProgram(true);
+          }
+        } catch {
+          // ignore
+        }
+        // LocalStorage fallback (optional; aligns with other modules)
+        if (!isPhDProgram) {
+          const lsFlag = localStorage.getItem("isPhDProgram");
+          if (lsFlag === "true") setIsPhDProgram(true);
         }
 
         for (const [label, cfg] of Object.entries(DOCUMENTS)) {
@@ -292,7 +316,8 @@ export default function SupportingDocuments({ onContinue, onBack }) {
 
   const summaryChips = Object.keys(DOCUMENTS).map((label) => {
     const uploaded = !!documents[label];
-    return { label, uploaded };
+    const required = isPhDProgram && PHD_REQUIRED.includes(label);
+    return { label, uploaded, required };
   });
 
   if (loading)
@@ -307,9 +332,21 @@ export default function SupportingDocuments({ onContinue, onBack }) {
 
   return (
     <form
-      className="supporting-docs-form"
       onSubmit={(e) => {
         e.preventDefault();
+
+        if (isPhDProgram) {
+          const missing = PHD_REQUIRED.filter((lbl) => !documents[lbl]);
+          if (missing.length > 0) {
+            Swal.fire({
+              icon: "warning",
+              title: "Required Documents Missing",
+              text: `Please upload: ${missing.join(", ")}`,
+            });
+            return;
+          }
+        }
+
         onContinue && onContinue();
       }}
       noValidate
@@ -353,8 +390,11 @@ export default function SupportingDocuments({ onContinue, onBack }) {
               {chip.label === "Personal Statement (PS) or SOP"
                 ? "Personal Statement"
                 : chip.label}
+              {chip.required && <span className="doc-chip-req">*</span>}
             </span>
-            <span className="sup-chip-status">{chip.uploaded ? "✓" : "•"}</span>
+            <span className="sup-chip-status">
+              {chip.uploaded ? "✓" : chip.required ? "!" : "•"}
+            </span>
           </div>
         ))}
       </div>
@@ -363,6 +403,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
         {Object.keys(DOCUMENTS).map((label) => {
           const isOpen = expanded === label;
           const doc = documents[label];
+          const required = isPhDProgram && PHD_REQUIRED.includes(label); // <-- add this
           return (
             <div
               key={label}
@@ -378,12 +419,17 @@ export default function SupportingDocuments({ onContinue, onBack }) {
                   setExpanded((prev) => (prev === label ? null : label))
                 }
               >
-                <span className="sup-acc-title">{label}</span>
+                <span className="sup-acc-title">
+                  {label}
+                  {required && <span className="doc-chip-req">*</span>}
+                </span>
                 <span className="sup-acc-meta">
                   {doc ? (
                     <span className="badge-uploaded">Uploaded</span>
                   ) : (
-                    <span className="badge-missing">Pending</span>
+                    <span className="badge-missing">
+                      {required ? "Required" : "Pending"}
+                    </span>
                   )}
                   <span className="chevron">{isOpen ? "▲" : "▼"}</span>
                 </span>
