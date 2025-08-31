@@ -1448,6 +1448,8 @@ export default function Home() {
           </Modal>
 
           {/* Testimonials Section */}
+          {/*
+
           <section className="py-20 bg-gradient-to-br from-blue-600 to-indigo-700 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <motion.div
@@ -1470,7 +1472,7 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* Testimonial Carousel */}
+              {/* Testimonial Carousel /}
               <TestimonialCarousel
                 testimonials={[
                   ...testimonials,
@@ -1492,6 +1494,7 @@ export default function Home() {
               />
             </div>
           </section>
+          */}
 
           {/* Contact Section */}
           <section id="contact" className="py-20 bg-gray-50">
