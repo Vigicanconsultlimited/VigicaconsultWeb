@@ -12,6 +12,7 @@ import kelvin from "../../assets/images/Kelvin.png";
 import john from "../../assets/images/john.jpg";
 import RentalHouse from "../../assets/images/houserental.jpg";
 import Modal from "./Modal";
+import FlightBookingModal from "./FlightBookingModal";
 import OrlandoSilver from "../../assets/images/OrlandoSilverRooms.webp";
 import OrlandoBronze from "../../assets/images/OrlandoVillageBronzePlus.webp";
 import OrlandoExternal from "../../assets/images/OrlandoVillageExternal.webp";
@@ -24,6 +25,8 @@ import {
   Clock,
   MapPin,
   Plane,
+  X,
+  Info,
   Star,
   CheckCircle,
   ArrowRight,
@@ -286,11 +289,12 @@ const FlightBookingForm = () => {
   const [destination, setDestination] = useState("");
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
-  const [travelers, setTravelers] = useState(1);
+  //const [travelers, setTravelers] = useState(1);
   const [fareType, setFareType] = useState("regular");
   const [directOnly, setDirectOnly] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [cabinClass, setCabinClass] = useState("Economy");
+  const [showModal, setShowModal] = useState(false);
 
   // Function to swap origin and destination
   const swapLocations = () => {
@@ -300,56 +304,61 @@ const FlightBookingForm = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="relative bg-white rounded-3xl shadow-2xl overflow-hidden mb-12"
-    >
-      {/* Background pattern for visual interest */}
-      <div className="absolute top-0 right-0 w-1/2 h-32 bg-gradient-to-l from-blue-100 to-transparent opacity-50 rounded-bl-full"></div>
-      <div className="absolute bottom-0 left-0 w-1/3 h-24 bg-gradient-to-r from-indigo-100 to-transparent opacity-50 rounded-tr-full"></div>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative bg-white rounded-3xl shadow-2xl overflow-hidden mb-12"
+      >
+        {/* Background pattern for visual interest */}
+        <div className="absolute top-0 right-0 w-1/2 h-32 bg-gradient-to-l from-blue-100 to-transparent opacity-50 rounded-bl-full"></div>
+        <div className="absolute bottom-0 left-0 w-1/3 h-24 bg-gradient-to-r from-indigo-100 to-transparent opacity-50 rounded-tr-full"></div>
 
-      <div className="relative p-8 md:p-10">
-        {/* Trip Type Selection */}
-        <div className="flex flex-wrap justify-center md:justify-start gap-3 mb-10">
-          {[
-            { id: "one-way", label: "One Way" },
-            { id: "round-trip", label: "Round Trip" },
-            { id: "multi-city", label: "Multi-City" },
-          ].map((type) => (
-            <button
-              key={type.id}
-              onClick={() => setTripType(type.id)}
-              className={`relative inline-flex items-center ${
-                tripType === type.id
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              } px-6 py-3 rounded-full font-medium cursor-pointer transition-all duration-200`}
-            >
-              {type.label}
-            </button>
-          ))}
-
-          <div className="ml-auto hidden md:block">
-            <div className="relative">
+        <div className="relative p-8 md:p-10">
+          {/* Trip Type Selection */}
+          <div className="flex flex-wrap justify-center md:justify-start gap-3 mb-10">
+            {[
+              { id: "one-way", label: "One Way" },
+              { id: "round-trip", label: "Round Trip" },
+              { id: "multi-city", label: "Multi-City" },
+            ].map((type) => (
               <button
-                onClick={() =>
-                  document
-                    .getElementById("cabin-dropdown")
-                    .classList.toggle("hidden")
-                }
-                className="relative inline-flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium cursor-pointer transition-all duration-200"
+                key={type.id}
+                onClick={() => setTripType(type.id)}
+                className={`relative inline-flex items-center ${
+                  tripType === type.id
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                } px-6 py-3 rounded-full font-medium cursor-pointer transition-all duration-200`}
               >
-                <span>{cabinClass}</span>
-                <ChevronDown className="ml-2 h-4 w-4" />
+                {type.label}
               </button>
-              <div
-                id="cabin-dropdown"
-                className="absolute mt-2 w-48 bg-white rounded-xl shadow-lg py-1 z-10 hidden"
-              >
-                {["Economy", "Premium Economy", "Business", "First Class"].map(
-                  (cabin) => (
+            ))}
+
+            <div className="ml-auto hidden md:block">
+              <div className="relative">
+                <button
+                  onClick={() =>
+                    document
+                      .getElementById("cabin-dropdown")
+                      .classList.toggle("hidden")
+                  }
+                  className="relative inline-flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-medium cursor-pointer transition-all duration-200"
+                >
+                  <span>{cabinClass}</span>
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </button>
+                <div
+                  id="cabin-dropdown"
+                  className="absolute mt-2 w-48 bg-white rounded-xl shadow-lg py-1 z-10 hidden"
+                >
+                  {[
+                    "Economy",
+                    "Premium Economy",
+                    "Business",
+                    "First Class",
+                  ].map((cabin) => (
                     <button
                       key={cabin}
                       onClick={() => {
@@ -362,238 +371,250 @@ const FlightBookingForm = () => {
                     >
                       {cabin}
                     </button>
-                  )
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Location and Date Fields */}
-        <div className="grid md:grid-cols-12 gap-6 mb-10">
-          {/* From-To Fields */}
-          <div className="md:col-span-5 grid md:grid-cols-2 gap-2 relative">
-            {/* From Field */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
-              <p className="text-sm text-blue-600 font-medium mb-1">From</p>
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 text-gray-400 mr-2" />
-                <input
-                  type="text"
-                  placeholder="City or airport"
-                  value={origin}
-                  onChange={(e) => setOrigin(e.target.value)}
-                  className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg"
-                />
-              </div>
-            </div>
-
-            {/* Exchange button */}
-            <button
-              onClick={swapLocations}
-              className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 hidden md:block"
-            >
-              <div className="bg-blue-600 rounded-full w-10 h-10 flex items-center justify-center text-white shadow-lg cursor-pointer hover:bg-blue-700 transition-colors">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                  />
-                </svg>
-              </div>
-            </button>
-
-            {/* To Field */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
-              <p className="text-sm text-blue-600 font-medium mb-1">To</p>
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 text-gray-400 mr-2" />
-                <input
-                  type="text"
-                  placeholder="City or airport"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Date Fields */}
-          <div className="md:col-span-4 grid md:grid-cols-2 gap-2">
-            {/* Departure Date */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
-              <p className="text-sm text-blue-600 font-medium mb-1">
-                Departure
-              </p>
-              <div className="flex items-center">
-                <Clock className="h-5 w-5 text-gray-400 mr-2" />
-                <input
-                  type="date"
-                  value={departureDate}
-                  onChange={(e) => setDepartureDate(e.target.value)}
-                  className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg"
-                />
-              </div>
-            </div>
-
-            {/* Return Date */}
-            <div
-              className={`bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow ${
-                tripType === "one-way" ? "opacity-50" : ""
-              }`}
-            >
-              <p className="text-sm text-blue-600 font-medium mb-1">Return</p>
-              <div className="flex items-center">
-                <Clock className="h-5 w-5 text-gray-400 mr-2" />
-                <input
-                  type="date"
-                  value={returnDate}
-                  onChange={(e) => setReturnDate(e.target.value)}
-                  disabled={tripType === "one-way"}
-                  className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Travelers & Search Button */}
-          <div className="md:col-span-3 grid md:grid-cols-3 gap-2">
-            {/* Travelers */}
-            <div className="md:col-span-1 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
-              <p className="text-sm text-blue-600 font-medium mb-1">
-                Travelers
-              </p>
-              <div className="flex items-center">
-                <Users className="h-5 w-5 text-gray-400 mr-2" />
-                <select
-                  className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg appearance-none cursor-pointer"
-                  value={travelers}
-                  onChange={(e) => setTravelers(parseInt(e.target.value))}
-                >
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                    <option key={num} value={num}>
-                      {num}
-                    </option>
                   ))}
-                </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Location and Date Fields */}
+          <div className="grid md:grid-cols-12 gap-6 mb-10">
+            {/* From-To Fields */}
+            <div className="md:col-span-5 grid md:grid-cols-2 gap-2 relative">
+              {/* From Field */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-sm text-blue-600 font-medium mb-1">From</p>
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 text-gray-400 mr-2" />
+                  <input
+                    type="text"
+                    placeholder="City or airport"
+                    value={origin}
+                    onChange={(e) => setOrigin(e.target.value)}
+                    className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Exchange button */}
+              <button
+                onClick={swapLocations}
+                className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 hidden md:block"
+              >
+                <div className="bg-blue-600 rounded-full w-10 h-10 flex items-center justify-center text-white shadow-lg cursor-pointer hover:bg-blue-700 transition-colors">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                    />
+                  </svg>
+                </div>
+              </button>
+
+              {/* To Field */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-sm text-blue-600 font-medium mb-1">To</p>
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 text-gray-400 mr-2" />
+                  <input
+                    type="text"
+                    placeholder="City or airport"
+                    value={destination}
+                    onChange={(e) => setDestination(e.target.value)}
+                    className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Search Button */}
-            <div className="md:col-span-2">
-              <button className="w-full h-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center justify-center font-medium text-lg shadow-lg hover:shadow-xl transition-all">
-                <Search className="h-5 w-5 mr-2" />
-                Search Flights
-              </button>
-            </div>
-          </div>
-        </div>
-        <button
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-            />
-          </svg>
-          Advanced Options
-        </button>
+            {/* Date Fields */}
+            <div className="md:col-span-4 grid md:grid-cols-2 gap-2">
+              {/* Departure Date */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-sm text-blue-600 font-medium mb-1">
+                  Departure
+                </p>
+                <div className="flex items-center">
+                  <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                  <input
+                    type="date"
+                    value={departureDate}
+                    onChange={(e) => setDepartureDate(e.target.value)}
+                    className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg"
+                  />
+                </div>
+              </div>
 
-        {/* Advanced options section */}
-        <AnimatePresence>
-          {showAdvanced && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-6 p-4 border border-gray-200 rounded-xl bg-gray-50"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Preferred Airlines
-                  </label>
-                  <select className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>Any Airline</option>
-                    <option>Emirates</option>
-                    <option>Qatar Airways</option>
-                    <option>Delta</option>
-                    <option>British Airways</option>
-                    <option>Air France</option>
+              {/* Return Date */}
+              <div
+                className={`bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow ${
+                  tripType === "one-way" ? "opacity-50" : ""
+                }`}
+              >
+                <p className="text-sm text-blue-600 font-medium mb-1">Return</p>
+                <div className="flex items-center">
+                  <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                  <input
+                    type="date"
+                    value={returnDate}
+                    onChange={(e) => setReturnDate(e.target.value)}
+                    disabled={tripType === "one-way"}
+                    className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Travelers & Search Button */}
+            <div className="md:col-span-3 grid md:grid-cols-3 gap-2">
+              {/* Travelers */}
+              {/*
+              <div className="md:col-span-1 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-sm text-blue-600 font-medium mb-1">
+                  Travelers
+                </p>
+                <div className="flex items-center">
+                  <Users className="h-5 w-5 text-gray-400 mr-2" />
+                  <select
+                    className="w-full bg-transparent border-none text-gray-800 focus:outline-none text-lg appearance-none cursor-pointer"
+                    value={travelers}
+                    onChange={(e) => setTravelers(parseInt(e.target.value))}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                      <option key={num} value={num}>
+                        {num}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Price Range
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span className="text-gray-500">-</span>
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Flight Times
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <select className="bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option>Departure</option>
-                      <option>Morning</option>
-                      <option>Afternoon</option>
-                      <option>Evening</option>
-                    </select>
-                    <select className="bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option>Arrival</option>
-                      <option>Morning</option>
-                      <option>Afternoon</option>
-                      <option>Evening</option>
-                    </select>
-                  </div>
-                </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              */}
 
-      {/* Footer with Continue Button */}
-      <div className="border-t border-gray-100 mt-6">
-        <div className="p-6 flex justify-end">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-10 py-3.5 font-medium text-lg shadow-lg hover:shadow-xl transition-all flex items-center">
-            Continue
-            <ArrowRight className="h-5 w-5 ml-2" />
+              {/* Search Button - Updated to open modal */}
+              <div className="md:col-span-2">
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="w-full h-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center justify-center font-medium text-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Search className="h-5 w-5 mr-2" />
+                  Search Flights
+                </button>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+              />
+            </svg>
+            Advanced Options
           </button>
+
+          {/* Advanced options section */}
+          <AnimatePresence>
+            {showAdvanced && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-6 p-4 border border-gray-200 rounded-xl bg-gray-50"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Preferred Airlines
+                    </label>
+                    <select className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option>Any Airline</option>
+                      <option>Emirates</option>
+                      <option>Qatar Airways</option>
+                      <option>Delta</option>
+                      <option>British Airways</option>
+                      <option>Air France</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Price Range
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        placeholder="Min"
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-gray-500">-</span>
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Flight Times
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select className="bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option>Departure</option>
+                        <option>Morning</option>
+                        <option>Afternoon</option>
+                        <option>Evening</option>
+                      </select>
+                      <select className="bg-white border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option>Arrival</option>
+                        <option>Morning</option>
+                        <option>Afternoon</option>
+                        <option>Evening</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
-    </motion.div>
+
+        {/* Footer with Continue Button */}
+        <div className="border-t border-gray-100 mt-6">
+          <div className="p-6 flex justify-end">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-10 py-3.5 font-medium text-lg shadow-lg hover:shadow-xl transition-all flex items-center">
+              Continue
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Modal */}
+      {/* travelers={travelers} */}
+      <FlightBookingModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+      />
+    </>
   );
 };
 
