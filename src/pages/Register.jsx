@@ -20,7 +20,9 @@ function Register() {
   const [password2, setPassword2] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
+  const [showPasswordHint, setShowPasswordHint] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [backendError, setBackendError] = useState("");
   const navigate = useNavigate();
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
@@ -32,6 +34,7 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setBackendError(""); // Clear any previous backend errors
 
     // Basic validation
     if (!email || !password || !password2) {
@@ -52,27 +55,41 @@ function Register() {
 
     setIsLoading(true);
 
-    const { error } = await register(email, password, password2);
-    if (error) {
+    try {
+      const { error } = await register(email, password, password2);
+      if (error) {
+        // Display backend error and set it for persistent display
+        setBackendError(error);
+        Toast.fire({
+          icon: "error",
+          title:
+            typeof error === "string"
+              ? error
+              : "Registration failed. Please try again.",
+        });
+        setIsLoading(false);
+      } else {
+        Toast.fire({
+          icon: "success",
+          title: "Registration successful! Redirecting to verification...",
+        });
+
+        // Small delay to show success message before navigation
+        setTimeout(() => {
+          navigate("/verify-otp", { state: { email } });
+          setIsLoading(false);
+        }, 1500);
+      }
+    } catch (error) {
+      // Handle unexpected errors
+      const errorMessage =
+        error.message || "Registration failed. Please try again.";
+      setBackendError(errorMessage);
       Toast.fire({
         icon: "error",
-        title:
-          typeof error === "string"
-            ? error
-            : "Registration failed. Please try again.",
+        title: errorMessage,
       });
       setIsLoading(false);
-    } else {
-      Toast.fire({
-        icon: "success",
-        title: "Registration successful! Redirecting to verification...",
-      });
-
-      // Small delay to show success message before navigation
-      setTimeout(() => {
-        navigate("/verify-otp", { state: { email } });
-        setIsLoading(false);
-      }, 1500);
     }
   };
 
@@ -100,6 +117,13 @@ function Register() {
             Create a free account
           </h2>
 
+          {/* Backend Error Display */}
+          {backendError && (
+            <div className="alert alert-danger py-2 px-3 mb-3" role="alert">
+              <small>{backendError}</small>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} autoComplete="off">
             <div className="mb-3">
               <input
@@ -120,12 +144,22 @@ function Register() {
                 placeholder="Password"
                 required
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setShowPasswordHint(true)}
+                onBlur={() => setShowPasswordHint(false)}
                 style={{ fontWeight: 400, fontSize: "16px" }}
                 disabled={isLoading}
               />
               <span
                 className="position-absolute eye-toggle"
                 onClick={() => !isLoading && setShowPassword(!showPassword)}
+                style={{
+                  right: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  color: "#6c757d",
+                  zIndex: 10,
+                }}
               >
                 {showPassword ? (
                   <i className="fas fa-eye-slash" />
@@ -133,6 +167,36 @@ function Register() {
                   <i className="fas fa-eye" />
                 )}
               </span>
+
+              {/* Password Hint */}
+              {showPasswordHint && (
+                <div
+                  className="mt-2 p-2 bg-light border rounded"
+                  style={{
+                    fontSize: "12px",
+                    color: "#6c757d",
+                    lineHeight: "1.4",
+                    animation: "fadeIn 0.3s ease-in-out",
+                  }}
+                >
+                  <strong>Password Requirements:</strong>
+                  <br />
+                  1. At least 8 characters
+                  <br />
+                  2. Combination of:
+                  <br />
+                  &nbsp;&nbsp;&nbsp;• Uppercase letters (A-Z)
+                  <br />
+                  &nbsp;&nbsp;&nbsp;• Lowercase letters (a-z)
+                  <br />
+                  &nbsp;&nbsp;&nbsp;• Numbers (0-9)
+                  <br />
+                  &nbsp;&nbsp;&nbsp;• Special characters (!, @, #, $, etc.)
+                  <br />
+                  <br />
+                  <strong>Example:</strong> P@ssw0rd123
+                </div>
+              )}
             </div>
 
             <div className="mb-4 position-relative">
@@ -148,6 +212,14 @@ function Register() {
               <span
                 className="position-absolute eye-toggle"
                 onClick={() => !isLoading && setShowPassword2(!showPassword2)}
+                style={{
+                  right: "12px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  color: "#6c757d",
+                  zIndex: 10,
+                }}
               >
                 {showPassword2 ? (
                   <i className="fas fa-eye-slash" />
@@ -272,6 +344,38 @@ function Register() {
           </form>
         </div>
       </div>
+
+      {/* Inline styles for the animation */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .alert-danger {
+          background-color: #f8d7da !important;
+          border-color: #f5c6cb !important;
+          color: #721c24 !important;
+          border-radius: 6px !important;
+          font-size: 14px !important;
+        }
+
+        .eye-toggle:hover {
+          color: #2135b0 !important;
+        }
+
+        @media (max-width: 768px) {
+          .password-hint {
+            font-size: 11px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
