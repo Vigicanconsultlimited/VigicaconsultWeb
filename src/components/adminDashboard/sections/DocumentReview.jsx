@@ -58,6 +58,7 @@ const ApplicationStatus = {
 
 // Document status
 const DocumentStatus = {
+  Pending: 0,
   Uploaded: 1,
   UnderReview: 2,
   Rejected: 3,
@@ -66,11 +67,33 @@ const DocumentStatus = {
 
 // Document status mapping for display
 const documentStatusMap = {
+  0: "pending",
   1: "uploaded",
   2: "under review",
   3: "rejected",
   4: "approved",
 };
+
+// Mappings for API enum values
+const languageOptions = [
+  "English",
+  "French",
+  "Spanish",
+  "Arabic",
+  "Mandarin",
+  "Hindi",
+  "Yoruba",
+  "Igbo",
+  "Hausa",
+  "Portuguese",
+  "Russian",
+  "Bengali",
+  "Japanese",
+  "German",
+  "Other",
+];
+const pronounOptions = ["He/Him", "She/Her", "They/Them", "Prefer not to say"];
+const genderOptions = ["Male", "Female", "Prefer not to say", "Other"];
 
 // Document fields and their API endpoints
 const docFields = [
@@ -127,13 +150,24 @@ const docFields = [
 ];
 
 export default function DocumentReview() {
-  // Current date/time and user as specified
-  const getCurrentDateTime = () => {
-    return "2025-08-10 23:33:36";
+  // Mapping functions
+  const mapGender = (val) => {
+    if (typeof val === "number" && genderOptions[val - 1])
+      return genderOptions[val - 1];
+    if (typeof val === "string") return val;
+    return "Not provided";
   };
-
-  const getCurrentUser = () => {
-    return "NeduStack";
+  const mapLanguage = (val) => {
+    if (typeof val === "number" && languageOptions[val - 1])
+      return languageOptions[val - 1];
+    if (typeof val === "string") return val;
+    return "Not specified";
+  };
+  const mapPronoun = (val) => {
+    if (typeof val === "number" && pronounOptions[val - 1])
+      return pronounOptions[val - 1];
+    if (typeof val === "string") return val;
+    return "Not specified";
   };
 
   // Get JWT token from cookies with debugging
@@ -289,10 +323,12 @@ export default function DocumentReview() {
           avatar: profile,
           documents: [],
           email: student.email,
-          phone: student.phoneNumber,
+          phone: student.phone,
+          gender: mapGender(student.gender),
+          pronoun: mapPronoun(student.preferredPronoun),
           address: student.address,
-          postCode: student.postalCode,
-          language: student.preferredLanguage,
+          postCode: student.postCode,
+          language: mapLanguage(student.firstLanguage),
           dateOfBirth: student.dateOfBirth,
           joined: student.dateCreated
             ? new Date(student.dateCreated).toLocaleDateString()
@@ -477,6 +513,8 @@ export default function DocumentReview() {
           const mappedApplicationStatus =
             statusMap[applicationStatusCode] || "pending";
 
+          // Fetch documents in parallel
+          // Fetch documents in parallel
           const documentsPromises = docFields
             .filter((doc) => result[doc.key])
             .map(async (doc) => {
@@ -484,29 +522,20 @@ export default function DocumentReview() {
                 const docRes = await apiInstance.get(
                   `${doc.apiEndpoint}/${selectedStudent.id}`
                 );
-
                 if (docRes?.data?.statusCode === 200 && docRes.data.result) {
                   let docData = null;
-
                   if (Array.isArray(docRes.data.result)) {
                     docData = docRes.data.result.find(
                       (item) =>
                         item.studentPersonalInformationId === selectedStudent.id
                     );
-                    if (!docData) {
-                      //console.warn(
-                      //  `No matching document found for ${doc.label} and student ${selectedStudent.id}`
-                      //);
-                      return null;
-                    }
+                    if (!docData) return null;
                   } else {
                     docData = docRes.data.result;
                   }
-
                   if (docData && docData.id) {
                     const docStatus =
-                      documentStatusMap[docData.status] || "uploaded";
-
+                      documentStatusMap[docData.status] || "pending";
                     return {
                       name: doc.label,
                       url: result[doc.key],
@@ -521,13 +550,42 @@ export default function DocumentReview() {
                 }
                 return null;
               } catch (error) {
-                //console.error(
-                //  `Failed to fetch document ID for ${doc.label}: ${error.message}`
-                //);
                 return null;
               }
             });
-
+          // Research Proposal special fetch
+          documentsPromises.push(
+            (async () => {
+              try {
+                const rpRes = await apiInstance.get(
+                  `ResearchProposal/${selectedStudent.id}`
+                );
+                if (
+                  rpRes?.data?.statusCode === 200 &&
+                  rpRes.data.result &&
+                  rpRes.data.result.researchProposalDocumentdownloadurl
+                ) {
+                  const rp = rpRes.data.result;
+                  return {
+                    name: "Research Proposal",
+                    url:
+                      rp.researchProposalDocumentgoogledocviewurl ||
+                      rp.researchProposalDocumentdownloadurl,
+                    status: documentStatusMap[rp.status] || "pending",
+                    apiEndpoint: "ResearchProposal",
+                    documentId: rp.id,
+                    studentPersonalInformationId: selectedStudent.id,
+                    rawStatus: rp.status,
+                    fullDocData: rp,
+                    downloadUrl: rp.researchProposalDocumentdownloadurl,
+                  };
+                }
+                return null;
+              } catch (error) {
+                return null;
+              }
+            })()
+          );
           const documentsResults = await Promise.all(documentsPromises);
           const documents = documentsResults.filter((doc) => doc !== null);
 
@@ -908,6 +966,9 @@ export default function DocumentReview() {
     return "pending";
   };
 
+  // Delete student function
+  //Rest component5
+
   const handleDeleteStudent = async (id) => {
     try {
       const result = await Swal.fire({
@@ -1252,6 +1313,31 @@ export default function DocumentReview() {
 
                       <div className="detail-item">
                         <div className="detail-icon">
+                          <User size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">Gender</span>
+                          <span className="detail-value">
+                            {selectedStudent.gender || "Not provided"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="detail-item">
+                        <div className="detail-icon">
+                          <User size={16} />
+                        </div>
+                        <div className="detail-content">
+                          <span className="detail-label">
+                            Preferred Pronoun
+                          </span>
+                          <span className="detail-value">
+                            {selectedStudent.pronoun || "Not specified"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="detail-item">
+                        <div className="detail-icon">
                           <LocationIcon size={16} />
                         </div>
                         <div className="detail-content">
@@ -1300,7 +1386,7 @@ export default function DocumentReview() {
                         </div>
                       </div>
 
-                      <div className="detail-item">
+                      {/*<div className="detail-item">
                         <div className="detail-icon">
                           <Calendar size={16} />
                         </div>
@@ -1311,6 +1397,7 @@ export default function DocumentReview() {
                           </span>
                         </div>
                       </div>
+                      */}
                     </div>
                   </div>
                 </div>
@@ -1788,7 +1875,12 @@ export default function DocumentReview() {
                     </div>
                     <div className="download-section">
                       <a
-                        href={selectedDocument.url}
+                        href={
+                          selectedDocument.name === "Research Proposal"
+                            ? selectedDocument.downloadUrl ||
+                              selectedDocument.url
+                            : selectedDocument.url
+                        }
                         target="_blank"
                         rel="noopener noreferrer"
                         download
