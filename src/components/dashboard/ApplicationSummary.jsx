@@ -26,8 +26,8 @@ function ApplicationSummary({ setCurrentStep }) {
   const [showInstructionsMobile, setShowInstructionsMobile] = useState(false);
   const [showNextStepsMobile, setShowNextStepsMobile] = useState(false);
 
-  const getCurrentDateTime = () => "2025-08-19 17:17:36";
-  const getCurrentUser = () => "NeduStack";
+  //const getCurrentDateTime = () => "2025-08-19 17:17:36";
+  //const getCurrentUser = () => "NeduStack";
 
   useEffect(() => {
     const fetchPersonalInfo = async () => {
