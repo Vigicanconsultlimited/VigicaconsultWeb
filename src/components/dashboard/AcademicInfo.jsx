@@ -27,6 +27,7 @@ export default function AcademicInfo({
     SchoolId: "",
     AcademicProgramId: "",
     CourseOfInterestId: "",
+    ResearchTopic: "", // <-- ADDED!
   });
 
   const [schools, setSchools] = useState([]);
@@ -191,6 +192,7 @@ export default function AcademicInfo({
             SchoolId: schoolId,
             AcademicProgramId: programId,
             CourseOfInterestId: courseId,
+            ResearchTopic: saved.researchTopic || "", // <-- ADDED!
           }));
         }
       } catch {
@@ -257,12 +259,24 @@ export default function AcademicInfo({
       Toast.fire({ icon: "warning", title: "Fill all required fields" });
       return;
     }
+    // ResearchTopic required for PhD
+    if (
+      isPhDProgram &&
+      (!formData.ResearchTopic || !formData.ResearchTopic.trim())
+    ) {
+      Toast.fire({
+        icon: "warning",
+        title: "Research topic is required for PhD",
+      });
+      return;
+    }
 
     const payload = new FormData();
     payload.append("PersonalInformationId", formData.PersonalInformationId);
     payload.append("SchoolId", formData.SchoolId);
     payload.append("AcademicProgramId", formData.AcademicProgramId);
     payload.append("CourseOfInterestId", formData.CourseOfInterestId);
+    if (isPhDProgram) payload.append("ResearchTopic", formData.ResearchTopic); // <-- ADDED!
 
     try {
       setSubmitting(true);
@@ -311,10 +325,9 @@ export default function AcademicInfo({
     const payload = new FormData();
     payload.append("Id", formData.Id);
     payload.append("PersonalInformationId", formData.PersonalInformationId);
-    payload.append("SchoolId", formData.SchoolId);
     payload.append("ProgramId", formData.AcademicProgramId);
     payload.append("CourseId", formData.CourseOfInterestId);
-
+    if (isPhDProgram) payload.append("ResearchTopic", formData.ResearchTopic); // <-- ADDED!
     try {
       showLoadingOverlay();
       await apiInstance.put("Academic/update", payload, {
@@ -578,6 +591,32 @@ export default function AcademicInfo({
         </div>
       </div>
 
+      {/* Research Topic for PhD only */}
+      {isPhDProgram && (
+        <div className="row g-3 pb-2 compact-row">
+          <div className="col-12">
+            <label className="form-label">
+              Research Topic <span className="required-asterisk">*</span>
+            </label>
+            <input
+              type="text"
+              className="form-control compact-input"
+              maxLength={200}
+              placeholder="Enter your research topic"
+              value={formData.ResearchTopic}
+              disabled={(!isEditing && isFormSubmitted) || !canEdit}
+              onChange={(e) =>
+                setFormData({ ...formData, ResearchTopic: e.target.value })
+              }
+              required={isPhDProgram}
+            />
+            <small className="text-muted">
+              Please specify your intended research topic. (Compulsory for PhD)
+            </small>
+          </div>
+        </div>
+      )}
+
       {formData.AcademicProgramId && selectedProgram && (
         <div className="program-details-card desktop-program-details">
           <h3 className="program-details-title">Selected Program Details</h3>
@@ -616,6 +655,12 @@ export default function AcademicInfo({
                 <span className="info-value">
                   {getCourseName(formData.CourseOfInterestId)}
                 </span>
+              </div>
+            )}
+            {isPhDProgram && formData.ResearchTopic && (
+              <div className="program-info-row">
+                <span className="info-label">Research Topic:</span>
+                <span className="info-value">{formData.ResearchTopic}</span>
               </div>
             )}
           </div>

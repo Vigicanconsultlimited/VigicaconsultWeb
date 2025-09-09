@@ -14,6 +14,7 @@ const documentTypes = [
   "Professional References",
   "Work Experience",
   "International Passport",
+  "Research Proposal", // <-- ADDED
 ];
 
 const documentAPIMap = {
@@ -77,9 +78,15 @@ const documentAPIMap = {
     viewKey: "internationalPassportDocumentgoogledocviewurl",
     nameKey: "internationalPassportDocumentdownloadurl",
   },
+  // --- ADDED RESEARCH PROPOSAL ---
+  "Research Proposal": {
+    statusUrl: "ResearchProposal/document",
+    getUrl: "ResearchProposal",
+    viewKey: "researchProposalDocumentgoogledocviewurl",
+    nameKey: "researchProposalDocumentdownloadurl",
+  },
 };
 
-// Status code -> internal key
 const statusKeyMap = {
   1: "uploaded",
   2: "under-review",
@@ -87,7 +94,6 @@ const statusKeyMap = {
   4: "approved",
 };
 
-// Colors + icons
 const statusMeta = {
   uploaded: { label: "Uploaded", color: "#198754", icon: "📤" },
   "under-review": { label: "Under Review", color: "#0d6efd", icon: "🔍" },
@@ -96,12 +102,10 @@ const statusMeta = {
   pending: { label: "Pending", color: "#ffc107", icon: "⏳" },
 };
 
-// Convert API status code to key
 const mapStatusKey = (code) => statusKeyMap[code] || "pending";
-
-// Uniform "View <Doc>" label (same approach as Supporting / Academic documents)
 const getViewLabel = (type) => {
   if (type === "Proof of English Proficiency") return "View English Proof";
+  if (type === "Research Proposal") return "View Research Proposal";
   return `View ${type}`;
 };
 
@@ -110,11 +114,10 @@ const ApplicationStatus = () => {
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // UI state
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [viewMode, setViewMode] = useState("grid"); // grid | list
-  const [expandedMobile, setExpandedMobile] = useState(null); // for mobile accordion
+  const [viewMode, setViewMode] = useState("grid");
+  const [expandedMobile, setExpandedMobile] = useState(null);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -135,42 +138,84 @@ const ApplicationStatus = () => {
             const { getUrl, statusUrl, viewKey, nameKey } =
               documentAPIMap[type];
             try {
-              const baseRes = await apiInstance.get(`${getUrl}/${studentId}`);
-              const docId = baseRes?.data?.result?.id;
-              if (!docId) {
+              let docId;
+              // Special handling for Research Proposal (API returns docId differently, but getUrl is same pattern)
+              if (type === "Research Proposal") {
+                // ResearchProposal/{studentId} returns result with id
+                const baseRes = await apiInstance.get(`${getUrl}/${studentId}`);
+                docId = baseRes?.data?.result?.id;
+                if (!docId) {
+                  return {
+                    type,
+                    fileName: null,
+                    url: null,
+                    statusKey: "pending",
+                    createdAt: null,
+                    updatedAt: null,
+                  };
+                }
+                // Now fetch document details
+                const detailRes = await apiInstance.get(
+                  `${statusUrl}?DocId=${docId}`
+                );
+                const detail = detailRes?.data?.result;
+                if (!detail) {
+                  return {
+                    type,
+                    fileName: null,
+                    url: null,
+                    statusKey: "pending",
+                    createdAt: null,
+                    updatedAt: null,
+                  };
+                }
+                const statusKey = mapStatusKey(detail.status);
                 return {
                   type,
-                  fileName: null,
-                  url: null,
-                  statusKey: "pending",
-                  createdAt: null,
-                  updatedAt: null,
+                  fileName: detail[nameKey]?.split("/").pop() || "File",
+                  url: detail[viewKey] || detail[nameKey] || null,
+                  statusKey,
+                  createdAt: detail.createdAt,
+                  updatedAt: detail.updatedAt,
                 };
-              }
-              const detailRes = await apiInstance.get(
-                `${statusUrl}?DocId=${docId}`
-              );
-              const detail = detailRes?.data?.result;
-              if (!detail) {
+              } else {
+                // All other documents
+                const baseRes = await apiInstance.get(`${getUrl}/${studentId}`);
+                docId = baseRes?.data?.result?.id;
+                if (!docId) {
+                  return {
+                    type,
+                    fileName: null,
+                    url: null,
+                    statusKey: "pending",
+                    createdAt: null,
+                    updatedAt: null,
+                  };
+                }
+                const detailRes = await apiInstance.get(
+                  `${statusUrl}?DocId=${docId}`
+                );
+                const detail = detailRes?.data?.result;
+                if (!detail) {
+                  return {
+                    type,
+                    fileName: null,
+                    url: null,
+                    statusKey: "pending",
+                    createdAt: null,
+                    updatedAt: null,
+                  };
+                }
+                const statusKey = mapStatusKey(detail.status);
                 return {
                   type,
-                  fileName: null,
-                  url: null,
-                  statusKey: "pending",
-                  createdAt: null,
-                  updatedAt: null,
+                  fileName: detail[nameKey]?.split("/").pop() || "File",
+                  url: detail[viewKey] || detail[nameKey] || null,
+                  statusKey,
+                  createdAt: detail.createdAt,
+                  updatedAt: detail.updatedAt,
                 };
               }
-              const statusKey = mapStatusKey(detail.status);
-              return {
-                type,
-                // stored fileName still used for search but not displayed
-                fileName: detail[nameKey]?.split("/").pop() || "File",
-                url: detail[viewKey] || detail[nameKey] || null,
-                statusKey,
-                createdAt: detail.createdAt,
-                updatedAt: detail.updatedAt,
-              };
             } catch {
               return {
                 type,
@@ -194,7 +239,6 @@ const ApplicationStatus = () => {
     fetchDocuments();
   }, [authData]);
 
-  // Derived counts
   const statusCounts = useMemo(() => {
     const base = {
       uploaded: 0,
@@ -209,7 +253,6 @@ const ApplicationStatus = () => {
     return base;
   }, [docs]);
 
-  // Filtered docs
   const filtered = useMemo(
     () =>
       docs.filter((d) => {
