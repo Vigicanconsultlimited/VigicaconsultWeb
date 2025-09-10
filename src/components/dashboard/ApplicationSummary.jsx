@@ -3,7 +3,6 @@ import "./styles/ApplicationSummary.css";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import Swal from "sweetalert2";
-
 const Toast = Swal.mixin({
   toast: true,
   position: "top",
@@ -19,15 +18,14 @@ function ApplicationSummary({ setCurrentStep }) {
   const [userName, setUserName] = useState("");
   const authData = useAuthStore((state) => state.allUserData);
   const [applicationStatus, setApplicationStatus] = useState(null);
-  const [submissionDate, setSubmissionDate] = useState("");
+  const [submissionDate, setSubmissionDate] = useState(""); // blank by default
   const [isResubmitting, setIsResubmitting] = useState(false);
 
   // Mobile collapsible states
   const [showInstructionsMobile, setShowInstructionsMobile] = useState(false);
   const [showNextStepsMobile, setShowNextStepsMobile] = useState(false);
 
-  //const getCurrentDateTime = () => "2025-08-19 17:17:36";
-  //const getCurrentUser = () => "NeduStack";
+  // Remove hardcoded functions
 
   useEffect(() => {
     const fetchPersonalInfo = async () => {
@@ -59,10 +57,11 @@ function ApplicationSummary({ setCurrentStep }) {
               if (appResponse?.data?.result) {
                 const status = appResponse.data.result.applicationStatus;
                 setApplicationStatus(status);
+                // Only set submissionDate if fetched from API
                 if (appResponse.data.result.createdAt) {
                   setSubmissionDate(appResponse.data.result.createdAt);
                 } else {
-                  setSubmissionDate(getCurrentDateTime());
+                  setSubmissionDate(""); // don't display if not present
                 }
                 if (status >= 1 && status !== 4 && status !== 2) {
                   setIsSubmitted(true);
@@ -71,21 +70,13 @@ function ApplicationSummary({ setCurrentStep }) {
                 }
               }
             } catch (err) {
-              console.log(
-                `No application found or error: ${
-                  err.message
-                } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-              );
+              console.log(`No application found or error: ${err.message}`);
               setApplicationStatus(2);
             }
           }
         }
       } catch (error) {
-        console.error(
-          `Error fetching personal info: ${
-            error.message
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
-        );
+        console.error(`Error fetching personal info: ${error.message}`);
         setUserName("");
       }
     };
@@ -172,8 +163,9 @@ function ApplicationSummary({ setCurrentStep }) {
     }
   };
 
+  // Only format date if present
   const formatDate = (dateString) => {
-    if (!dateString) return getCurrentDateTime();
+    if (!dateString) return null;
     try {
       if (dateString.includes(" ")) return dateString;
       const date = new Date(dateString);
@@ -212,7 +204,7 @@ function ApplicationSummary({ setCurrentStep }) {
         );
         Swal.close();
         setApplicationStatus(1);
-        setSubmissionDate(getCurrentDateTime());
+        // Do not set submissionDate unless refetched
         setIsSubmitted(true);
         Toast.fire({ icon: "success", title: "Application resubmitted" });
       } catch (error) {
@@ -273,7 +265,7 @@ function ApplicationSummary({ setCurrentStep }) {
         Swal.close();
         setIsSubmitted(true);
         setApplicationStatus(1);
-        setSubmissionDate(getCurrentDateTime());
+        // Do not set submissionDate unless refetched
         Toast.fire({
           icon: "success",
           title: isResubmission ? "Resubmitted" : "Submitted",
@@ -308,20 +300,26 @@ function ApplicationSummary({ setCurrentStep }) {
 
   // Meta detail block (shown for Rejected above instructions)
   const resubmissionMetaBlock =
-    applicationStatus === 4 && shouldShowSubmissionForm ? (
+    applicationStatus === 4 &&
+    shouldShowSubmissionForm &&
+    (userName || submissionDate) ? (
       <div className="resubmission-meta-block">
         <div className="meta-row">
           <span className="meta-label">Status:</span>
           <span className="meta-value">{getStatusText(applicationStatus)}</span>
         </div>
-        <div className="meta-row">
-          <span className="meta-label">Rejection Date:</span>
-          <span className="meta-value">{formatDate(submissionDate)}</span>
-        </div>
-        <div className="meta-row">
-          <span className="meta-label">Applicant:</span>
-          <span className="meta-value">{userName || getCurrentUser()}</span>
-        </div>
+        {submissionDate && (
+          <div className="meta-row">
+            <span className="meta-label">Rejection Date:</span>
+            <span className="meta-value">{formatDate(submissionDate)}</span>
+          </div>
+        )}
+        {userName && (
+          <div className="meta-row">
+            <span className="meta-label">Applicant:</span>
+            <span className="meta-value">{userName}</span>
+          </div>
+        )}
       </div>
     ) : null;
 
@@ -584,17 +582,24 @@ function ApplicationSummary({ setCurrentStep }) {
             </div>
           </div>
 
-          <div className="submission-details compact-details">
-            <p>
-              <strong>Applicant:</strong> {userName || getCurrentUser()}
-            </p>
-            <p>
-              <strong>
-                {applicationStatus === 4 ? "Rejection" : "Submission"} Date:
-              </strong>{" "}
-              {formatDate(submissionDate)}
-            </p>
-          </div>
+          {/* Only show applicant and submission/rejection date if fetched */}
+          {(userName || submissionDate) && (
+            <div className="submission-details compact-details">
+              {userName && (
+                <p>
+                  <strong>Applicant:</strong> {userName}
+                </p>
+              )}
+              {submissionDate && (
+                <p>
+                  <strong>
+                    {applicationStatus === 4 ? "Rejection" : "Submission"} Date:
+                  </strong>{" "}
+                  {formatDate(submissionDate)}
+                </p>
+              )}
+            </div>
+          )}
 
           {getStatusContent(applicationStatus || 1).note && (
             <div

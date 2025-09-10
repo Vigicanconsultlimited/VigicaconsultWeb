@@ -41,6 +41,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "./Header";
 import LoadingSpinner from "./LoadingSpinner";
+import { Email } from "@mui/icons-material";
 
 // SweetAlert Toast configuration
 const Toast = Swal.mixin({
@@ -1371,6 +1372,28 @@ export default function Home() {
                         Requesting A Call
                       </h3>
                       <p className="text-gray-600">+234 901 445 6659</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+                      <Info className="w-6 h-6 text-white" />
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        Got issues? Call Our Tech Team
+                      </h3>
+                      <div className="text-gray-600 flex flex-col lg:flex-row lg:items-center lg:gap-4 gap-2">
+                        <p className="flex items-center gap-2">
+                          <Phone className="w-4 h-4" /> +44 730 979 4839
+                        </p>
+                        <span className="hidden lg:inline">|</span>
+                        <p className="flex items-center gap-2">
+                          <Email className="w-4 h-4" />{" "}
+                          signalls247@vigicaconsult.com
+                        </p>
+                      </div>
                     </div>
                   </div>
 
