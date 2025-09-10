@@ -611,7 +611,7 @@ export default function AcademicInfo({
               required={isPhDProgram}
             />
             <small className="text-muted">
-              Please specify your intended research topic. (Compulsory for PhD)
+              Please specify your intended research topic. (Max word count: 100)
             </small>
           </div>
         </div>
