@@ -42,6 +42,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Header from "./Header";
 import LoadingSpinner from "./LoadingSpinner";
 import { Email } from "@mui/icons-material";
+import apiInstance from "../../utils/axios";
 
 // SweetAlert Toast configuration
 const Toast = Swal.mixin({
@@ -56,9 +57,6 @@ const Toast = Swal.mixin({
     title: "swal-mobile-title",
   },
 });
-
-// Initialize EmailJS with your public key
-emailjs.init("YOUR_PUBLIC_KEY_HERE"); // Replace with your actual public key from EmailJS
 
 const statsData = [
   { number: "850+", label: "Documents Reviewed", icon: FileCheck },
@@ -316,6 +314,16 @@ const FlightBookingForm = () => {
   const [cabinClass, setCabinClass] = useState("Economy");
   const [showModal, setShowModal] = useState(false);
 
+  // Show alert when flight booking button is clicked
+  const handleFlightBookingClick = () => {
+    Swal.fire({
+      icon: "info",
+      title: "We are working to make this service functional",
+      text: "This feature is coming soon!",
+      confirmButtonText: "OK",
+    });
+  };
+
   // Function to swap origin and destination
   const swapLocations = () => {
     const temp = origin;
@@ -498,7 +506,8 @@ const FlightBookingForm = () => {
               {/* Search Button - Updated to open modal */}
               <div className="md:col-span-2">
                 <button
-                  onClick={() => setShowModal(true)}
+                  onClick={handleFlightBookingClick}
+                  //onClick={() => setShowModal(true)}
                   className="w-full h-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl flex items-center justify-center font-medium text-lg shadow-lg hover:shadow-xl transition-all"
                 >
                   <Search className="h-5 w-5 mr-2" />
@@ -627,6 +636,16 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Accommodation button handler
+  const handleAccomButtonClick = () => {
+    Swal.fire({
+      icon: "info",
+      title: "We are working to make this service functional",
+      text: "This feature is coming soon!",
+      confirmButtonText: "OK",
+    });
+  };
+
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -666,24 +685,16 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
-      // EmailJS template parameters
-      const templateParams = {
-        to_email: "m.emmanuel@vigicaconsult.com",
-        from_name: formData.fullName,
-        from_email: formData.email,
-        phone: formData.phone || "Not provided",
-        message: formData.message,
-        reply_to: formData.email,
-        submitted_on: new Date().toLocaleString(),
-      };
+      // --- Send to Vigica API ---
+      const vigicaForm = new FormData();
+      vigicaForm.append("FullName", formData.fullName);
+      vigicaForm.append("SendersEmail", formData.email);
+      vigicaForm.append("SendersPhone", formData.phone);
+      vigicaForm.append("Message", formData.message);
 
-      // Send email using EmailJS
-      await emailjs.send(
-        "YOUR_SERVICE_ID", // Replace with your EmailJS service ID
-        "YOUR_TEMPLATE_ID", // Replace with your EmailJS template ID
-        templateParams,
-        "YOUR_PUBLIC_KEY" // Replace with your EmailJS public key
-      );
+      await apiInstance.post("Enquiry", vigicaForm, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       Toast.fire({
         icon: "success",
@@ -1132,6 +1143,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                  onClick={handleAccomButtonClick}
                 >
                   Browse Accommodations
                 </Button>
