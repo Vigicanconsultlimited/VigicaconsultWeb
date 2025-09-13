@@ -27,7 +27,7 @@ export default function AcademicInfo({
     SchoolId: "",
     AcademicProgramId: "",
     CourseOfInterestId: "",
-    ResearchTopic: "", // <-- ADDED!
+    ResearchTopic: "",
   });
 
   const [schools, setSchools] = useState([]);
@@ -325,9 +325,10 @@ export default function AcademicInfo({
     const payload = new FormData();
     payload.append("Id", formData.Id);
     payload.append("PersonalInformationId", formData.PersonalInformationId);
+    payload.append("SchoolId", formData.SchoolId);
     payload.append("ProgramId", formData.AcademicProgramId);
     payload.append("CourseId", formData.CourseOfInterestId);
-    if (isPhDProgram) payload.append("ResearchTopic", formData.ResearchTopic); // <-- ADDED!
+    if (isPhDProgram) payload.append("ResearchTopic", formData.ResearchTopic);
     try {
       showLoadingOverlay();
       await apiInstance.put("Academic/update", payload, {
@@ -611,7 +612,7 @@ export default function AcademicInfo({
               required={isPhDProgram}
             />
             <small className="text-muted">
-              Please specify your intended research topic. (Max word count: 100)
+              Please specify your intended research topic.
             </small>
           </div>
         </div>
