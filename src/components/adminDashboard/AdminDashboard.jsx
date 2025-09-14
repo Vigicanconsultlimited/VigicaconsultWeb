@@ -24,12 +24,12 @@ export default function AdminDashboard() {
       try {
         // Use the correct path - check your baseURL
         const response = await apiInstance.get("StudentPersonalInfo");
-        console.log("Fetched Personal Info:", response.data);
+        //console.log("Fetched Personal Info:", response.data);
         // Response from axios is already JSON
         setPersonalData(response.data.result || []);
       } catch (err) {
         setError(err.message || "Unknown error");
-        console.error("API error:", err);
+        //console.error("API error:", err);
       }
       setLoading(false);
     };

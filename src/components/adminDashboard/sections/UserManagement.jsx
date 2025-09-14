@@ -30,9 +30,8 @@ import {
 } from "lucide-react";
 
 export default function UserManagement() {
-  // Current timestamp: 2025-08-10 22:35:25 UTC by NeduStack
-  const getCurrentDateTime = () => "2025-08-10 22:35:25";
-  const getCurrentUser = () => "NeduStack";
+  //const getCurrentDateTime = () => "2025-08-10 22:35:25";
+  //const getCurrentUser = () => "NeduStack";
 
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
