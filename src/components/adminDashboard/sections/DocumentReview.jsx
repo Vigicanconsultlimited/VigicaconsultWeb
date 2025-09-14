@@ -237,6 +237,10 @@ export default function DocumentReview() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
+  // Track previous values
+  const prevSearchText = useRef(searchText);
+  const prevFilterStatus = useRef(filterStatus);
+
   const [toggleStates, setToggleStates] = useState({
     approve: false,
     reject: false,
@@ -454,7 +458,15 @@ export default function DocumentReview() {
       filtered = filtered.filter((s) => s.applicationStatus === filterStatus);
     }
     setFilteredStudentList(filtered);
-    setCurrentPage(1); // Reset to first page on filter/search change
+    // Only reset pagination if search/filter changed
+    if (
+      prevSearchText.current !== searchText ||
+      prevFilterStatus.current !== filterStatus
+    ) {
+      setCurrentPage(1);
+    }
+    prevSearchText.current = searchText;
+    prevFilterStatus.current = filterStatus;
   }, [searchText, filterStatus, studentList]);
 
   // --- PAGE DATA ---
@@ -1281,16 +1293,10 @@ export default function DocumentReview() {
                         setApplicationDropdownOpen(true);
                       }}
                     >
-                      {/* --- COLORED FULL NAME CELL --- */}
                       <td
                         className="student-name"
-                        style={{
-                          backgroundColor: getStatusColor(
-                            deriveStatus(student)
-                          ),
-                          color: "#222",
-                          borderRadius: "8px",
-                        }}
+                        data-status={deriveStatus(student)}
+                        style={{}}
                       >
                         <img
                           src={student.avatar}
@@ -1299,14 +1305,6 @@ export default function DocumentReview() {
                         />
                         <span>{student.name}</span>
                       </td>
-                      {/*
-                      <td>
-                        <span className={getStatusClass(deriveStatus(student))}>
-                          {deriveStatus(student).charAt(0).toUpperCase() +
-                            deriveStatus(student).slice(1)}
-                        </span>
-                      </td>
-                      */}
                       <td>
                         <button
                           className="action-btn delete-btn"
