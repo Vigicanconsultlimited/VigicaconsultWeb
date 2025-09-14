@@ -2,26 +2,37 @@
 .supporting-docs-form {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  padding: 2rem 2rem 2.25rem;
-  max-width: 880px;
-  margin: 0 auto 2rem;
-  font-family: "Segoe UI", "Inter", sans-serif;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  padding: 4rem 4rem 2.25rem;
+  max-width: 880px !important; /* Match AcademicDocuments exactly */
+  margin: 2 auto 2rem;
+  font-family: "Segoe UI", "Inter", Arial, sans-serif;
   position: relative;
 }
 
+/* Unify title and description styling */
 .supporting-title {
-  font-size: 1.9rem;
+  color: #2135b0;
   font-weight: 700;
-  color: #1f3fd6;
+  font-size: 1.9rem;
   margin: 0 0 0.75rem;
 }
-
 .supporting-desc {
   font-size: 0.95rem;
-  color: #555f75;
+  color: #495269;
+  margin-bottom: 1.1rem;
   line-height: 1.35;
-  margin-bottom: 1rem;
+}
+.supporting-accordion {
+  gap: 0.9rem;
+}
+.sup-acc-item {
+  border-radius: 14px;
+  padding: 14px 16px 10px;
+}
+.sup-acc-item.open {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  border-color: #c6d3ea;
 }
 
 .application-status {
