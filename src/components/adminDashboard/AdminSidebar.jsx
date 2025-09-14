@@ -28,6 +28,7 @@ export default function AdminSidebar({
   const menuItems = [
     { id: "overview", label: "Overview", icon: BarChart3 },
     { id: "document-review", label: "Document Review", icon: FileText },
+    { id: "applications", label: "Applications", icon: FileText },
     { id: "user-management", label: "User Management", icon: Users },
     { id: "uploaded-files", label: "Uploaded Files", icon: Upload },
     { id: "creation-center", label: "Creation Center", icon: HelpCircle },

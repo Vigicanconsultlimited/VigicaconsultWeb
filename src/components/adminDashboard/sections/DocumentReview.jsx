@@ -24,6 +24,7 @@ import {
   CreditCard,
   UserCheck as StatusIcon,
   Download,
+  RotateCw,
 } from "lucide-react";
 import apiInstance from "../../../utils/axios";
 import "../styles/DocumentReview.css";
@@ -46,6 +47,13 @@ const statusMap = {
   4: "rejected",
   5: "approved",
 };
+const statusHints = [
+  { key: "pending", label: "Pending", color: "#ffd54f" },
+  { key: "submitted", label: "Submitted", color: "#b3e5fc" },
+  { key: "under review", label: "Under Review", color: "#64b5f6" },
+  { key: "approved", label: "Approved", color: "#81c784" },
+  { key: "rejected", label: "Rejected", color: "#ef5350" },
+];
 
 // Application Status enum for API calls
 const ApplicationStatus = {
@@ -74,6 +82,15 @@ const documentStatusMap = {
   4: "approved",
 };
 
+const statusColors = {
+  submitted: "#b3e5fc",
+  pending: "#ffd54f",
+  "under review": "#64b5f6",
+  rejected: "#ef5350",
+  approved: "#81c784",
+  uploaded: "#aed581",
+};
+
 // Mappings for API enum values
 const languageOptions = [
   "English",
@@ -94,6 +111,12 @@ const languageOptions = [
 ];
 const pronounOptions = ["He/Him", "She/Her", "They/Them", "Prefer not to say"];
 const genderOptions = ["Male", "Female", "Prefer not to say", "Other"];
+const getStatusColor = (status) => statusColors[status] || "#eeeeee";
+
+const handleReloadDocument = () => {
+  setDocReloadFlag((v) => v + 1);
+  Toast.fire({ icon: "info", title: "Document reloaded!" });
+};
 
 // Document fields and their API endpoints
 const docFields = [
@@ -170,6 +193,9 @@ export default function DocumentReview() {
     return "Not specified";
   };
 
+  // Document reload flag to force iframe reloads
+  const [docReloadFlag, setDocReloadFlag] = useState(0);
+
   // Get JWT token from cookies with debugging
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
@@ -191,7 +217,6 @@ export default function DocumentReview() {
         title: "Authentication Invalid. Please login again.",
       });
     }
-
     return token || "";
   };
 
@@ -203,6 +228,18 @@ export default function DocumentReview() {
   const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
   const [personalDropdownOpen, setPersonalDropdownOpen] = useState(true);
   const [applicationDropdownOpen, setApplicationDropdownOpen] = useState(true);
+
+  // --- PAGINATION & FILTER STATE ---
+  const [filteredStudentList, setFilteredStudentList] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
+  // Track previous values
+  const prevSearchText = useRef(searchText);
+  const prevFilterStatus = useRef(filterStatus);
+
   const [toggleStates, setToggleStates] = useState({
     approve: false,
     reject: false,
@@ -270,6 +307,7 @@ export default function DocumentReview() {
           programDescription:
             result.program?.description || "No program information",
           courseOfInterest: result.courseOfInterest?.name || "Not specified",
+          researchTopic: result.researchTopic || "",
           schoolName: result.schoolResponse?.name || "Not specified",
           programLevel: result.program?.programLevel || 0,
           duration: result.program?.durationInYears || 0,
@@ -317,7 +355,9 @@ export default function DocumentReview() {
         const students = res.data.result.map((student) => ({
           id: student.id,
           name:
-            `${student.firstName || ""} ${student.lastName || ""}`.trim() ||
+            `${student.firstName || ""} ${student.middleName || ""} ${
+              student.lastName || ""
+            }`.trim() ||
             student.email ||
             "Unnamed",
           avatar: profile,
@@ -404,6 +444,36 @@ export default function DocumentReview() {
     }
     loadingState(false);
   };
+
+  // --- FILTER & PAGINATE STUDENT LIST ---
+  useEffect(() => {
+    let filtered = studentList;
+    if (searchText) {
+      filtered = filtered.filter((s) =>
+        s.name.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+    if (filterStatus !== "all") {
+      filtered = filtered.filter((s) => s.applicationStatus === filterStatus);
+    }
+    setFilteredStudentList(filtered);
+    // Only reset pagination if search/filter changed
+    if (
+      prevSearchText.current !== searchText ||
+      prevFilterStatus.current !== filterStatus
+    ) {
+      setCurrentPage(1);
+    }
+    prevSearchText.current = searchText;
+    prevFilterStatus.current = filterStatus;
+  }, [searchText, filterStatus, studentList]);
+
+  // --- PAGE DATA ---
+  const paginatedStudents = filteredStudentList.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+  const totalPages = Math.ceil(filteredStudentList.length / pageSize);
 
   useEffect(() => {
     fetchStudents(false);
@@ -599,7 +669,9 @@ export default function DocumentReview() {
               ? {
                   ...prev,
                   name:
-                    `${p.firstName || ""} ${p.lastName || ""}`.trim() ||
+                    `${p.firstName || ""} ${p.middleName || ""} ${
+                      p.lastName || ""
+                    }`.trim() ||
                     p.email ||
                     "Unnamed",
                   email: p.email || prev.email,
@@ -1139,6 +1211,51 @@ export default function DocumentReview() {
           />
           {refreshingStatuses ? "Refreshing..." : "Refresh"}
         </button>
+
+        {/* --- Status Legend --- */}
+        <div className="status-hints-row">
+          {statusHints.map((hint) => (
+            <span
+              key={hint.key}
+              className="status-hint-badge"
+              style={{
+                backgroundColor: hint.color,
+                color: "#212121",
+                marginRight: "1rem",
+                borderRadius: "8px",
+                padding: "0.3em 0.8em",
+                fontWeight: 500,
+                display: "inline-block",
+              }}
+            >
+              {hint.label}
+            </span>
+          ))}
+        </div>
+
+        {/* --- Search and Filter --- */}
+        <div className="student-filter-row">
+          <input
+            type="text"
+            className="student-search-input"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search student name..."
+            style={{ marginRight: "1em" }}
+          />
+          <select
+            className="student-status-select"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="submitted">Submitted</option>
+            <option value="under review">Under Review</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
       </div>
 
       <div className="document-review-section">
@@ -1155,12 +1272,12 @@ export default function DocumentReview() {
                 <thead>
                   <tr>
                     <th>Full Name</th>
-                    <th>Status</th>
+                    {/*<th>Status</th>*/}
                     <th>Delete</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {studentList.map((student) => (
+                  {paginatedStudents.map((student) => (
                     <tr
                       key={student.id}
                       className={
@@ -1175,19 +1292,17 @@ export default function DocumentReview() {
                         setApplicationDropdownOpen(true);
                       }}
                     >
-                      <td className="student-name">
+                      <td
+                        className="student-name"
+                        data-status={deriveStatus(student)}
+                        style={{}}
+                      >
                         <img
                           src={student.avatar}
                           className="student-avatar"
                           alt={student.name}
                         />
                         <span>{student.name}</span>
-                      </td>
-                      <td>
-                        <span className={getStatusClass(deriveStatus(student))}>
-                          {deriveStatus(student).charAt(0).toUpperCase() +
-                            deriveStatus(student).slice(1)}
-                        </span>
                       </td>
                       <td>
                         <button
@@ -1213,6 +1328,26 @@ export default function DocumentReview() {
                 </tbody>
               </table>
             )}
+          </div>
+          {/* --- PAGINATION BUTTONS --- */}
+          <div className="pagination-controls">
+            <button
+              className="pagination-btn"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            >
+              Prev
+            </button>
+            <span className="pagination-info">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className="pagination-btn"
+              disabled={currentPage === totalPages || totalPages === 0}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            >
+              Next
+            </button>
           </div>
         </div>
 
@@ -1476,6 +1611,23 @@ export default function DocumentReview() {
                             </span>
                           </div>
                         </div>
+
+                        {academicInfo.programLevel === 2 &&
+                          academicInfo.researchTopic && (
+                            <div className="detail-item full-width">
+                              <div className="detail-icon">
+                                <BookOpen size={16} />
+                              </div>
+                              <div className="detail-content">
+                                <span className="detail-label">
+                                  Research Topic
+                                </span>
+                                <span className="detail-value">
+                                  {academicInfo.researchTopic}
+                                </span>
+                              </div>
+                            </div>
+                          )}
 
                         <div className="detail-item">
                           <div className="detail-icon">
@@ -1849,6 +2001,7 @@ export default function DocumentReview() {
               <div className="document-preview-content">
                 <div className="pdf-preview-image">
                   <iframe
+                    key={docReloadFlag}
                     title="Document Preview"
                     src={selectedDocument.url}
                     className="document-iframe"
@@ -1873,6 +2026,7 @@ export default function DocumentReview() {
                           selectedDocument.status.slice(1)}
                       </span>
                     </div>
+                    {/*
                     <div className="download-section">
                       <a
                         href={
@@ -1890,6 +2044,32 @@ export default function DocumentReview() {
                         Download File
                       </a>
                     </div>
+                    */}
+                  </div>
+
+                  {/* --- Download and Reload buttons centered --- */}
+                  <div className="download-reload-row">
+                    <a
+                      href={
+                        selectedDocument.name === "Research Proposal"
+                          ? selectedDocument.downloadUrl || selectedDocument.url
+                          : selectedDocument.url
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="download-btn enhanced"
+                    >
+                      <Download size={18} />
+                      Download File
+                    </a>
+                    <button
+                      className="reload-btn enhanced"
+                      onClick={handleReloadDocument}
+                    >
+                      <RotateCw size={18} />
+                      Reload
+                    </button>
                   </div>
 
                   {/* Enhanced Document Review Actions */}
