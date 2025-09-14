@@ -10,6 +10,7 @@ import Inbox from "../components/adminDashboard/sections/Inbox";
 import SentMessages from "../components/adminDashboard/sections/SentMessages";
 import "../components/adminDashboard/styles/AdminDashboard.css";
 import CreationCenter from "../components/adminDashboard/sections/CreationCenter";
+import Applications from "../components/adminDashboard/sections/Applications";
 //import "../styles/AdminDashboard.css";
 
 export default function AdminDashboard() {
@@ -24,6 +25,8 @@ export default function AdminDashboard() {
         return <Overview />;
       case "document-review":
         return <DocumentReview />;
+      case "applications":
+        return <Applications />;
       case "user-management":
         return <UserManagement />;
       case "uploaded-files":

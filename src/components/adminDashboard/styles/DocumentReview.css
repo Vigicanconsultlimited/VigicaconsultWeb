@@ -1416,6 +1416,116 @@
   color: white;
 }
 
+.status-hints-row {
+  margin-top: 0.7em;
+  margin-bottom: 0.5em;
+}
+
+.student-filter-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.2em;
+}
+
+.student-search-input {
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  border: 1px solid #bbb;
+  font-size: 1em;
+}
+
+.student-status-select {
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  border: 1px solid #bbb;
+  font-size: 1em;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1em 0 0.5em 0;
+  gap: 1.5em;
+}
+
+.pagination-btn {
+  background: #64b5f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4em 1.2em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pagination-btn:disabled {
+  background: #e0e0e0;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-weight: 500;
+  color: #333;
+}
+
+.student-name {
+  font-weight: 600;
+  font-size: 1.07em;
+  padding: 0.45em 0.9em;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.download-reload-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.7em;
+  margin: 1.2em auto 1em auto;
+}
+
+.download-btn.enhanced {
+  background: #81c784;
+  color: #fff;
+  border: none;
+  padding: 0.5em 1.2em;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.download-btn.enhanced:hover {
+  background: #388e3c;
+  color: #fff;
+}
+
+.reload-btn.enhanced {
+  background: #64b5f6;
+  color: #fff;
+  border: none;
+  padding: 0.5em 1.2em;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  transition: background 0.2s;
+}
+
+.reload-btn.enhanced:hover {
+  background: #1976d2;
+  color: #fff;
+}
+
 /* Mobile Responsive Design - Compact */
 @media (max-width: 900px) {
   .document-review-section {
