@@ -332,6 +332,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
 
   return (
     <form
+      className="supporting-docs-form"
       onSubmit={(e) => {
         e.preventDefault();
 
@@ -365,7 +366,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
         </div>
       )}
 
-      <div className="supporting-desc">
+      <div className="supporting-desc supporting-docs-form">
         {!canEdit && (
           <div className="alert alert-primary compact-alert mb-2">
             <strong>Notice:</strong> Editing disabled at current status.

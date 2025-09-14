@@ -217,7 +217,6 @@ export default function DocumentReview() {
         title: "Authentication Invalid. Please login again.",
       });
     }
-
     return token || "";
   };
 

@@ -15,7 +15,6 @@ import {
   MapPin,
   Calendar,
   X,
-  Filter,
 } from "lucide-react";
 
 const statusMap = {
@@ -60,6 +59,7 @@ export default function Applications() {
   const [programLevelFilter, setProgramLevelFilter] = useState("all");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  // Fetch paginated applications for display
   const fetchApplications = useCallback(
     async (page = 1, isRefresh = false) => {
       const loadingState = isRefresh ? setRefreshing : setLoadingApps;
@@ -134,7 +134,7 @@ export default function Applications() {
     );
   });
 
-  // Export functionality (includes all details for filtered apps)
+  // Export current filtered page
   const handleExport = () => {
     const csvHeader = [
       "Full Name",
@@ -143,7 +143,6 @@ export default function Applications() {
       "School",
       "School Address",
       "Program",
-      "Program Level",
       "Status",
       "Course of Interest",
       "Date of Birth",
@@ -169,7 +168,6 @@ export default function Applications() {
             `"${ac.schoolResponse?.name || ""}"`,
             `"${ac.schoolResponse?.addresss || ""}"`,
             `"${ac.program?.description || ""}"`,
-            `"${programLevelMap[ac.program?.programLevel] || ""}"`,
             `"${statusMap[app.applicationStatus] || ""}"`,
             `"${ac.courseOfInterest?.name || ""}"`,
             `"${pi.dob || ""}"`,
@@ -183,6 +181,71 @@ export default function Applications() {
     const a = document.createElement("a");
     a.href = url;
     a.download = `applications-export-${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
+    a.click();
+  };
+
+  // Export ALL applications, not just paginated/filtered
+  const handleExportAll = async () => {
+    let allExportApplications = [];
+    try {
+      const res = await apiInstance.get(
+        `StudentApplication/allapplicationspagenation?pageNumber=1&pageSize=10000`
+      );
+      if (res?.data?.data && Array.isArray(res.data.data)) {
+        allExportApplications = res.data.data;
+      }
+    } catch (error) {
+      alert("Failed to fetch all applications for export.");
+      return;
+    }
+
+    const csvHeader = [
+      "Full Name",
+      "Email",
+      "Phone",
+      "School",
+      "School Address",
+      "Program",
+      "Status",
+      "Course of Interest",
+      "Date of Birth",
+      "Research Topic",
+    ].join(",");
+
+    const csvContent =
+      csvHeader +
+      "\n" +
+      allExportApplications
+        .map((app) => {
+          const pi = app.personalInformation || {};
+          const ac = app.academic || {};
+          const fullName = [pi.firstName, pi.middleName, pi.lastName]
+            .filter(Boolean)
+            .join(" ")
+            .trim();
+
+          return [
+            `"${fullName}"`,
+            `"${pi.email || ""}"`,
+            `"${pi.phone || ""}"`,
+            `"${ac.schoolResponse?.name || ""}"`,
+            `"${ac.schoolResponse?.addresss || ""}"`,
+            `"${ac.program?.description || ""}"`, // Only program description
+            `"${statusMap[app.applicationStatus] || ""}"`,
+            `"${ac.courseOfInterest?.name || ""}"`,
+            `"${pi.dob || ""}"`,
+            `"${ac.researchTopic || ""}"`,
+          ].join(",");
+        })
+        .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `applications-export-all-${
       new Date().toISOString().split("T")[0]
     }.csv`;
     a.click();
@@ -226,6 +289,13 @@ export default function Applications() {
             <button onClick={handleExport} className="btn btn-sm btn-outline">
               <Download size={16} />
               Export
+            </button>
+            <button
+              onClick={handleExportAll}
+              className="btn btn-sm btn-outline"
+            >
+              <Download size={16} />
+              Export All
             </button>
           </div>
         </div>
@@ -375,10 +445,6 @@ export default function Applications() {
                         </td>
                         <td className="program-cell">
                           {ac.program?.description || ""}
-                          {ac.program?.programLevel &&
-                          programLevelMap[ac.program.programLevel]
-                            ? ` (${programLevelMap[ac.program.programLevel]})`
-                            : ""}
                         </td>
                         <td className="research-topic-cell">
                           {ac.researchTopic ? (
@@ -494,16 +560,6 @@ export default function Applications() {
                   <span>
                     {selectedApplication.academic?.program?.description ||
                       "Not specified"}
-                    {selectedApplication.academic?.program?.programLevel &&
-                    programLevelMap[
-                      selectedApplication.academic.program.programLevel
-                    ]
-                      ? ` (${
-                          programLevelMap[
-                            selectedApplication.academic.program.programLevel
-                          ]
-                        })`
-                      : ""}
                   </span>
                 </div>
                 <div className="stat-item">
