@@ -377,7 +377,7 @@ export default function Overview() {
         </div>
 
         {/* Audience Satisfaction */}
-        {/* Audience Satisfaction (REPLACE THIS WHOLE CARD) */}
+        {/* 
         <div className="insights-card satisfaction">
           <div className="insights-card-header">
             <span>Audience Satisfaction</span>
@@ -385,10 +385,10 @@ export default function Overview() {
           </div>
 
           <div className="audience-layout">
-            {/* Left: Gauge */}
+            {/* Left: Gauge /}
             <div className="aud-gauge">
               <svg viewBox="0 0 120 60" className="aud-gauge-svg">
-                {/* background arc */}
+                {/* background arc /}
                 <path
                   d="M10,55 A50,50 0 0,1 110,55"
                   fill="none"
@@ -396,7 +396,7 @@ export default function Overview() {
                   strokeWidth="10"
                   strokeLinecap="round"
                 />
-                {/* foreground arc */}
+                {/* foreground arc /}
                 <path
                   d="M10,55 A50,50 0 0,1 110,55"
                   fill="none"
@@ -406,7 +406,7 @@ export default function Overview() {
                   strokeDasharray="120"
                   strokeDashoffset={120 - satisfaction.percentage}
                 />
-                {/* number */}
+                {/* number /}
                 <text
                   x="60"
                   y="42"
@@ -424,13 +424,13 @@ export default function Overview() {
               </span>
             </div>
 
-            {/* Right: Rows */}
+            {/* Right: Rows /}
             <div className="aud-rows">
               {satisfaction.stars.map((s) => (
                 <div key={s.star} className="aud-row">
                   <span className="aud-label">{s.star} Stars</span>
 
-                  {/* Always render 5 stars horizontally, color first N */}
+                  {/* Always render 5 stars horizontally, color first N /}
                   <span className="aud-stars" aria-label={`${s.star} star row`}>
                     {[1, 2, 3, 4, 5].map((n) => (
                       <Star
@@ -449,9 +449,11 @@ export default function Overview() {
             </div>
           </div>
         </div>
+        */}
       </div>
 
       {/* Site Analytics */}
+      {/*
       <h2 className="overview-section-title">Site Analytics</h2>
       <div className="analytics-cards-row">
         {analytics.map((a) => (
@@ -494,7 +496,7 @@ export default function Overview() {
           </div>
         ))}
 
-        {/* Gender Distribution */}
+        {/* Gender Distribution /}
         <div className="analytics-card gender">
           <div className="analytics-card-header">
             <span>Applicants by Gender</span>
@@ -552,6 +554,7 @@ export default function Overview() {
           </div>
         </div>
       </div>
+      */}
     </div>
   );
 }
