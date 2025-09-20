@@ -149,32 +149,33 @@ export default function Applications() {
       "Research Topic",
     ].join(",");
 
-    const csvContent =
-      csvHeader +
-      "\n" +
-      filteredApplications
-        .map((app) => {
-          const pi = app.personalInformation || {};
-          const ac = app.academic || {};
-          const fullName = [pi.firstName, pi.middleName, pi.lastName]
-            .filter(Boolean)
-            .join(" ")
-            .trim();
+   const csvContent =
+  csvHeader +
+  "\n" +
+  allExportApplications
+    .map((app) => {
+      const pi = app.personalInformation || {};
+      const ac = app.academic || {};
+      const fullName = [pi.firstName, pi.middleName, pi.lastName]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
 
-          return [
-            `"${fullName}"`,
-            `"${pi.email || ""}"`,
-            `"${pi.phone || ""}"`,
-            `"${ac.schoolResponse?.name || ""}"`,
-            `"${ac.schoolResponse?.addresss || ""}"`,
-            `"${ac.program?.description || ""}"`,
-            `"${statusMap[app.applicationStatus] || ""}"`,
-            `"${ac.courseOfInterest?.name || ""}"`,
-            `"${pi.dob || ""}"`,
-            `"${ac.researchTopic || ""}"`,
-          ].join(",");
-        })
-        .join("\n");
+      return [
+        `"${fullName}"`,
+        `"${pi.email || ""}"`,
+        `"${pi.phone || ""}"`,
+        `"${ac.schoolResponse?.name || ""}"`,
+        `"${ac.schoolResponse?.addresss || ""}"`,
+        `"${ac.program?.description || ""}"`,
+        `"${statusMap[app.applicationStatus] || ""}"`,
+        `"${ac.courseOfInterest?.name || ""}"`,
+        `"${pi.dob || ""}"`,
+        `"${ac.researchTopic || ""}"`,
+        `"${app.researchProposalurl || ""}"`, // <-- use app.researchProposalurl
+      ].join(",");
+    })
+    .join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
