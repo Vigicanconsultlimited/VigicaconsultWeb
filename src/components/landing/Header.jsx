@@ -294,7 +294,7 @@ function Header() {
                   <FaTwitter />
                 </a>
                 <a
-                  href="https://www.instagram.com/vigicaconsult/"
+                  href="https://www.instagram.com/VIGICA_Consult/"
                   className="text-white hover:text-blue-200 transition-colors"
                 >
                   <FaInstagram />
