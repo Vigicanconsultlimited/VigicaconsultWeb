@@ -300,7 +300,7 @@ function Header() {
                   <FaInstagram />
                 </a>
                 <a
-                  href="https://www.facebook.com/profile.php?id=61579196807381"
+                  href="https://www.facebook.com/VIGICAConsult"
                   className="text-white hover:text-blue-200 transition-colors"
                 >
                   <FaFacebook />
