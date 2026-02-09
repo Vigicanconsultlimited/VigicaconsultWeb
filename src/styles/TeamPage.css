@@ -153,8 +153,8 @@
 /* Team Grid */
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
   margin-top: 2rem;
 }
 
@@ -162,7 +162,7 @@
 .team-card {
   position: relative;
   background: white;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
@@ -187,7 +187,7 @@
 
 .card-image {
   width: 100%;
-  height: 280px;
+  height: 180px;
   overflow: hidden;
 }
 
@@ -203,36 +203,37 @@
 }
 
 .card-content {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .member-name {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 0.25rem;
 }
 
 .member-position {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: #3b82f6;
   font-weight: 500;
   margin-bottom: 0.25rem;
 }
 
 .member-department {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #64748b;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .member-bio {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   color: #64748b;
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -248,12 +249,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: #f1f5f9;
   color: #64748b;
-  font-size: 1rem;
+  font-size: 0.85rem;
   transition: all 0.3s ease;
 }
 
@@ -292,7 +293,7 @@
 .view-profile-btn {
   display: inline-block;
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   background: #f1f5f9;
   color: #3b82f6;
   text-align: center;
