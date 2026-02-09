@@ -1402,7 +1402,6 @@ export default function Home() {
                       </h3>
                       <div className="text-gray-600 flex flex-col lg:flex-row lg:items-center lg:gap-4 gap-2">
                         <p className="flex items-center gap-2">
-                          <Phone className="w-4 h-4" /> +44 730 979 4839
                         </p>
                         <span className="hidden lg:inline">|</span>
                         <p className="flex items-center gap-2">
