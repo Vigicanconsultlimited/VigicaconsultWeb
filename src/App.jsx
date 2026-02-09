@@ -22,6 +22,9 @@ import Logout from "./pages/Logout";
 import OtpverifyPage from "./pages/OtpVerifyPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import TeamPage from "./pages/TeamPage";
+import TeamMemberProfile from "./pages/TeamMemberProfile";
+import TeamApplicationForm from "./pages/TeamApplicationForm";
 
 // Component to redirect to appropriate dashboard based on role
 function DashboardRedirect() {
@@ -77,6 +80,11 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/logout" element={<Logout />} />
+
+        {/* Team Pages - Public */}
+        <Route path="/team" element={<TeamPage />} />
+        <Route path="/team/apply" element={<TeamApplicationForm />} />
+        <Route path="/team/:id" element={<TeamMemberProfile />} />
 
         {/* Dashboard redirect route - redirects to appropriate dashboard based on role */}
         <Route

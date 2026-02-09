@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "../ui/button";
 import vigicaLogo from "../../assets/images/vigicaV2.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaMapMarkerAlt,
   FaPhone,
@@ -27,6 +27,8 @@ const navItems = [
   { id: "study", label: "Study Abroad" },
   { id: "flights", label: "Flights" },
   { id: "accommodation", label: "Accommodation" },
+  { id: "partners", label: "Partners" },
+  { id: "staff", label: "Our Team", isLink: true, to: "/team" },
   { id: "contact", label: "Contact" },
 ];
 
@@ -35,6 +37,9 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [displayName, setDisplayName] = useState("");
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const user = useAuthStore((state) => state.allUserData);
@@ -49,12 +54,12 @@ function Header() {
       try {
         const apiInstance = (await import("../../utils/axios")).default;
         const personalRes = await apiInstance.get(
-          `StudentPersonalInfo/user/${userId}`
+          `StudentPersonalInfo/user/${userId}`,
         );
         const personalInfoId = personalRes?.data?.result?.id;
         if (personalInfoId) {
           const submittedAppRes = await apiInstance.get(
-            `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+            `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`,
           );
           const personalData =
             submittedAppRes?.data?.result?.personalInformation;
@@ -94,6 +99,24 @@ function Header() {
     return () => window.removeEventListener("scroll", handleScrollSpy);
   }, []);
 
+  // Handle hash navigation when coming from another page
+  useEffect(() => {
+    if (location.pathname === "/" && location.hash) {
+      const sectionId = location.hash.replace("#", "");
+      // Wait for page to render before scrolling
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const headerEl = document.querySelector("header");
+          const headerHeight = headerEl ? headerEl.offsetHeight : 0;
+          el.style.scrollMarginTop = `${headerHeight + 8}px`;
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          setCurrentSection(sectionId);
+        }
+      }, 100);
+    }
+  }, [location]);
+
   //scrollToSection
   const scrollToSection = async (sectionId) => {
     const doScroll = () => {
@@ -110,6 +133,12 @@ function Header() {
 
       setCurrentSection(sectionId);
     };
+
+    // If not on the landing page, navigate there first with the section hash
+    if (location.pathname !== "/") {
+      navigate(`/#${sectionId}`);
+      return;
+    }
 
     // If on mobile and menu is open, close it first and wait for the collapse animation
     const isMobile = window.innerWidth < 768;
@@ -343,20 +372,30 @@ function Header() {
             {/* Desktop Navigation */}
             <div className="desktop-only flex-1 items-center justify-center">
               <div className="flex items-center">
-                {navItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => scrollToSection(item.id)}
-                    className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 group ${
-                      currentSection === item.id
-                        ? "text-blue-600 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {item.label}
-                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-                  </button>
-                ))}
+                {navItems.map((item) =>
+                  item.isLink ? (
+                    <Link
+                      key={item.id}
+                      to={item.to}
+                      className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 text-gray-600 no-underline`}
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <button
+                      key={item.id}
+                      onClick={() => scrollToSection(item.id)}
+                      className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 group ${
+                        currentSection === item.id
+                          ? "text-blue-600 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {item.label}
+                      <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                    </button>
+                  ),
+                )}
               </div>
             </div>
 
@@ -391,19 +430,30 @@ function Header() {
               className="md:hidden bg-white border-t border-gray-100"
             >
               <div className="px-4 py-2 space-y-1">
-                {navItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => scrollToSection(item.id)}
-                    className={`block w-full text-left px-4 py-2 rounded-lg transition-colors ${
-                      currentSection === item.id
-                        ? "text-blue-600 bg-blue-50 font-semibold"
-                        : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
+                {navItems.map((item) =>
+                  item.isLink ? (
+                    <Link
+                      key={item.id}
+                      to={item.to}
+                      className={`block w-full text-left px-4 py-2 rounded-lg transition-colors text-gray-600 hover:text-blue-600 hover:bg-blue-50 no-underline`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <button
+                      key={item.id}
+                      onClick={() => scrollToSection(item.id)}
+                      className={`block w-full text-left px-4 py-2 rounded-lg transition-colors ${
+                        currentSection === item.id
+                          ? "text-blue-600 bg-blue-50 font-semibold"
+                          : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ),
+                )}
                 {renderMobileAuthButton()}
               </div>
             </motion.div>

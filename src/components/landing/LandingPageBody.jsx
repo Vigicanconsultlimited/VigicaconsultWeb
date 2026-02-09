@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "./Header";
+import Partners from "./Partners";
 import LoadingSpinner from "./LoadingSpinner";
 import { Email } from "@mui/icons-material";
 import apiInstance from "../../utils/axios";
@@ -164,7 +165,7 @@ const TestimonialCarousel = ({ testimonials }) => {
   const handlePrevious = () => {
     setDirection("left");
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
+      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1,
     );
   };
 
@@ -1345,6 +1346,9 @@ export default function Home() {
               </div>
             </form>
           </Modal>
+
+          {/* Partners Section */}
+          <Partners />
 
           {/* Contact Section */}
           <section id="contact" className="py-20 bg-gray-50">

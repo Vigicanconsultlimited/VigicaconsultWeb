@@ -50,6 +50,7 @@ export default function Applications() {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [exportingAll, setExportingAll] = useState(false);
 
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -134,6 +135,40 @@ export default function Applications() {
     );
   });
 
+  // Helper function to generate CSV row
+  const generateCSVRow = (app) => {
+    const pi = app.personalInformation || {};
+    const ac = app.academic || {};
+    const fullName = [pi.firstName, pi.middleName, pi.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    // Extract research proposal URL (convert from Google Docs view URL to download URL)
+    let proposalDownloadUrl = "";
+    if (app.researchProposalurl) {
+      // Convert Google Docs view URL to direct download URL
+      const match = app.researchProposalurl.match(/url=([^&]+)/);
+      if (match) {
+        proposalDownloadUrl = decodeURIComponent(match[1]);
+      }
+    }
+
+    return [
+      `"${fullName}"`,
+      `"${pi.email || ""}"`,
+      `"${pi.phone || ""}"`,
+      `"${ac.schoolResponse?.name || ""}"`,
+      `"${ac.schoolResponse?.addresss || ""}"`,
+      `"${ac.program?.description || ""}"`,
+      `"${statusMap[app.applicationStatus] || ""}"`,
+      `"${ac.courseOfInterest?.name || ""}"`,
+      `"${pi.dob || ""}"`,
+      `"${ac.researchTopic || ""}"`,
+      `"${proposalDownloadUrl}"`,
+    ].join(",");
+  };
+
   // Export current filtered page
   const handleExport = () => {
     const csvHeader = [
@@ -147,34 +182,11 @@ export default function Applications() {
       "Course of Interest",
       "Date of Birth",
       "Research Topic",
+      "PhD Proposal Download Link",
     ].join(",");
 
     const csvContent =
-      csvHeader +
-      "\n" +
-      filteredApplications
-        .map((app) => {
-          const pi = app.personalInformation || {};
-          const ac = app.academic || {};
-          const fullName = [pi.firstName, pi.middleName, pi.lastName]
-            .filter(Boolean)
-            .join(" ")
-            .trim();
-
-          return [
-            `"${fullName}"`,
-            `"${pi.email || ""}"`,
-            `"${pi.phone || ""}"`,
-            `"${ac.schoolResponse?.name || ""}"`,
-            `"${ac.schoolResponse?.addresss || ""}"`,
-            `"${ac.program?.description || ""}"`,
-            `"${statusMap[app.applicationStatus] || ""}"`,
-            `"${ac.courseOfInterest?.name || ""}"`,
-            `"${pi.dob || ""}"`,
-            `"${ac.researchTopic || ""}"`,
-          ].join(",");
-        })
-        .join("\n");
+      csvHeader + "\n" + filteredApplications.map(generateCSVRow).join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -186,69 +198,83 @@ export default function Applications() {
     a.click();
   };
 
-  // Export ALL applications, not just paginated/filtered
-  const handleExportAll = async () => {
-    let allExportApplications = [];
+  // Fetch all applications using totalPages
+  const fetchAllApplications = async () => {
     try {
-      const res = await apiInstance.get(
-        `StudentApplication/allapplicationspagenation?pageNumber=1&pageSize=10000`
+      // First, get the first page to determine total pages
+      const firstPageRes = await apiInstance.get(
+        `StudentApplication/allapplicationspagenation?pageNumber=1&pageSize=${pageSize}`
       );
-      if (res?.data?.data && Array.isArray(res.data.data)) {
-        allExportApplications = res.data.data;
+
+      if (!firstPageRes?.data?.data) {
+        throw new Error("Invalid response format");
       }
+
+      const totalPages = firstPageRes.data.totalPages || 1;
+      let allApplications = [...firstPageRes.data.data];
+
+      // If there are more pages, fetch them
+      if (totalPages > 1) {
+        const pagePromises = [];
+        for (let page = 2; page <= totalPages; page++) {
+          pagePromises.push(
+            apiInstance.get(
+              `StudentApplication/allapplicationspagenation?pageNumber=${page}&pageSize=${pageSize}`
+            )
+          );
+        }
+
+        const remainingPages = await Promise.all(pagePromises);
+        remainingPages.forEach((res) => {
+          if (res?.data?.data && Array.isArray(res.data.data)) {
+            allApplications = [...allApplications, ...res.data.data];
+          }
+        });
+      }
+
+      return allApplications;
+    } catch (error) {
+      console.error("Error fetching all applications:", error);
+      throw error;
+    }
+  };
+
+  // Export ALL applications using totalPages
+  const handleExportAll = async () => {
+    setExportingAll(true);
+    try {
+      const allApplications = await fetchAllApplications();
+
+      const csvHeader = [
+        "Full Name",
+        "Email",
+        "Phone",
+        "School",
+        "School Address",
+        "Program",
+        "Status",
+        "Course of Interest",
+        "Date of Birth",
+        "Research Topic",
+        "PhD Proposal Download Link",
+      ].join(",");
+
+      const csvContent =
+        csvHeader + "\n" + allApplications.map(generateCSVRow).join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `applications-export-all-${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
+      a.click();
     } catch (error) {
       alert("Failed to fetch all applications for export.");
-      return;
+    } finally {
+      setExportingAll(false);
     }
-
-    const csvHeader = [
-      "Full Name",
-      "Email",
-      "Phone",
-      "School",
-      "School Address",
-      "Program",
-      "Status",
-      "Course of Interest",
-      "Date of Birth",
-      "Research Topic",
-    ].join(",");
-
-    const csvContent =
-      csvHeader +
-      "\n" +
-      allExportApplications
-        .map((app) => {
-          const pi = app.personalInformation || {};
-          const ac = app.academic || {};
-          const fullName = [pi.firstName, pi.middleName, pi.lastName]
-            .filter(Boolean)
-            .join(" ")
-            .trim();
-
-          return [
-            `"${fullName}"`,
-            `"${pi.email || ""}"`,
-            `"${pi.phone || ""}"`,
-            `"${ac.schoolResponse?.name || ""}"`,
-            `"${ac.schoolResponse?.addresss || ""}"`,
-            `"${ac.program?.description || ""}"`, // Only program description
-            `"${statusMap[app.applicationStatus] || ""}"`,
-            `"${ac.courseOfInterest?.name || ""}"`,
-            `"${pi.dob || ""}"`,
-            `"${ac.researchTopic || ""}"`,
-          ].join(",");
-        })
-        .join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `applications-export-all-${
-      new Date().toISOString().split("T")[0]
-    }.csv`;
-    a.click();
   };
 
   const handleViewApplication = (app) => {
@@ -292,10 +318,11 @@ export default function Applications() {
             </button>
             <button
               onClick={handleExportAll}
+              disabled={exportingAll}
               className="btn btn-sm btn-outline"
             >
               <Download size={16} />
-              Export All
+              {exportingAll ? "Exporting..." : "Export All"}
             </button>
           </div>
         </div>
