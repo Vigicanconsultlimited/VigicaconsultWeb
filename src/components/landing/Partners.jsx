@@ -4,11 +4,9 @@ import { Badge } from "../ui/badge";
 import { Handshake } from "lucide-react";
 import DMU from "../../assets/images/1499083809_Capture.avif";
 import Leed_Bekett from "../../assets/images/2018_LBU01_PURPLE_jpg-1024x430.jpg";
-import EBSG from "../../assets/images/ebonyiia.PNG";
-//"C:\Users\User\Desktop\proj\VigicaconsultWeb\vigicanwebapp\src\assets\images\1499083809_Capture.avif"
+import EBSG from "../../assets/images/ebonyiia.png";
+//"C:\Users\User\Desktop\proj\VigicaconsultWeb\vigicanwebapp\src\assets\images\ebonyiia.png"
 // Partners data - easily extendable
-
-//"C:\Users\User\Desktop\proj\VigicaconsultWeb\vigicanwebapp\src\assets\images\Leeds-Beckett-Universiry.webp"
 const partnersData = [
   {
     id: 1,
