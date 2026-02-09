@@ -1,8 +1,13 @@
 import axios from "axios";
 
 // Django backend API instance for team management microservice
+// Uses Railway production URL in production, localhost in development
+const TEAM_API_BASE_URL = import.meta.env.PROD
+  ? "https://teamapi-production.up.railway.app/api/v1/"
+  : "http://127.0.0.1:8000/api/v1/";
+
 const teamApiInstance = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/v1/",
+  baseURL: TEAM_API_BASE_URL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
