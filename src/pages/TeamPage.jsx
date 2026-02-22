@@ -18,6 +18,22 @@ import "../styles/TeamPage.css";
 // Default profile image
 const defaultProfile = "/default-profile.jpg";
 
+// Base URL for media files (Django server)
+const MEDIA_BASE_URL = import.meta.env.PROD
+  ? "" // Production: Cloudinary returns full URLs
+  : "http://127.0.0.1:8000"; // Development: Django local server
+
+// Helper to get full image URL
+const getImageUrl = (url) => {
+  if (!url) return defaultProfile;
+  // If it's already a full URL (Cloudinary), return as-is
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  // Otherwise, prepend the Django server URL
+  return `${MEDIA_BASE_URL}${url}`;
+};
+
 function TeamPage() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -181,15 +197,15 @@ function TeamPage() {
                     <div className="featured-badge">Featured</div>
                   )}
 
-                  <div className="card-image">
+                  <Link to={`/team/${member.id}`} className="card-image">
                     <img
-                      src={member.profile_picture_url || defaultProfile}
+                      src={getImageUrl(member.profile_picture_url)}
                       alt={member.full_name}
                       onError={(e) => {
                         e.target.src = defaultProfile;
                       }}
                     />
-                  </div>
+                  </Link>
 
                   <div className="card-content">
                     <h3 className="member-name">{member.full_name}</h3>
