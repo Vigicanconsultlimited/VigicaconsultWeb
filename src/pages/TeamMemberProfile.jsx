@@ -18,6 +18,22 @@ import "../styles/TeamMemberProfile.css";
 // Default profile image
 const defaultProfile = "/default-profile.jpg";
 
+// Base URL for media files (Django server)
+const MEDIA_BASE_URL = import.meta.env.PROD
+  ? "" // Production: Cloudinary returns full URLs
+  : "http://127.0.0.1:8000"; // Development: Django local server
+
+// Helper to get full image URL
+const getImageUrl = (url) => {
+  if (!url) return defaultProfile;
+  // If it's already a full URL (Cloudinary), return as-is
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  // Otherwise, prepend the Django server URL
+  return `${MEDIA_BASE_URL}${url}`;
+};
+
 function TeamMemberProfile() {
   const { id } = useParams();
   const [member, setMember] = useState(null);
@@ -104,7 +120,7 @@ function TeamMemberProfile() {
             <div className="profile-header">
               <div className="profile-image-container">
                 <img
-                  src={member.profile_picture_url || defaultProfile}
+                  src={getImageUrl(member.profile_picture_url)}
                   alt={member.full_name}
                   className="profile-image"
                   onError={(e) => {
