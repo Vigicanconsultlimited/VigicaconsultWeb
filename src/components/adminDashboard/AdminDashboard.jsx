@@ -8,6 +8,7 @@ import SatisfactionRating from "./SatisfactionRating";
 import ProgressBar from "./ProgressBar";
 import apiInstance from "../../utils/axios";
 import { FileText } from "lucide-react";
+import ManageTeam from "./sections/ManageTeam";
 
 export default function AdminDashboard() {
   const [currentStep, setCurrentStep] = useState("dashboard-home");
@@ -40,10 +41,10 @@ export default function AdminDashboard() {
   // Example: Analytics Calculations
   const totalApplications = personalData.length;
   const maleApplications = personalData.filter(
-    (p) => p.preferredPronoun === 1
+    (p) => p.preferredPronoun === 1,
   ).length;
   const femaleApplications = personalData.filter(
-    (p) => p.preferredPronoun === 2
+    (p) => p.preferredPronoun === 2,
   ).length;
   const applicationsByGender = {
     male:
@@ -293,6 +294,8 @@ export default function AdminDashboard() {
             </p>
           </Card>
         );
+      case "manage-team":
+        return <ManageTeam />;
       case "uploaded-files":
         return (
           <Card>

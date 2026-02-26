@@ -25,6 +25,8 @@ import ResetPassword from "./pages/ResetPassword";
 import TeamPage from "./pages/TeamPage";
 import TeamMemberProfile from "./pages/TeamMemberProfile";
 import TeamApplicationForm from "./pages/TeamApplicationForm";
+import TeamDashboard from "./pages/TeamDashboard";
+import BookAppointment from "./pages/BookAppointment";
 
 // Component to redirect to appropriate dashboard based on role
 function DashboardRedirect() {
@@ -32,6 +34,9 @@ function DashboardRedirect() {
 
   if (userRole === "Admin") {
     return <Navigate to="/admin-dashboard" replace />;
+  }
+  if (userRole === "TeamMember") {
+    return <Navigate to="/team/dashboard" replace />;
   }
   return <Navigate to="/dashboard" replace />;
 }
@@ -85,6 +90,22 @@ function App() {
         <Route path="/team" element={<TeamPage />} />
         <Route path="/team/apply" element={<TeamApplicationForm />} />
         <Route path="/team/:id" element={<TeamMemberProfile />} />
+
+        {/* Team Member Dashboard - Only for TeamMember role */}
+        <Route
+          path="/team/dashboard"
+          element={
+            <PrivateRoute>
+              <RequireRole role="TeamMember">
+                <TeamDashboard />
+              </RequireRole>
+            </PrivateRoute>
+          }
+        />
+
+        {/* Appointment Booking */}
+        <Route path="/book" element={<BookAppointment />} />
+        <Route path="/book/:teamMemberId" element={<BookAppointment />} />
 
         {/* Dashboard redirect route - redirects to appropriate dashboard based on role */}
         <Route

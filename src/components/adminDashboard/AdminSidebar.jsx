@@ -13,6 +13,7 @@ import {
   Send as SendIcon,
   ChevronDown,
   ChevronUp,
+  UserCog,
 } from "lucide-react";
 import "./styles/AdminSidebar.css";
 import { Link } from "react-router-dom";
@@ -30,6 +31,7 @@ export default function AdminSidebar({
     { id: "document-review", label: "Document Review", icon: FileText },
     { id: "applications", label: "Applications", icon: FileText },
     { id: "user-management", label: "User Management", icon: Users },
+    { id: "manage-team", label: "Manage Team", icon: UserCog },
     { id: "uploaded-files", label: "Uploaded Files", icon: Upload },
     { id: "creation-center", label: "Creation Center", icon: HelpCircle },
     // Messages menu handled below

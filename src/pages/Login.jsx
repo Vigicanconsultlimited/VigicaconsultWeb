@@ -40,6 +40,8 @@ function Login() {
       const userRole = useAuthStore.getState().getUserRole();
       if (userRole === "Admin") {
         navigate("/admin-dashboard");
+      } else if (userRole === "TeamMember") {
+        navigate("/team/dashboard");
       } else {
         navigate("/dashboard");
       }
@@ -102,6 +104,8 @@ function Login() {
         setTimeout(() => {
           if (userRole === "Admin") {
             navigate("/admin-dashboard");
+          } else if (userRole === "TeamMember") {
+            navigate("/team/dashboard");
           } else {
             navigate("/dashboard");
           }
