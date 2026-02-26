@@ -23,6 +23,18 @@ export const teamApi = {
     return response.data;
   },
 
+  // Get team members grouped by category
+  getTeamMembersByCategory: async () => {
+    const response = await teamApiInstance.get("team/by-category/");
+    return response.data;
+  },
+
+  // Get all public categories
+  getCategories: async () => {
+    const response = await teamApiInstance.get("team/categories/public/");
+    return response.data;
+  },
+
   // Get a specific team member's details
   getTeamMemberDetails: async (id) => {
     const response = await teamApiInstance.get(`team/${id}/`);
@@ -51,6 +63,14 @@ export const teamApi = {
   getTeamByDepartment: async (department) => {
     const response = await teamApiInstance.get("team/", {
       params: { department },
+    });
+    return response.data;
+  },
+
+  // Filter by category
+  getTeamByCategory: async (categoryId) => {
+    const response = await teamApiInstance.get("team/", {
+      params: { category: categoryId },
     });
     return response.data;
   },

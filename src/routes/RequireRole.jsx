@@ -15,6 +15,8 @@ const RequireRole = ({ children, role }) => {
   if (userRole !== role) {
     if (userRole === "Admin") {
       return <Navigate to="/admin-dashboard" replace />;
+    } else if (userRole === "TeamMember") {
+      return <Navigate to="/team/dashboard" replace />;
     } else {
       return <Navigate to="/dashboard" replace />;
     }

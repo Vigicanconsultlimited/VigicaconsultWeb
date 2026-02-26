@@ -8,6 +8,7 @@ import UploadedFiles from "../components/adminDashboard/sections/UploadedFiles";
 import QuestionCenter from "../components/adminDashboard/sections/QuestionCenter";
 import Inbox from "../components/adminDashboard/sections/Inbox";
 import SentMessages from "../components/adminDashboard/sections/SentMessages";
+import ManageTeam from "../components/adminDashboard/sections/ManageTeam";
 import "../components/adminDashboard/styles/AdminDashboard.css";
 import CreationCenter from "../components/adminDashboard/sections/CreationCenter";
 import Applications from "../components/adminDashboard/sections/Applications";
@@ -29,6 +30,8 @@ export default function AdminDashboard() {
         return <Applications />;
       case "user-management":
         return <UserManagement />;
+      case "manage-team":
+        return <ManageTeam />;
       case "uploaded-files":
         return <UploadedFiles />;
       case "creation-center":

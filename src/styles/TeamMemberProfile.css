@@ -206,7 +206,7 @@
 }
 
 .profile-bio h2::before {
-  content: '';
+  content: "";
   width: 4px;
   height: 28px;
   background: linear-gradient(135deg, #3b82f6, #60a5fa);

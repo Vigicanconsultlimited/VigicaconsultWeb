@@ -1,0 +1,10 @@
+export { default as Overview } from "./Overview";
+export { default as Applications } from "./Applications";
+export { default as CreationCenter } from "./CreationCenter";
+export { default as DocumentReview } from "./DocumentReview";
+export { default as Inbox } from "./Inbox";
+export { default as QuestionCenter } from "./QuestionCenter";
+export { default as SentMessages } from "./SentMessages";
+export { default as UploadedFiles } from "./UploadedFiles";
+export { default as UserManagement } from "./UserManagement";
+export { default as ManageTeam } from "./ManageTeam";

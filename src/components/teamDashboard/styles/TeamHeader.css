@@ -1,0 +1,217 @@
+/* Team Header Styles - Matches Admin Header */
+.team-header-redesign {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.team-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  max-width: 100%;
+}
+
+/* Hamburger Button */
+.header-hamburger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.header-hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile Logo */
+.team-header-mobile-logo {
+  display: none;
+}
+
+.mobile-logo-img {
+  height: 40px;
+  width: auto;
+}
+
+/* Name Container */
+.team-name-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-name-container .sidebar-brand {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.team-name-container .sidebar-subbrand {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+}
+
+/* Desktop Profile */
+.team-header-desktop-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.profile-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.profile-role {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+.dropdown-chevron {
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform 0.2s;
+}
+
+.dropdown-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  min-width: 250px;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f8f9fa;
+}
+
+.dropdown-header img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dropdown-name {
+  font-weight: 600;
+  color: #1a237e;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.dropdown-email {
+  color: #666;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #eee;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #f5f5f5;
+  color: #1a237e;
+}
+
+.dropdown-item.logout {
+  color: #dc3545;
+  border-top: 1px solid #eee;
+}
+
+.dropdown-item.logout:hover {
+  background: #fff5f5;
+  color: #dc3545;
+}
+
+/* Mobile Styles */
+@media (max-width: 991px) {
+  .header-hamburger-btn {
+    display: flex;
+    order: 1;
+  }
+
+  .team-header-mobile-logo {
+    display: flex;
+    order: 2;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .team-name-container {
+    display: none;
+  }
+
+  .team-header-desktop-profile {
+    order: 3;
+  }
+
+  .profile-details {
+    display: none;
+  }
+
+  .dropdown-chevron {
+    display: none;
+  }
+
+  .profile-dropdown {
+    right: -10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .team-header-bar {
+    padding: 0.5rem 1rem;
+  }
+
+  .profile-avatar {
+    width: 36px;
+    height: 36px;
+  }
+}
