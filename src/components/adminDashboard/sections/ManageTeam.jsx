@@ -37,7 +37,7 @@ api.interceptors.request.use((config) => {
 
 const ManageTeam = () => {
   const [activeTab, setActiveTab] = useState("members");
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState([]); // all members (unfiltered)
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -63,27 +63,19 @@ const ManageTeam = () => {
     } else {
       fetchCategories();
     }
-  }, [activeTab, statusFilter]);
+  }, [activeTab]);
 
   const fetchMembers = async () => {
     setLoading(true);
     try {
-      const url =
-        statusFilter === "all"
-          ? "/team/admin/team/"
-          : `/team/admin/team/?status=${statusFilter}`;
-      const response = await api.get(url);
+      const response = await api.get("/team/admin/team/");
       const data = response.data.results || response.data;
       setMembers(data);
-
-      // Calculate stats
-      const allResponse = await api.get("/team/admin/team/");
-      const allData = allResponse.data.results || allResponse.data;
       setStats({
-        total: allData.length,
-        approved: allData.filter((m) => m.status === "approved").length,
-        pending: allData.filter((m) => m.status === "pending").length,
-        rejected: allData.filter((m) => m.status === "rejected").length,
+        total: data.length,
+        approved: data.filter((m) => m.status === "approved").length,
+        pending: data.filter((m) => m.status === "pending").length,
+        rejected: data.filter((m) => m.status === "rejected").length,
       });
     } catch (error) {
       console.error("Error fetching members:", error);
@@ -188,6 +180,7 @@ const ManageTeam = () => {
   };
 
   const filteredMembers = members.filter((member) => {
+    if (statusFilter !== "all" && member.status !== statusFilter) return false;
     if (!searchQuery) return true;
     const search = searchQuery.toLowerCase();
     return (
