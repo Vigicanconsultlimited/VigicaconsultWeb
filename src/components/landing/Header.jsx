@@ -79,6 +79,13 @@ function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Clear scroll-based active state when navigating away from home
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      setCurrentSection("");
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     const handleScrollSpy = () => {
       const sections = navItems
@@ -377,7 +384,11 @@ function Header() {
                     <Link
                       key={item.id}
                       to={item.to}
-                      className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 text-gray-600 no-underline`}
+                      className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 no-underline ${
+                        location.pathname === item.to
+                          ? "text-blue-600 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600"
+                          : "text-gray-600"
+                      }`}
                     >
                       {item.label}
                     </Link>
@@ -435,7 +446,11 @@ function Header() {
                     <Link
                       key={item.id}
                       to={item.to}
-                      className={`block w-full text-left px-4 py-2 rounded-lg transition-colors text-gray-600 hover:text-blue-600 hover:bg-blue-50 no-underline`}
+                      className={`block w-full text-left px-4 py-2 rounded-lg transition-colors no-underline ${
+                        location.pathname === item.to
+                          ? "text-blue-600 bg-blue-50 font-semibold"
+                          : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                      }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item.label}

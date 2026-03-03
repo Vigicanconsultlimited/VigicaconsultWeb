@@ -18,6 +18,15 @@ import "../styles/TeamPage.css";
 // Default profile image
 const defaultProfile = "/default-profile.jpg";
 
+// Vigica company social links — used as fallback when a member hasn't set their own
+const VIGICA_SOCIALS = {
+  linkedin:
+    "https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true",
+  twitter: "https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09",
+  facebook: "https://www.facebook.com/profile.php?id=61579196807381",
+  instagram: "https://www.instagram.com/vigicaconsult/",
+};
+
 // Base URL for media files (Django server)
 const MEDIA_BASE_URL = import.meta.env.PROD
   ? "" // Production: Cloudinary returns full URLs
@@ -73,46 +82,38 @@ const TeamMemberCard = ({
 
       {/* Social Links */}
       <div className="social-links">
-        {member.linkedin_url && (
-          <a
-            href={member.linkedin_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-link linkedin"
-          >
-            <FaLinkedin />
-          </a>
-        )}
-        {member.twitter_url && (
-          <a
-            href={member.twitter_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-link twitter"
-          >
-            <FaTwitter />
-          </a>
-        )}
-        {member.facebook_url && (
-          <a
-            href={member.facebook_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-link facebook"
-          >
-            <FaFacebook />
-          </a>
-        )}
-        {member.instagram_url && (
-          <a
-            href={member.instagram_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="social-link instagram"
-          >
-            <FaInstagram />
-          </a>
-        )}
+        <a
+          href={member.linkedin_url || VIGICA_SOCIALS.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-link linkedin"
+        >
+          <FaLinkedin />
+        </a>
+        <a
+          href={member.twitter_url || VIGICA_SOCIALS.twitter}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-link twitter"
+        >
+          <FaTwitter />
+        </a>
+        <a
+          href={member.facebook_url || VIGICA_SOCIALS.facebook}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-link facebook"
+        >
+          <FaFacebook />
+        </a>
+        <a
+          href={member.instagram_url || VIGICA_SOCIALS.instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-link instagram"
+        >
+          <FaInstagram />
+        </a>
       </div>
 
       <Link to={`/team/${member.id}`} className="view-profile-btn">
@@ -301,9 +302,11 @@ function TeamPage() {
                               </p>
                             )}
                           </div>
+                          {/* Member Count 
                           <span className="member-count bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm ml-2">
                             {item.members?.length || 0} members
                           </span>
+                          */}
                         </div>
                         <button className="collapse-btn p-2">
                           {collapsedCategories[categoryId] ? (
