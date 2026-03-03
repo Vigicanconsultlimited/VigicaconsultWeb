@@ -5,6 +5,7 @@ import { Handshake } from "lucide-react";
 import DMU from "../../assets/images/1499083809_Capture.avif";
 import Leed_Bekett from "../../assets/images/2018_LBU01_PURPLE_jpg-1024x430.jpg";
 import EBSG from "../../assets/images/ebonyiia.png";
+import Robert_Gordon from "../../assets/images/RobertGordon.png";
 //"C:\Users\User\Desktop\proj\VigicaconsultWeb\vigicanwebapp\src\assets\images\ebonyiia.png"
 // Partners data - easily extendable
 const partnersData = [
@@ -31,9 +32,9 @@ const partnersData = [
   },
   {
     id: 4,
-    name: "Ebonyi State Scholarship Board",
-    logo: null, // Will use placeholder
-    url: "#",
+    name: "Robert Gordon University, Aberdeen",
+    logo: Robert_Gordon,
+    url: "https://www.rgu.ac.uk/",
     description: "Scholarship Partner",
   },
 ];
@@ -75,18 +76,18 @@ const Partners = () => {
               href={partner.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group"
+              className="group no-underline"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
             >
-              <div className="bg-white rounded-2xl p-6 lg:p-8 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 h-full flex flex-col items-center justify-center min-h-[180px]">
+              <div className="bg-white rounded-xl p-4 lg:p-5 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 h-full flex flex-col items-center justify-center min-h-[130px]">
                 {partner.logo ? (
                   <img
                     src={partner.logo}
                     alt={partner.name}
-                    className="max-h-16 lg:max-h-20 w-auto object-contain mb-4 grayscale group-hover:grayscale-0 transition-all duration-300"
+                    className="max-h-10 lg:max-h-12 w-auto object-contain mb-3 grayscale group-hover:grayscale-0 transition-all duration-300"
                     onError={(e) => {
                       e.target.style.display = "none";
                       e.target.nextSibling.style.display = "flex";
@@ -95,13 +96,13 @@ const Partners = () => {
                 ) : null}
                 {/* Fallback placeholder */}
                 <div
-                  className={`${partner.logo ? "hidden" : "flex"} w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl items-center justify-center mb-4`}
+                  className={`${partner.logo ? "hidden" : "flex"} w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl items-center justify-center mb-3`}
                 >
-                  <span className="text-white text-2xl lg:text-3xl font-bold">
+                  <span className="text-white text-xl lg:text-2xl font-bold">
                     {partner.name.charAt(0)}
                   </span>
                 </div>
-                <h3 className="text-sm lg:text-base font-semibold text-gray-800 text-center group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xs lg:text-sm font-semibold text-gray-800 text-center group-hover:text-blue-600 transition-colors no-underline">
                   {partner.name}
                 </h3>
                 <p className="text-xs text-gray-500 mt-1 text-center">
@@ -124,7 +125,7 @@ const Partners = () => {
             Interested in partnering with us?{" "}
             <a
               href="#contact"
-              className="text-blue-600 font-semibold hover:text-blue-700 underline"
+              className="text-blue-600 font-semibold hover:text-blue-700 no-underline"
             >
               Get in touch
             </a>
