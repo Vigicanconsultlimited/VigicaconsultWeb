@@ -19,7 +19,7 @@ import Isaiah from "../assets/images/Isaiah.jpg";
 
 const CONSULTANT = {
   name: "Dr. Gideon Okorie",
-  title: "Chief Consultant",
+  title: "Ebonyi State Scholarship Liaison Officer/Chief Consultant",
   photo: drGideon,
   speech: `While pursuing my MBA in Global Healthcare Management at the University of Greater Manchester, serving as both Class Representative and Student Ambassador strengthened my resolve to become a person of value rather than merely someone who is successful.
 
