@@ -47,6 +47,9 @@ const ManageTeam = () => {
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [positions, setPositions] = useState([]);
+  const [showPositionModal, setShowPositionModal] = useState(false);
+  const [editingPosition, setEditingPosition] = useState(null);
   const [stats, setStats] = useState({
     total: 0,
     approved: 0,
@@ -61,8 +64,10 @@ const ManageTeam = () => {
   useEffect(() => {
     if (activeTab === "members") {
       fetchMembers();
-    } else {
+    } else if (activeTab === "categories") {
       fetchCategories();
+    } else if (activeTab === "positions") {
+      fetchPositions();
     }
   }, [activeTab]);
 
@@ -169,6 +174,46 @@ const ManageTeam = () => {
     }
   };
 
+  const fetchPositions = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get("/team/admin/positions/");
+      const data = response.data.results || response.data;
+      setPositions(data);
+    } catch (error) {
+      console.error("Error fetching positions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSavePosition = async (positionData) => {
+    try {
+      if (editingPosition) {
+        await api.put(`/team/admin/positions/${editingPosition.id}/`, positionData);
+      } else {
+        await api.post("/team/admin/positions/", positionData);
+      }
+      fetchPositions();
+      setShowPositionModal(false);
+      setEditingPosition(null);
+    } catch (error) {
+      console.error("Error saving position:", error);
+      alert("Failed to save position");
+    }
+  };
+
+  const handleDeletePosition = async (positionId) => {
+    if (!confirm("Are you sure you want to delete this position?")) return;
+    try {
+      await api.delete(`/team/admin/positions/${positionId}/`);
+      fetchPositions();
+    } catch (error) {
+      console.error("Error deleting position:", error);
+      alert("Failed to delete position");
+    }
+  };
+
   const handleDeleteCategory = async (categoryId) => {
     if (!confirm("Are you sure you want to delete this category?")) return;
     try {
@@ -237,6 +282,12 @@ const ManageTeam = () => {
           onClick={() => setActiveTab("categories")}
         >
           <FaTags /> Categories
+        </button>
+        <button
+          className={`tab-btn ${activeTab === "positions" ? "active" : ""}`}
+          onClick={() => setActiveTab("positions")}
+        >
+          <FaChartBar /> Positions
         </button>
       </div>
 
@@ -395,7 +446,7 @@ const ManageTeam = () => {
             )}
           </div>
         </>
-      ) : (
+      ) : activeTab === "categories" ? (
         <>
           {/* Categories Tab */}
           <div className="categories-header">
@@ -424,7 +475,6 @@ const ManageTeam = () => {
                       <button
                         disabled={index === 0}
                         onClick={() => {
-                          // Move up logic
                           const newOrder = category.display_order - 1;
                           api
                             .patch(`/team/admin/categories/${category.id}/`, {
@@ -488,6 +538,97 @@ const ManageTeam = () => {
                     <button
                       className="delete-btn"
                       onClick={() => handleDeleteCategory(category.id)}
+                    >
+                      <FaTrash /> Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Positions Tab */}
+          <div className="categories-header">
+            <h3>Team Positions</h3>
+            <button
+              className="add-category-btn"
+              onClick={() => {
+                setEditingPosition(null);
+                setShowPositionModal(true);
+              }}
+            >
+              <FaPlus /> Add Position
+            </button>
+          </div>
+
+          <div className="categories-list">
+            {positions.length === 0 ? (
+              <div className="no-data">
+                No positions found. Create one to get started.
+              </div>
+            ) : (
+              positions.map((position, index) => (
+                <div key={position.id} className="category-card">
+                  <div className="category-info">
+                    <div className="category-order">
+                      <button
+                        disabled={index === 0}
+                        onClick={() => {
+                          const newOrder = position.display_order - 1;
+                          api
+                            .patch(`/team/admin/positions/${position.id}/`, {
+                              display_order: newOrder,
+                            })
+                            .then(() => fetchPositions());
+                        }}
+                      >
+                        <FaArrowUp />
+                      </button>
+                      <span>{position.display_order}</span>
+                      <button
+                        disabled={index === positions.length - 1}
+                        onClick={() => {
+                          const newOrder = position.display_order + 1;
+                          api
+                            .patch(`/team/admin/positions/${position.id}/`, {
+                              display_order: newOrder,
+                            })
+                            .then(() => fetchPositions());
+                        }}
+                      >
+                        <FaArrowDown />
+                      </button>
+                    </div>
+                    <div className="category-details">
+                      <h4>{position.name}</h4>
+                      <p className="category-slug">/{position.slug}</p>
+                      <p className="category-description">
+                        {position.description || "No description"}
+                      </p>
+                    </div>
+                    <div className="category-meta">
+                      <span
+                        className={`status-badge ${position.is_active ? "active" : "inactive"}`}
+                      >
+                        {position.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="category-actions">
+                    <button
+                      className="edit-btn"
+                      onClick={() => {
+                        setEditingPosition(position);
+                        setShowPositionModal(true);
+                      }}
+                    >
+                      <FaEdit /> Edit
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDeletePosition(position.id)}
                     >
                       <FaTrash /> Delete
                     </button>
@@ -789,6 +930,18 @@ const ManageTeam = () => {
           onClose={() => {
             setShowCategoryModal(false);
             setEditingCategory(null);
+          }}
+        />
+      )}
+
+      {/* Position Modal */}
+      {showPositionModal && (
+        <PositionModal
+          position={editingPosition}
+          onSave={handleSavePosition}
+          onClose={() => {
+            setShowPositionModal(false);
+            setEditingPosition(null);
           }}
         />
       )}
@@ -1484,6 +1637,130 @@ const CategoryModal = ({ category, onSave, onClose }) => {
             cursor: pointer;
             font-size: 14px;
           }
+          .cancel-btn { background: #f0f0f0; }
+          .save-btn { background: #1a365d; color: white; }
+        `}</style>
+      </div>
+    </div>
+  );
+};
+
+const PositionModal = ({ position, onSave, onClose }) => {
+  const [formData, setFormData] = useState({
+    name: position?.name || "",
+    slug: position?.slug || "",
+    description: position?.description || "",
+    display_order: position?.display_order || 0,
+    is_active: position?.is_active ?? true,
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+      ...(name === "name" && !position
+        ? {
+            slug: value
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9-]/g, ""),
+          }
+        : {}),
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>{position ? "Edit Position" : "Add Position"}</h3>
+          <button className="close-btn" onClick={onClose}>
+            <FaTimes />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+            <div className="form-group">
+              <label>Position Title *</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder="e.g., Senior Consultant"
+              />
+            </div>
+            <div className="form-group">
+              <label>Slug *</label>
+              <input
+                type="text"
+                name="slug"
+                value={formData.slug}
+                onChange={handleChange}
+                required
+                placeholder="e.g., senior-consultant"
+              />
+            </div>
+            <div className="form-group">
+              <label>Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Brief description of this position"
+                rows={3}
+              />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Display Order</label>
+                <input
+                  type="number"
+                  name="display_order"
+                  value={formData.display_order}
+                  onChange={handleChange}
+                  min={0}
+                />
+              </div>
+              <div className="form-group checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="is_active"
+                    checked={formData.is_active}
+                    onChange={handleChange}
+                  />
+                  Active (available for selection)
+                </label>
+              </div>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="cancel-btn" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="save-btn">
+              {position ? "Update" : "Create"} Position
+            </button>
+          </div>
+        </form>
+
+        <style>{`
+          .form-group { margin-bottom: 15px; }
+          .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 14px; }
+          .form-group input[type="text"],
+          .form-group input[type="number"],
+          .form-group textarea { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+          .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+          .form-group.checkbox label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+          .cancel-btn, .save-btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
           .cancel-btn { background: #f0f0f0; }
           .save-btn { background: #1a365d; color: white; }
         `}</style>

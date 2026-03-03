@@ -40,6 +40,7 @@ export default function EditProfile({
   onProfileCreated,
 }) {
   const [categories, setCategories] = useState([]);
+  const [positions, setPositions] = useState([]);
   const [isCreating, setIsCreating] = useState(!teamMember);
   const [isEditMode, setIsEditMode] = useState(false); // New: controls whether fields are editable
   const [form, setForm] = useState({
@@ -67,6 +68,7 @@ export default function EditProfile({
 
   useEffect(() => {
     fetchCategories();
+    fetchPositions();
     fetchMyProfile();
   }, []);
 
@@ -145,6 +147,15 @@ export default function EditProfile({
     }
   };
 
+  const fetchPositions = async () => {
+    try {
+      const response = await api.get("/team/positions/dropdown/");
+      setPositions(response.data);
+    } catch (error) {
+      console.error("Error fetching positions:", error);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -181,7 +192,7 @@ export default function EditProfile({
     if (!form.first_name.trim())
       newErrors.first_name = "First name is required";
     if (!form.last_name.trim()) newErrors.last_name = "Last name is required";
-    if (!form.position.trim()) newErrors.position = "Position is required";
+    if (!form.position) newErrors.position = "Please select a position";
     if (!form.short_bio.trim())
       newErrors.short_bio = "Short biography is required";
     else if (form.short_bio.length > 300)
@@ -206,38 +217,32 @@ export default function EditProfile({
         formData.append("profile_picture", profilePicture);
       }
 
-      // Debug: Check if token exists
+      const headers = { "Content-Type": "multipart/form-data" };
       const token = Cookies.get("access_token");
-      console.log("Token exists:", !!token);
-      console.log(
-        "Token preview:",
-        token ? token.substring(0, 50) + "..." : "NO TOKEN",
-      );
-
-      const headers = {
-        "Content-Type": "multipart/form-data",
-      };
-
-      // Explicitly add Authorization header
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
       if (isCreating) {
-        const response = await api.post("/team/my-profile/", formData, {
-          headers,
-        });
+        const response = await api.post("/team/my-profile/", formData, { headers });
+        const savedProfile = response.data.profile;
+        setExistingProfile(savedProfile);
+        setIsCreating(false);
+        if (savedProfile?.profile_picture_url) setPreviewUrl(savedProfile.profile_picture_url);
         setMessage({
           type: "success",
-          text: "Profile created successfully! Pending admin approval.",
+          text: "Profile submitted successfully! It is now pending admin approval.",
         });
-        if (onProfileCreated) onProfileCreated(response.data.profile);
+        if (onProfileCreated) onProfileCreated(savedProfile);
       } else {
-        const response = await api.patch("/team/my-profile/", formData, {
-          headers,
+        const response = await api.patch("/team/my-profile/", formData, { headers });
+        const savedProfile = response.data.profile;
+        setExistingProfile(savedProfile);
+        setIsEditMode(false);
+        if (savedProfile?.profile_picture_url) setPreviewUrl(savedProfile.profile_picture_url);
+        setMessage({
+          type: "success",
+          text: "Profile updated and resubmitted for admin approval.",
         });
-        setMessage({ type: "success", text: "Profile updated successfully!" });
-        if (onUpdateProfile) onUpdateProfile(response.data.profile);
+        if (onUpdateProfile) onUpdateProfile(savedProfile);
       }
     } catch (err) {
       console.error("Error saving profile:", err);
@@ -402,13 +407,25 @@ export default function EditProfile({
           </div>
         )}
 
-        {currentStatus === "approved" && (
+        {currentStatus === "approved" && !isEditMode && (
           <div className="status-banner success">
             <FaCheck size={18} />
             <div>
-              <strong>Profile Approved</strong> - Your profile is live on the
-              team page.
-              {!isEditMode && " Click 'Edit Profile' to make changes."}
+              <strong>Profile Approved</strong> — Your profile is currently live
+              on the team page. Click <strong>Edit Profile</strong> to make
+              changes. Note: editing will resubmit your profile for admin
+              approval.
+            </div>
+          </div>
+        )}
+
+        {currentStatus === "approved" && isEditMode && (
+          <div className="status-banner warning">
+            <AlertCircle size={20} />
+            <div>
+              <strong>Editing Live Profile</strong> — Saving these changes will
+              resubmit your profile for admin review. Your profile will be set
+              to <strong>pending</strong> until the admin approves the update.
             </div>
           </div>
         )}
@@ -546,16 +563,21 @@ export default function EditProfile({
                 <label htmlFor="position">
                   Position/Title <span className="required">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   id="position"
                   name="position"
                   value={form.position}
                   onChange={handleChange}
-                  className={`${errors.position ? "error" : ""} ${!isEditable ? "readonly-input" : ""}`}
-                  placeholder="e.g., Senior Consultant, Marketing Manager"
-                  readOnly={!isEditable}
-                />
+                  className={`select-input ${errors.position ? "error" : ""} ${!isEditable ? "readonly-input" : ""}`}
+                  disabled={!isEditable}
+                >
+                  <option value="">Select a position</option>
+                  {positions.map((pos) => (
+                    <option key={pos.id} value={pos.name}>
+                      {pos.name}
+                    </option>
+                  ))}
+                </select>
                 {errors.position && (
                   <span className="error-text">{errors.position}</span>
                 )}
@@ -728,19 +750,26 @@ export default function EditProfile({
           {/* Submit Button - only show when editable */}
           {isEditable && (
             <div className="form-actions">
-              <button type="submit" className="submit-btn" disabled={saving}>
-                {saving ? (
-                  <>
-                    <FaSpinner className="spinner" />
-                    {isCreating ? "Creating Profile..." : "Saving Changes..."}
-                  </>
-                ) : (
-                  <>
-                    <FaCheck />
-                    {isCreating ? "Submit Application" : "Save Changes"}
-                  </>
-                )}
-              </button>
+              <div className="submit-wrapper">
+                <button type="submit" className="submit-btn" disabled={saving}>
+                  {saving ? (
+                    <>
+                      <FaSpinner className="spinner" />
+                      {isCreating ? "Submitting..." : "Resubmitting..."}
+                    </>
+                  ) : (
+                    <>
+                      <FaCheck />
+                      {isCreating ? "Submit for Approval" : "Save & Resubmit for Approval"}
+                    </>
+                  )}
+                </button>
+                <p className="submit-note">
+                  {isCreating
+                    ? "Your profile will be reviewed by an admin before it appears on the team page."
+                    : "Your changes will be reviewed by an admin. Your profile status will be set to pending until approved."}
+                </p>
+              </div>
             </div>
           )}
         </form>
@@ -1101,6 +1130,22 @@ export default function EditProfile({
           display: flex;
           justify-content: center;
           margin-top: 32px;
+        }
+
+        .submit-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .submit-note {
+          font-size: 0.78rem;
+          color: #94a3b8;
+          text-align: center;
+          max-width: 420px;
+          line-height: 1.5;
+          margin: 0;
         }
         
         .submit-btn {

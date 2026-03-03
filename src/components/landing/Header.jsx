@@ -22,7 +22,7 @@ import "./styles/Header.css";
 
 const navItems = [
   { id: "home", label: "Home" },
-  { id: "about", label: "About" },
+  { id: "about", label: "About", isLink: true, to: "/about" },
   { id: "services", label: "Services" },
   { id: "study", label: "Study Abroad" },
   { id: "flights", label: "Flights" },

@@ -22,6 +22,7 @@ import Logout from "./pages/Logout";
 import OtpverifyPage from "./pages/OtpVerifyPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AboutPage from "./pages/AboutPage";
 import TeamPage from "./pages/TeamPage";
 import TeamMemberProfile from "./pages/TeamMemberProfile";
 import TeamApplicationForm from "./pages/TeamApplicationForm";
@@ -85,6 +86,9 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/logout" element={<Logout />} />
+
+        {/* About Page */}
+        <Route path="/about" element={<AboutPage />} />
 
         {/* Team Pages - Public */}
         <Route path="/team" element={<TeamPage />} />
