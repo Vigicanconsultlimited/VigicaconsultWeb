@@ -302,11 +302,6 @@ function TeamPage() {
                               </p>
                             )}
                           </div>
-                          {/* Member Count 
-                          <span className="member-count bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm ml-2">
-                            {item.members?.length || 0} members
-                          </span>
-                          */}
                         </div>
                         <button className="collapse-btn p-2">
                           {collapsedCategories[categoryId] ? (
