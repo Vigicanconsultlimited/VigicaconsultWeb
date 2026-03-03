@@ -19,6 +19,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import Cookies from "js-cookie";
+import LoadingSpinner from "../../shared/LoadingSpinner";
 
 const API_BASE_URL = import.meta.env.PROD
   ? "https://teamapi-production.up.railway.app/api/v1"
@@ -239,7 +240,11 @@ const ManageTeam = () => {
         </button>
       </div>
 
-      {activeTab === "members" ? (
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "60px 0" }}>
+          <LoadingSpinner size="xl" text="Loading..." />
+        </div>
+      ) : activeTab === "members" ? (
         <>
           {/* Stats Cards */}
           <div className="team-stats">
@@ -300,9 +305,7 @@ const ManageTeam = () => {
 
           {/* Members Table */}
           <div className="team-table-container">
-            {loading ? (
-              <div className="loading">Loading...</div>
-            ) : filteredMembers.length === 0 ? (
+            {filteredMembers.length === 0 ? (
               <div className="no-data">No team members found</div>
             ) : (
               <table className="team-table">
@@ -409,9 +412,7 @@ const ManageTeam = () => {
           </div>
 
           <div className="categories-list">
-            {loading ? (
-              <div className="loading">Loading...</div>
-            ) : categories.length === 0 ? (
+            {categories.length === 0 ? (
               <div className="no-data">
                 No categories found. Create one to get started.
               </div>

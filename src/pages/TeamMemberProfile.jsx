@@ -18,6 +18,14 @@ import "../styles/TeamMemberProfile.css";
 // Default profile image
 const defaultProfile = "/default-profile.jpg";
 
+// Vigica company social links — used as fallback when a member hasn't set their own
+const VIGICA_SOCIALS = {
+  linkedin: "https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true",
+  twitter: "https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09",
+  facebook: "https://www.facebook.com/profile.php?id=61579196807381",
+  instagram: "https://www.instagram.com/vigicaconsult/",
+};
+
 // Base URL for media files (Django server)
 const MEDIA_BASE_URL = import.meta.env.PROD
   ? "" // Production: Cloudinary returns full URLs
@@ -154,50 +162,42 @@ function TeamMemberProfile() {
 
                 {/* Social Links */}
                 <div className="social-links-profile">
-                  {member.linkedin_url && (
-                    <a
-                      href={member.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="social-link linkedin"
-                      title="LinkedIn"
-                    >
-                      <FaLinkedin />
-                    </a>
-                  )}
-                  {member.twitter_url && (
-                    <a
-                      href={member.twitter_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="social-link twitter"
-                      title="Twitter"
-                    >
-                      <FaTwitter />
-                    </a>
-                  )}
-                  {member.facebook_url && (
-                    <a
-                      href={member.facebook_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="social-link facebook"
-                      title="Facebook"
-                    >
-                      <FaFacebook />
-                    </a>
-                  )}
-                  {member.instagram_url && (
-                    <a
-                      href={member.instagram_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="social-link instagram"
-                      title="Instagram"
-                    >
-                      <FaInstagram />
-                    </a>
-                  )}
+                  <a
+                    href={member.linkedin_url || VIGICA_SOCIALS.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-link linkedin"
+                    title="LinkedIn"
+                  >
+                    <FaLinkedin />
+                  </a>
+                  <a
+                    href={member.twitter_url || VIGICA_SOCIALS.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-link twitter"
+                    title="Twitter"
+                  >
+                    <FaTwitter />
+                  </a>
+                  <a
+                    href={member.facebook_url || VIGICA_SOCIALS.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-link facebook"
+                    title="Facebook"
+                  >
+                    <FaFacebook />
+                  </a>
+                  <a
+                    href={member.instagram_url || VIGICA_SOCIALS.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-link instagram"
+                    title="Instagram"
+                  >
+                    <FaInstagram />
+                  </a>
                   {member.website_url && (
                     <a
                       href={member.website_url}

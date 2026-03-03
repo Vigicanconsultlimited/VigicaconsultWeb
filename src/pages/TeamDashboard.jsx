@@ -9,6 +9,7 @@ import UpcomingAppointments from "../components/teamDashboard/sections/UpcomingA
 import EditProfile from "../components/teamDashboard/sections/EditProfile";
 import Settings from "../components/teamDashboard/sections/Settings";
 import { authApi, bookingApi } from "../utils/teamAuthApi";
+import LoadingSpinner from "../components/shared/LoadingSpinner";
 import "./TeamDashboardLayout.css";
 
 function TeamDashboard() {
@@ -271,9 +272,8 @@ function TeamDashboard() {
 
   if (loading) {
     return (
-      <div className="team-dashboard-loading">
-        <div className="spinner"></div>
-        <p>Loading dashboard...</p>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+        <LoadingSpinner size="xl" text="Loading dashboard..." />
       </div>
     );
   }
