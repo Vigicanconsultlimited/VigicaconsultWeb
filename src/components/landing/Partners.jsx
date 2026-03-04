@@ -5,7 +5,7 @@ import { Handshake } from "lucide-react";
 import DMU from "../../assets/images/1499083809_Capture.avif";
 import Leed_Bekett from "../../assets/images/2018_LBU01_PURPLE_jpg-1024x430.jpg";
 import EBSG from "../../assets/images/ebonyiia.png";
-import Robert_Gordon from "../../assets/images/RobertGordon.png";
+import Robert_Gordon from "../../assets/images/RobertGordon.jpg";
 //"C:\Users\User\Desktop\proj\VigicaconsultWeb\vigicanwebapp\src\assets\images\ebonyiia.png"
 // Partners data - easily extendable
 const partnersData = [
