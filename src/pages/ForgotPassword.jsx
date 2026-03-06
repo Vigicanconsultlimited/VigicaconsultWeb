@@ -39,7 +39,7 @@ function ForgotPassword() {
     }
 
     const response = await apiInstance.post(
-      `User/forgotpasswordrequest?email=${encodeURIComponent(emailToSend)}`
+      `User/forgotpasswordrequest?email=${encodeURIComponent(emailToSend)}`,
     );
 
     // normalize success detection
@@ -148,7 +148,7 @@ function ForgotPassword() {
             <div className="d-flex justify-content-center mb-4">
               <img
                 src={vigicaLogo}
-                alt="Vigica Logo"
+                alt="VIGICA Logo"
                 className="img-fluid"
                 style={{ maxWidth: "200px" }}
               />

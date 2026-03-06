@@ -7,7 +7,7 @@ const Footer = () => (
   <footer className="footer-section footer-variant-2">
     <div className="container">
       <div className="footer-header-row d-flex justify-content-between align-items-start mb-3">
-        <img src={footerLogo} alt="Vigica Consult Ltd" className="w-35 h-12" />
+        <img src={footerLogo} alt="VIGICA Consult Ltd" className="w-35 h-12" />
         <div className="footer-social-icons mt-1">
           <a href="http://t.me/vigica_1" className="footer-social-btn">
             <i className="fa-brands fa-telegram"></i>
@@ -52,7 +52,7 @@ const Footer = () => (
           <div className="footer-column">
             <h4 className="footer-title-variant2">About Us</h4>
             <p className="footer-description-variant2">
-              Vigica Consult is your trusted partner for study abroad, travel,
+              VIGICA Consult is your trusted partner for study abroad, travel,
               and hotel bookings. We provide personalized visa application
               guidance, scholarship support, and pre-departure orientation. Our
               team is dedicated to making your study abroad journey smooth and
@@ -91,7 +91,7 @@ const Footer = () => (
               Subscribe Our Newsletter
             </h4>
             <p className="text-base text-gray-200 mb-5">
-              Stay updated with the latest news and offers from Vigica Consult.
+              Stay updated with the latest news and offers from VIGICA Consult.
               Subscribe to our newsletter for exclusive content and updates.
             </p>
 

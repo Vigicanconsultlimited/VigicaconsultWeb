@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaUsers,
   FaUserCheck,
@@ -16,6 +17,10 @@ import {
   FaArrowUp,
   FaArrowDown,
   FaChartBar,
+  FaChevronLeft,
+  FaChevronRight,
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
 } from "react-icons/fa";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -36,7 +41,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Auth error response interceptor — will be enhanced per-component with navigate
+let authErrorHandler = null;
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      if (authErrorHandler) authErrorHandler(error);
+    }
+    return Promise.reject(error);
+  },
+);
+
+const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
+
 const ManageTeam = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("members");
   const [members, setMembers] = useState([]); // all members (unfiltered)
   const [categories, setCategories] = useState([]);
@@ -60,6 +84,29 @@ const ManageTeam = () => {
   const [activityMember, setActivityMember] = useState(null);
   const [activityData, setActivityData] = useState(null);
   const [activityLoading, setActivityLoading] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Register auth error handler for navigation redirect
+  useEffect(() => {
+    authErrorHandler = (error) => {
+      const status = error.response?.status;
+      const message =
+        status === 401
+          ? "Your session has expired. Please log in again."
+          : "You don't have permission to access this resource.";
+      alert(message);
+      // Clear tokens
+      Cookies.remove("access_token");
+      Cookies.remove("refresh_token");
+      navigate("/login", { replace: true });
+    };
+    return () => {
+      authErrorHandler = null;
+    };
+  }, [navigate]);
 
   useEffect(() => {
     if (activeTab === "members") {
@@ -190,7 +237,10 @@ const ManageTeam = () => {
   const handleSavePosition = async (positionData) => {
     try {
       if (editingPosition) {
-        await api.put(`/team/admin/positions/${editingPosition.id}/`, positionData);
+        await api.put(
+          `/team/admin/positions/${editingPosition.id}/`,
+          positionData,
+        );
       } else {
         await api.post("/team/admin/positions/", positionData);
       }
@@ -236,6 +286,34 @@ const ManageTeam = () => {
       member.position?.toLowerCase().includes(search)
     );
   });
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
+
+  // Pagination calculations
+  const totalFilteredItems = filteredMembers.length;
+  const totalPages = Math.max(1, Math.ceil(totalFilteredItems / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const startIndex = (safePage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalFilteredItems);
+  const paginatedMembers = filteredMembers.slice(startIndex, endIndex);
+
+  // Generate page numbers for pagination controls
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    let start = Math.max(1, safePage - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages, start + maxVisible - 1);
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -292,7 +370,14 @@ const ManageTeam = () => {
       </div>
 
       {loading ? (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "60px 0" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "60px 0",
+          }}
+        >
           <LoadingSpinner size="xl" text="Loading..." />
         </div>
       ) : activeTab === "members" ? (
@@ -359,90 +444,170 @@ const ManageTeam = () => {
             {filteredMembers.length === 0 ? (
               <div className="no-data">No team members found</div>
             ) : (
-              <table className="team-table">
-                <thead>
-                  <tr>
-                    <th>Member</th>
-                    <th>Position</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredMembers.map((member) => (
-                    <tr key={member.id}>
-                      <td>
-                        <div className="member-info">
-                          <img
-                            src={
-                              member.profile_picture_url ||
-                              "/default-profile.jpg"
-                            }
-                            alt={member.first_name}
-                            className="member-avatar"
-                          />
-                          <div>
-                            <div className="member-name">
-                              {member.first_name} {member.last_name}
-                            </div>
-                            <div className="member-email">{member.email}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>{member.position}</td>
-                      <td>{member.category_name || "—"}</td>
-                      <td>{getStatusBadge(member.status)}</td>
-                      <td>
-                        <div className="action-buttons">
-                          <button
-                            className="action-btn view"
-                            onClick={() => {
-                              setSelectedMember(member);
-                              setShowMemberModal(true);
-                            }}
-                            title="View Details"
-                          >
-                            <FaEye />
-                          </button>
-                          <button
-                            className="action-btn activity"
-                            onClick={() => fetchMemberActivity(member)}
-                            title="View Activity"
-                          >
-                            <FaChartBar />
-                          </button>
-                          {member.status === "pending" && (
-                            <>
-                              <button
-                                className="action-btn approve"
-                                onClick={() => handleApprove(member.id)}
-                                title="Approve"
-                              >
-                                <FaCheck />
-                              </button>
-                              <button
-                                className="action-btn reject"
-                                onClick={() => handleReject(member.id)}
-                                title="Reject"
-                              >
-                                <FaTimes />
-                              </button>
-                            </>
-                          )}
-                          <button
-                            className="action-btn delete"
-                            onClick={() => handleDeleteMember(member.id)}
-                            title="Delete"
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </td>
+              <>
+                <table className="team-table">
+                  <thead>
+                    <tr>
+                      <th>Member</th>
+                      <th>Position</th>
+                      <th>Category</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {paginatedMembers.map((member) => (
+                      <tr key={member.id}>
+                        <td>
+                          <div className="member-info">
+                            <img
+                              src={
+                                member.profile_picture_url ||
+                                "/default-profile.jpg"
+                              }
+                              alt={member.first_name}
+                              className="member-avatar"
+                            />
+                            <div>
+                              <div className="member-name">
+                                {member.first_name} {member.last_name}
+                              </div>
+                              <div className="member-email">{member.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{member.position}</td>
+                        <td>{member.category_name || "—"}</td>
+                        <td>{getStatusBadge(member.status)}</td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="action-btn view"
+                              onClick={() => {
+                                setSelectedMember(member);
+                                setShowMemberModal(true);
+                              }}
+                              title="View Details"
+                            >
+                              <FaEye />
+                            </button>
+                            <button
+                              className="action-btn activity"
+                              onClick={() => fetchMemberActivity(member)}
+                              title="View Activity"
+                            >
+                              <FaChartBar />
+                            </button>
+                            {member.status === "pending" && (
+                              <>
+                                <button
+                                  className="action-btn approve"
+                                  onClick={() => handleApprove(member.id)}
+                                  title="Approve"
+                                >
+                                  <FaCheck />
+                                </button>
+                                <button
+                                  className="action-btn reject"
+                                  onClick={() => handleReject(member.id)}
+                                  title="Reject"
+                                >
+                                  <FaTimes />
+                                </button>
+                              </>
+                            )}
+                            <button
+                              className="action-btn delete"
+                              onClick={() => handleDeleteMember(member.id)}
+                              title="Delete"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Pagination Controls */}
+                <div className="pagination-container">
+                  <div className="pagination-info">
+                    <span>
+                      Showing {totalFilteredItems === 0 ? 0 : startIndex + 1}–
+                      {endIndex} of {totalFilteredItems} members
+                    </span>
+                    <div className="items-per-page">
+                      <label>Per page:</label>
+                      <select
+                        value={itemsPerPage}
+                        onChange={(e) => {
+                          setItemsPerPage(Number(e.target.value));
+                          setCurrentPage(1);
+                        }}
+                      >
+                        {ITEMS_PER_PAGE_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="pagination-buttons">
+                      <button
+                        className="page-btn"
+                        disabled={safePage === 1}
+                        onClick={() => setCurrentPage(1)}
+                        title="First page"
+                      >
+                        <FaAngleDoubleLeft />
+                      </button>
+                      <button
+                        className="page-btn"
+                        disabled={safePage === 1}
+                        onClick={() =>
+                          setCurrentPage((p) => Math.max(1, p - 1))
+                        }
+                        title="Previous page"
+                      >
+                        <FaChevronLeft />
+                      </button>
+
+                      {getPageNumbers().map((page) => (
+                        <button
+                          key={page}
+                          className={`page-btn page-num ${safePage === page ? "active" : ""}`}
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </button>
+                      ))}
+
+                      <button
+                        className="page-btn"
+                        disabled={safePage === totalPages}
+                        onClick={() =>
+                          setCurrentPage((p) => Math.min(totalPages, p + 1))
+                        }
+                        title="Next page"
+                      >
+                        <FaChevronRight />
+                      </button>
+                      <button
+                        className="page-btn"
+                        disabled={safePage === totalPages}
+                        onClick={() => setCurrentPage(totalPages)}
+                        title="Last page"
+                      >
+                        <FaAngleDoubleRight />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </>
@@ -749,7 +914,8 @@ const ManageTeam = () => {
             <div className="modal-header">
               <h3>
                 <FaChartBar style={{ marginRight: 8 }} />
-                Activity — {activityMember.first_name} {activityMember.last_name}
+                Activity — {activityMember.first_name}{" "}
+                {activityMember.last_name}
               </h3>
               <button
                 className="close-btn"
@@ -767,17 +933,52 @@ const ManageTeam = () => {
                   {/* Stats Grid */}
                   <div className="activity-stats-grid">
                     {[
-                      { label: "Total", value: activityData.stats?.total ?? 0, color: "#1a56db" },
-                      { label: "Upcoming", value: activityData.stats?.upcoming ?? 0, color: "#0d9488" },
-                      { label: "This Month", value: activityData.stats?.this_month ?? 0, color: "#db2777" },
-                      { label: "Pending", value: activityData.stats?.pending ?? 0, color: "#d97706" },
-                      { label: "Confirmed", value: activityData.stats?.confirmed ?? 0, color: "#0891b2" },
-                      { label: "Completed", value: activityData.stats?.completed ?? 0, color: "#059669" },
-                      { label: "Cancelled", value: activityData.stats?.cancelled ?? 0, color: "#dc2626" },
-                      { label: "No Show", value: activityData.stats?.no_show ?? 0, color: "#7c3aed" },
+                      {
+                        label: "Total",
+                        value: activityData.stats?.total ?? 0,
+                        color: "#1a56db",
+                      },
+                      {
+                        label: "Upcoming",
+                        value: activityData.stats?.upcoming ?? 0,
+                        color: "#0d9488",
+                      },
+                      {
+                        label: "This Month",
+                        value: activityData.stats?.this_month ?? 0,
+                        color: "#db2777",
+                      },
+                      {
+                        label: "Pending",
+                        value: activityData.stats?.pending ?? 0,
+                        color: "#d97706",
+                      },
+                      {
+                        label: "Confirmed",
+                        value: activityData.stats?.confirmed ?? 0,
+                        color: "#0891b2",
+                      },
+                      {
+                        label: "Completed",
+                        value: activityData.stats?.completed ?? 0,
+                        color: "#059669",
+                      },
+                      {
+                        label: "Cancelled",
+                        value: activityData.stats?.cancelled ?? 0,
+                        color: "#dc2626",
+                      },
+                      {
+                        label: "No Show",
+                        value: activityData.stats?.no_show ?? 0,
+                        color: "#7c3aed",
+                      },
                     ].map((s) => (
                       <div key={s.label} className="activity-stat-card">
-                        <div className="activity-stat-value" style={{ color: s.color }}>
+                        <div
+                          className="activity-stat-value"
+                          style={{ color: s.color }}
+                        >
                           {s.value}
                         </div>
                         <div className="activity-stat-label">{s.label}</div>
@@ -788,7 +989,8 @@ const ManageTeam = () => {
                   {/* Upcoming Appointments */}
                   <div className="activity-section">
                     <h4 className="activity-section-title">
-                      Upcoming Appointments ({activityData.stats?.upcoming ?? 0})
+                      Upcoming Appointments ({activityData.stats?.upcoming ?? 0}
+                      )
                     </h4>
                     {activityData.upcoming_appointments?.length > 0 ? (
                       <table className="activity-table">
@@ -804,26 +1006,39 @@ const ManageTeam = () => {
                           {activityData.upcoming_appointments.map((appt) => (
                             <tr key={appt.id}>
                               <td>
-                                <div style={{ fontWeight: 500 }}>{appt.client_name}</div>
-                                <div style={{ fontSize: 11, color: "#6b7280" }}>{appt.client_email}</div>
+                                <div style={{ fontWeight: 500 }}>
+                                  {appt.client_name}
+                                </div>
+                                <div style={{ fontSize: 11, color: "#6b7280" }}>
+                                  {appt.client_email}
+                                </div>
                               </td>
                               <td>{appt["service_type__name"] || "—"}</td>
                               <td style={{ whiteSpace: "nowrap" }}>
                                 {appt.start_datetime
-                                  ? new Date(appt.start_datetime).toLocaleDateString("en-US", {
-                                      month: "short", day: "numeric", year: "numeric",
+                                  ? new Date(
+                                      appt.start_datetime,
+                                    ).toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
                                     })
                                   : "—"}
                                 <div style={{ fontSize: 11, color: "#6b7280" }}>
                                   {appt.start_datetime
-                                    ? new Date(appt.start_datetime).toLocaleTimeString("en-US", {
-                                        hour: "numeric", minute: "2-digit",
+                                    ? new Date(
+                                        appt.start_datetime,
+                                      ).toLocaleTimeString("en-US", {
+                                        hour: "numeric",
+                                        minute: "2-digit",
                                       })
                                     : ""}
                                 </div>
                               </td>
                               <td>
-                                <span className={`appt-pill appt-pill-${appt.status}`}>
+                                <span
+                                  className={`appt-pill appt-pill-${appt.status}`}
+                                >
                                   {appt.status}
                                 </span>
                               </td>
@@ -832,13 +1047,17 @@ const ManageTeam = () => {
                         </tbody>
                       </table>
                     ) : (
-                      <p className="activity-empty">No upcoming appointments.</p>
+                      <p className="activity-empty">
+                        No upcoming appointments.
+                      </p>
                     )}
                   </div>
 
                   {/* Recent Appointments */}
                   <div className="activity-section">
-                    <h4 className="activity-section-title">Recent Appointments (last 10)</h4>
+                    <h4 className="activity-section-title">
+                      Recent Appointments (last 10)
+                    </h4>
                     {activityData.recent_appointments?.length > 0 ? (
                       <table className="activity-table">
                         <thead>
@@ -851,32 +1070,50 @@ const ManageTeam = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {activityData.recent_appointments.slice(0, 10).map((appt) => (
-                            <tr key={appt.id}>
-                              <td>
-                                <div style={{ fontWeight: 500 }}>{appt.client_name}</div>
-                                <div style={{ fontSize: 11, color: "#6b7280" }}>{appt.client_email}</div>
-                              </td>
-                              <td>{appt["service_type__name"] || "—"}</td>
-                              <td style={{ whiteSpace: "nowrap" }}>
-                                {appt.start_datetime
-                                  ? new Date(appt.start_datetime).toLocaleDateString("en-US", {
-                                      month: "short", day: "numeric", year: "numeric",
-                                    })
-                                  : "—"}
-                              </td>
-                              <td style={{ color: "#6b7280" }}>
-                                {appt.start_datetime && appt.end_datetime
-                                  ? Math.round((new Date(appt.end_datetime) - new Date(appt.start_datetime)) / 60000) + " min"
-                                  : "—"}
-                              </td>
-                              <td>
-                                <span className={`appt-pill appt-pill-${appt.status}`}>
-                                  {appt.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
+                          {activityData.recent_appointments
+                            .slice(0, 10)
+                            .map((appt) => (
+                              <tr key={appt.id}>
+                                <td>
+                                  <div style={{ fontWeight: 500 }}>
+                                    {appt.client_name}
+                                  </div>
+                                  <div
+                                    style={{ fontSize: 11, color: "#6b7280" }}
+                                  >
+                                    {appt.client_email}
+                                  </div>
+                                </td>
+                                <td>{appt["service_type__name"] || "—"}</td>
+                                <td style={{ whiteSpace: "nowrap" }}>
+                                  {appt.start_datetime
+                                    ? new Date(
+                                        appt.start_datetime,
+                                      ).toLocaleDateString("en-US", {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      })
+                                    : "—"}
+                                </td>
+                                <td style={{ color: "#6b7280" }}>
+                                  {appt.start_datetime && appt.end_datetime
+                                    ? Math.round(
+                                        (new Date(appt.end_datetime) -
+                                          new Date(appt.start_datetime)) /
+                                          60000,
+                                      ) + " min"
+                                    : "—"}
+                                </td>
+                                <td>
+                                  <span
+                                    className={`appt-pill appt-pill-${appt.status}`}
+                                  >
+                                    {appt.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
                         </tbody>
                       </table>
                     ) : (
@@ -886,12 +1123,16 @@ const ManageTeam = () => {
 
                   {/* Availability */}
                   <div className="activity-section">
-                    <h4 className="activity-section-title">Weekly Availability</h4>
+                    <h4 className="activity-section-title">
+                      Weekly Availability
+                    </h4>
                     {activityData.availability?.length > 0 ? (
                       <div className="avail-chips">
                         {activityData.availability.map((slot, i) => (
                           <div key={i} className="avail-chip">
-                            <span className="avail-chip-day">{slot.weekday_name}</span>
+                            <span className="avail-chip-day">
+                              {slot.weekday_name}
+                            </span>
                             <span className="avail-chip-time">
                               {slot.start_time} – {slot.end_time}
                             </span>
@@ -899,7 +1140,9 @@ const ManageTeam = () => {
                         ))}
                       </div>
                     ) : (
-                      <p className="activity-empty">No availability configured.</p>
+                      <p className="activity-empty">
+                        No availability configured.
+                      </p>
                     )}
                   </div>
                 </>
@@ -1413,6 +1656,94 @@ const ManageTeam = () => {
           font-size: 13px;
           margin: 0;
           padding: 12px 0;
+        }
+        /* ── Pagination ── */
+        .pagination-container {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+          padding: 16px 20px;
+          border-top: 1px solid #e5e7eb;
+          background: #f9fafb;
+          gap: 12px;
+        }
+        .pagination-info {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          font-size: 13px;
+          color: #6b7280;
+        }
+        .items-per-page {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .items-per-page label {
+          font-size: 13px;
+          color: #6b7280;
+        }
+        .items-per-page select {
+          padding: 4px 8px;
+          border: 1px solid #d1d5db;
+          border-radius: 6px;
+          font-size: 13px;
+          background: white;
+          cursor: pointer;
+          outline: none;
+        }
+        .items-per-page select:focus {
+          border-color: #1a365d;
+          box-shadow: 0 0 0 2px rgba(26,54,93,0.15);
+        }
+        .pagination-buttons {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .page-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 34px;
+          height: 34px;
+          border: 1px solid #d1d5db;
+          background: white;
+          border-radius: 6px;
+          cursor: pointer;
+          color: #374151;
+          font-size: 13px;
+          transition: all 0.15s ease;
+        }
+        .page-btn:hover:not(:disabled):not(.active) {
+          background: #f3f4f6;
+          border-color: #9ca3af;
+        }
+        .page-btn:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+        .page-btn.active {
+          background: #1a365d;
+          color: white;
+          border-color: #1a365d;
+          font-weight: 600;
+        }
+        .page-btn.page-num {
+          min-width: 34px;
+        }
+        @media (max-width: 640px) {
+          .pagination-container {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          .pagination-info {
+            justify-content: space-between;
+          }
+          .pagination-buttons {
+            justify-content: center;
+          }
         }
       `}</style>
     </div>

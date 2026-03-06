@@ -9,6 +9,7 @@ import {
   FaStar,
   FaChevronLeft,
   FaChevronRight,
+  FaCheckCircle,
 } from "react-icons/fa";
 import Header from "../components/landing/Header";
 import "../styles/AboutPage.css";
@@ -61,7 +62,7 @@ const MANAGER = {
   name: "Mr. Emmanuel Ajah",
   title: "CEO",
   photo: "/default-profile.jpg",
-  speech: `Running the day-to-day operations at Vigica Consult has given me a deep appreciation of what our clients go through — the excitement, the anxiety, and ultimately the triumph of seeing their dreams materialize.
+  speech: `Running the day-to-day operations at VIGICA Consult has given me a deep appreciation of what our clients go through — the excitement, the anxiety, and ultimately the triumph of seeing their dreams materialize.
 
 Our operational team works tirelessly to ensure that every application, every document, every deadline is handled with precision and care. We have built systems and partnerships that allow us to offer a seamless experience from your first consultation to your arrival at your dream university.
 
@@ -74,7 +75,7 @@ const CLIENT_TESTIMONIALS = [
     type: "video",
     videoId: "SB56MgkscJA",
     quote:
-      "Vigica Consult made my study abroad dream a reality. Their guidance was exceptional from start to finish.",
+      "VIGICA Consult made my study abroad dream a reality. Their guidance was exceptional from start to finish.",
     name: "Ndubuisi Augustine",
     caption:
       "Studying Software Engineering at University of Greater Manchester",
@@ -85,7 +86,7 @@ const CLIENT_TESTIMONIALS = [
   //   type: "quote",
   //   videoId: null,
   //   quote:
-  //     "I was initially overwhelmed by the application process, but Vigica Consult made everything crystal clear. I am now studying Medicine at a top Canadian university thanks to their unwavering support.",
+  //     "I was initially overwhelmed by the application process, but VIGICA Consult made everything crystal clear. I am now studying Medicine at a top Canadian university thanks to their unwavering support.",
   //   name: "Fatima Al-Hassan",
   //   caption: "Medical Student, University of Toronto, Canada",
   //   avatar: "/default-profile.jpg",
@@ -95,7 +96,7 @@ const CLIENT_TESTIMONIALS = [
   //   type: "video",
   //   videoId: "SB56MgkscJA", // ← Replace with real YouTube video ID
   //   quote:
-  //     "The scholarship support I received was incredible. I never believed I could study in the UK debt-free, but Vigica made it happen!",
+  //     "The scholarship support I received was incredible. I never believed I could study in the UK debt-free, but VIGICA made it happen!",
   //   name: "Chisom Eze",
   //   caption: "Scholarship Recipient, University of Manchester, UK",
   //   avatar: "/default-profile.jpg",
@@ -105,7 +106,7 @@ const CLIENT_TESTIMONIALS = [
   //   type: "quote",
   //   videoId: null,
   //   quote:
-  //     "Professional, prompt, and truly caring. Vigica Consult feels like family. They celebrated every milestone with me.",
+  //     "Professional, prompt, and truly caring. VIGICA Consult feels like family. They celebrated every milestone with me.",
   //   name: "Musa Ibrahim",
   //   caption: "Business Administration, Concordia University, Canada",
   //   avatar: "/default-profile.jpg",
@@ -190,7 +191,7 @@ const EXPERTS = [
     institution: "Ebonyi State Government",
     photo: "/default-profile.jpg",
     remark:
-      "Vigica Consult stands out in the Nigerian consulting space for its holistic approach. They don't just place students — they prepare them for global success.",
+      "VIGICA Consult stands out in the Nigerian consulting space for its holistic approach. They don't just place students — they prepare them for global success.",
   },
   // {
   //   id: 2,
@@ -199,7 +200,7 @@ const EXPERTS = [
   //   institution: "Lagos Business School",
   //   photo: "/default-profile.jpg",
   //   remark:
-  //     "I have witnessed firsthand how Vigica's structured guidance has transformed young Nigerians into globally competitive professionals.",
+  //     "I have witnessed firsthand how VIGICA's structured guidance has transformed young Nigerians into globally competitive professionals.",
   // },
   // {
   //   id: 3,
@@ -208,7 +209,7 @@ const EXPERTS = [
   //   institution: "British Council Nigeria",
   //   photo: "/default-profile.jpg",
   //   remark:
-  //     "The level of professionalism and genuine commitment to student welfare at Vigica Consult is a benchmark for the entire industry.",
+  //     "The level of professionalism and genuine commitment to student welfare at VIGICA Consult is a benchmark for the entire industry.",
   // },
   // {
   //   id: 4,
@@ -217,7 +218,7 @@ const EXPERTS = [
   //   institution: "Chevening Alumni Network",
   //   photo: "/default-profile.jpg",
   //   remark:
-  //     "As a Chevening Scholar, I see how important proper guidance is. Vigica provides exactly that — informed, personalised support that makes all the difference.",
+  //     "As a Chevening Scholar, I see how important proper guidance is. VIGICA provides exactly that — informed, personalised support that makes all the difference.",
   // },
 ];
 
@@ -269,6 +270,28 @@ const AWARDS = [
   //   icon: "award",
   // },
 ];
+
+const EXPERIENCE_TEXT = `Through a strategic partnership with the Ebonyi State Scholarship Board, VIGICA Consult Limited has successfully designed, implemented, and managed a comprehensive international scholarship programme from inception to its current advanced stage. The programme has supported scholars through postgraduate studies and has now progressed to the stage where beneficiaries are advancing into doctoral programmes across leading universities in the United Kingdom.
+
+Our management approach integrates strategic university placement, cost optimisation, academic monitoring, financial accountability, and student welfare support, ensuring that the objectives of the Ebonyi State Government's investment in human capital development are fully realised.
+
+Key outcomes of the programme include:
+
+• Successful placement of 128 scholars in reputable universities across the United Kingdom in high-impact academic disciplines.
+
+• Tuition fee savings exceeding £2,560,000 secured for the Ebonyi State Government through negotiated institutional discounts and strategic partnerships with universities.
+
+• Seamless academic progression, with all scholars who expressed interest successfully transitioning from Master's programmes to PhD studies in the United Kingdom.
+
+• Exceptional academic performance, with over 98% of scholars graduating with Distinction, while the remaining scholars achieved Merit, reflecting the strength of the academic support systems provided.
+
+• Efficient financial management, including the structured disbursement of stipends and other approved sundry expenses in line with sponsor agreements and programme guidelines.
+
+• Continuous academic monitoring and student welfare support, ensuring scholars remain on track academically while maintaining their well-being throughout the duration of their studies.
+
+Beyond academic supervision, the programme actively promotes cultural engagement, leadership development, and community interaction, enabling scholars to maintain a strong connection to Nigeria while studying abroad. This approach strengthens their commitment to applying the knowledge, skills, and global exposure acquired during their studies toward national development upon completion.
+
+The demonstrated success of this programme reflects VIGICA Consult Limited's proven capacity to manage large-scale international scholarship initiatives efficiently, transparently, and with measurable outcomes, delivering significant value for government investment in education and human capital development.`;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -375,12 +398,42 @@ function AboutPage() {
           transition={{ duration: 0.7 }}
         >
           <p className="about-hero-tag">Who We Are</p>
-          <h1>About Vigica Consult</h1>
+          <h1>About VIGICA Consult</h1>
           <p className="about-hero-sub">
             Connecting Nigerian talent to global opportunity through honest
             guidance, proven expertise, and genuine care.
           </p>
         </motion.div>
+      </section>
+
+      {/* ── Experience & Proven Results ─────────────────────────────── */}
+      <section className="about-section experience-section">
+        <div className="about-container">
+          <motion.div
+            className="about-section-header"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <span className="about-section-label experience-label">
+              Achievement
+            </span>
+            <h2 className="about-section-title experience-title">
+              Our Experience and Proven Results
+            </h2>
+          </motion.div>
+
+          <motion.div
+            className="experience-content"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <ReadMoreParagraphs text={EXPERIENCE_TEXT} visibleCount={2} />
+          </motion.div>
+        </div>
       </section>
 
       {/* ── Consultant's Speech ─────────────────────────────────────── */}
@@ -654,7 +707,7 @@ function AboutPage() {
             <h2 className="about-section-title">What Experts Say</h2>
             <p className="about-section-sub">
               Leading professionals across academia and industry share their
-              perspective on Vigica Consult.
+              perspective on VIGICA Consult.
             </p>
           </motion.div>
 
@@ -705,9 +758,7 @@ function AboutPage() {
             <span className="about-section-label awards-label">
               Recognition
             </span>
-            <h2 className="about-section-title awards-title">
-              Achievements &amp; Awards
-            </h2>
+            <h2 className="about-section-title awards-title">Awards</h2>
             <p className="about-section-sub awards-sub">
               Our commitment to excellence has been recognised by industry
               leaders and awarding bodies.

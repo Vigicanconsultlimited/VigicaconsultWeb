@@ -68,7 +68,7 @@ export default function AdminSidebar({
               <img
                 src={logo}
                 className="sidebar-logo-img me-2"
-                alt="Vigica Consult Ltd"
+                alt="VIGICA Consult Ltd"
                 style={{ width: "100px", height: "auto" }}
               />
             </div>

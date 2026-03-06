@@ -19,13 +19,13 @@ export default function DashboardNavbar() {
     const fetchName = async () => {
       try {
         const personalRes = await apiInstance.get(
-          `StudentPersonalInfo/user/${userId}`
+          `StudentPersonalInfo/user/${userId}`,
         );
         const personalInfoId = personalRes?.data?.result?.id;
 
         if (personalInfoId) {
           const submittedAppRes = await apiInstance.get(
-            `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+            `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`,
           );
           const personalData =
             submittedAppRes?.data?.result?.personalInformation;
@@ -50,7 +50,7 @@ export default function DashboardNavbar() {
           <div className="d-flex d-lg-none flex-column text-center w-100">
             <img
               src={loo}
-              alt="Vigica Logo"
+              alt="VIGICA Logo"
               className="dashboard-navbar-logo mx-auto mb-1"
             />
             <span className="dashboard-navbar-brand fw-bold text-white">
@@ -73,7 +73,7 @@ export default function DashboardNavbar() {
             >
               <img
                 src={logo}
-                alt="Vigica Logo"
+                alt="VIGICA Logo"
                 className="dashboard-navbar-logo me-2"
               />
               <div className="d-none d-md-block">

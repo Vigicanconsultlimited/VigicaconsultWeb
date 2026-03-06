@@ -29,12 +29,12 @@ export default function TeamHeader({ toggleSidebar, teamUser }) {
           <Menu size={28} />
         </button>
 
-        {/* Mobile: Vigica logo and brand */}
+        {/* Mobile: VIGICA logo and brand */}
         <div className="team-header-mobile-logo">
           <img
             src={logo}
             className="mobile-logo-img me-2"
-            alt="Vigica Consult Ltd"
+            alt="VIGICA Consult Ltd"
           />
         </div>
         <div className="team-name-container">
