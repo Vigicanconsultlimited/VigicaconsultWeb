@@ -22,12 +22,12 @@ export default function DashboardNavbar() {
       try {
         if (!userId) return;
         const personalRes = await apiInstance.get(
-          `StudentPersonalInfo/user/${userId}`
+          `StudentPersonalInfo/user/${userId}`,
         );
         const personalInfoId = personalRes?.data?.result?.id;
         if (!personalInfoId) return;
         const submittedAppRes = await apiInstance.get(
-          `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+          `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`,
         );
         const personalData = submittedAppRes?.data?.result?.personalInformation;
         if (personalData?.firstName) setDisplayName(personalData.firstName);
@@ -49,12 +49,12 @@ export default function DashboardNavbar() {
               {!logoError ? (
                 <img
                   src={logo}
-                  alt="Vigica Consult Ltd"
+                  alt="VIGICA Consult Ltd"
                   className="desktop-logo"
                   onError={() => setLogoError(true)}
                 />
               ) : (
-                <span className="logo-fallback-text">Vigica</span>
+                <span className="logo-fallback-text">VIGICA</span>
               )}
             </a>
           </div>
@@ -132,12 +132,12 @@ export default function DashboardNavbar() {
               {!logoError ? (
                 <img
                   src={logo}
-                  alt="Vigica Consult Ltd"
+                  alt="VIGICA Consult Ltd"
                   className="mobile-logo"
                   onError={() => setLogoError(true)}
                 />
               ) : (
-                <span className="logo-fallback-text small">Vigica</span>
+                <span className="logo-fallback-text small">VIGICA</span>
               )}
             </div>
 

@@ -370,7 +370,7 @@ function Header() {
               >
                 <img
                   src={vigicaLogo}
-                  alt="Vigica Consult Logo"
+                  alt="VIGICA Consult Logo"
                   className="w-35 h-12"
                 />
               </motion.div>

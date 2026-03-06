@@ -181,7 +181,7 @@ export default function OtpverifyPage() {
             <div className="d-flex justify-content-center mb-4">
               <img
                 src={vigicaLogo}
-                alt="Vigica Logo"
+                alt="VIGICA Logo"
                 className="img-fluid"
                 style={{ maxWidth: "200px" }}
               />

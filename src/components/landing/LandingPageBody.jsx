@@ -132,7 +132,7 @@ const testimonials = [
     name: "Precious Nweze",
     university: "University of Greater Manchester",
     image: precious,
-    text: "Vigica Consult made my study abroad journey seamless. From visa application to accommodation, their support was invaluable.",
+    text: "VIGICA Consult made my study abroad journey seamless. From visa application to accommodation, their support was invaluable.",
     rating: 5,
   },
 
@@ -140,7 +140,7 @@ const testimonials = [
     name: "Oji Ojii",
     university: "University of Greater Manchester",
     image: mercy,
-    text: "Vigica Consult made my study abroad journey seamless. From visa application to accommodation, their support was invaluable.",
+    text: "VIGICA Consult made my study abroad journey seamless. From visa application to accommodation, their support was invaluable.",
     rating: 5,
   },
 ];
@@ -686,7 +686,7 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
-      // --- Send to Vigica API ---
+      // --- Send to VIGICA API ---
       const vigicaForm = new FormData();
       vigicaForm.append("FullName", formData.fullName);
       vigicaForm.append("SendersEmail", formData.email);
@@ -1401,8 +1401,7 @@ export default function Home() {
                         Got issues? Call Our Tech Team
                       </h3>
                       <div className="text-gray-600 flex flex-col lg:flex-row lg:items-center lg:gap-4 gap-2">
-                        <p className="flex items-center gap-2">
-                        </p>
+                        <p className="flex items-center gap-2"></p>
                         <span className="hidden lg:inline">|</span>
                         <p className="flex items-center gap-2">
                           <Email className="w-4 h-4" />{" "}

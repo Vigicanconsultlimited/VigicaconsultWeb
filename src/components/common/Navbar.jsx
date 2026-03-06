@@ -19,7 +19,7 @@ const Navbar = () => {
           {/* Logo Image - adjust width/height as needed */}
           <img
             src={logo2}
-            alt="Vigica Consult Ltd"
+            alt="VIGICA Consult Ltd"
             className="me-2"
             style={{ width: "200px", height: "auto" }}
           />

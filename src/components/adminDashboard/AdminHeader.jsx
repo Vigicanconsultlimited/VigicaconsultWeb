@@ -34,7 +34,7 @@ export default function AdminHeader({ toggleSidebar }) {
           setAdminName(
             userRsponse?.firstName && userRsponse?.lastName
               ? `${userRsponse.firstName} ${userRsponse.lastName}`
-              : userRsponse?.email || "Admin"
+              : userRsponse?.email || "Admin",
           );
         } else {
           setIsAdmin(false);
@@ -71,12 +71,12 @@ export default function AdminHeader({ toggleSidebar }) {
           <Menu size={28} />
         </button>
 
-        {/* Mobile: Vigica logo and brand */}
+        {/* Mobile: VIGICA logo and brand */}
         <div className="admin-header-mobile-logo">
           <img
             src={logo}
             className="mobile-logo-img me-2"
-            alt="Vigica Consult Ltd"
+            alt="VIGICA Consult Ltd"
           />
         </div>
         <div className="admin-name-container">
