@@ -9,7 +9,7 @@ import UpcomingAppointments from "../components/teamDashboard/sections/UpcomingA
 import EditProfile from "../components/teamDashboard/sections/EditProfile";
 import Settings from "../components/teamDashboard/sections/Settings";
 import { authApi, bookingApi } from "../utils/teamAuthApi";
-import LoadingSpinner from "../components/shared/LoadingSpinner";
+import VigicaLoader from "../components/shared/VigicaLoader";
 import "./TeamDashboardLayout.css";
 
 function TeamDashboard() {
@@ -272,9 +272,7 @@ function TeamDashboard() {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-        <LoadingSpinner size="xl" text="Loading dashboard..." />
-      </div>
+      <VigicaLoader variant="inline" size="md" text="Loading dashboard..." />
     );
   }
 

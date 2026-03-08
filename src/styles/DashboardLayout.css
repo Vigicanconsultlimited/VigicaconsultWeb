@@ -1,0 +1,28 @@
+/* Student Dashboard Layout - Mobile First */
+
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.dashboard-content-area {
+  flex: 1;
+  padding: 1rem;
+  min-width: 0; /* Prevent flex child overflow */
+  overflow-x: hidden;
+}
+
+/* Desktop: sidebar takes space, content shifts */
+@media (min-width: 768px) {
+  .dashboard-content-area {
+    margin-left: 280px; /* Sidebar width */
+    padding: 1.5rem 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard-content-area {
+    padding: 2rem 2.5rem;
+  }
+}

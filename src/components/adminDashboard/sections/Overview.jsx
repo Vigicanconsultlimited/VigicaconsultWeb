@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BarChart2, ChevronDown, MoreHorizontal, Star } from "lucide-react";
 import apiInstance from "../../../utils/axios";
+import VigicaLoader from "../../shared/VigicaLoader";
 import "../styles/Overview.css";
 
 // Static (mocked) data for non-API sections
@@ -139,7 +140,7 @@ export default function Overview() {
       try {
         setLoading(true);
         const response = await apiInstance.get(
-          "StudentApplication/allapplications"
+          "StudentApplication/allapplications",
         );
         if (response?.data?.statusCode === 200 && response?.data?.result) {
           const {
@@ -153,19 +154,19 @@ export default function Overview() {
 
           const totalChange = calculateChangePercent(
             totalNumOfApplications,
-            "total"
+            "total",
           );
           const approvedChange = calculateChangePercent(
             approvedApplications,
-            "approved"
+            "approved",
           );
           const rejectedChange = calculateChangePercent(
             rejectedApplications,
-            "rejected"
+            "rejected",
           );
           const pendingChange = calculateChangePercent(
             pendingApplications,
-            "pending"
+            "pending",
           );
 
           setStatCards([
@@ -216,7 +217,7 @@ export default function Overview() {
         console.error(
           `Overview: Error fetching application stats: ${
             error.message
-          } at ${getCurrentDateTime()} by ${getCurrentUser()}`
+          } at ${getCurrentDateTime()} by ${getCurrentUser()}`,
         );
         setError("Failed to load application statistics");
       } finally {
@@ -244,10 +245,11 @@ export default function Overview() {
   if (loading) {
     return (
       <div className="overview-main">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Loading application statistics...</p>
-        </div>
+        <VigicaLoader
+          variant="inline"
+          size="lg"
+          text="Loading application statistics..."
+        />
       </div>
     );
   }

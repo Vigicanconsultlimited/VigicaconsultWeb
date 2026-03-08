@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import { teamApi } from "../utils/teamApi";
 import Header from "../components/landing/Header";
+import VigicaLoader from "../components/shared/VigicaLoader";
 import "../styles/TeamPage.css";
 
 // Default profile image
@@ -243,10 +244,11 @@ function TeamPage() {
 
           {/* Loading State */}
           {loading && (
-            <div className="loading-container">
-              <div className="spinner"></div>
-              <p>Loading team members...</p>
-            </div>
+            <VigicaLoader
+              variant="inline"
+              size="lg"
+              text="Loading team members..."
+            />
           )}
 
           {/* Error State */}

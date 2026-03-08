@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "../../shared/Modal";
 import LoadingSpinner from "../../shared/LoadingSpinner";
+import VigicaLoader from "../../shared/VigicaLoader";
 import profile from "../../../assets/images/default-profile.jpg";
 import apiInstance from "../../../utils/axios";
 import Swal from "sweetalert2";
@@ -240,7 +241,7 @@ export default function UploadedFiles() {
             const documents = res.data.result.map((doc) => {
               // Find the student who owns this document
               const owner = studentsData.find(
-                (student) => student.id === doc.studentPersonalInformationId
+                (student) => student.id === doc.studentPersonalInformationId,
               );
 
               // Extract file size from URL or set default
@@ -309,7 +310,7 @@ export default function UploadedFiles() {
       setFiles(allFiles);
 
       console.log(
-        `Loaded ${allFiles.length} documents from ${studentsData.length} students`
+        `Loaded ${allFiles.length} documents from ${studentsData.length} students`,
       );
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -448,7 +449,7 @@ export default function UploadedFiles() {
               Authorization: `Bearer ${token}`,
               Accept: "application/json",
             },
-          }
+          },
         );
 
         if (response?.data?.statusCode === 200 || response?.status === 200) {
@@ -460,7 +461,7 @@ export default function UploadedFiles() {
             students.map((student) => ({
               ...student,
               documents: student.documents.filter((doc) => doc.id !== file.id),
-            }))
+            })),
           );
 
           Toast.fire({
@@ -598,10 +599,11 @@ export default function UploadedFiles() {
       {/* Files Table */}
       <div className="files-table-container">
         {loadingFiles || loadingStudents ? (
-          <div className="loading-state">
-            <LoadingSpinner size="lg" />
-            <p>Loading files and student data...</p>
-          </div>
+          <VigicaLoader
+            variant="inline"
+            size="md"
+            text="Loading files and student data..."
+          />
         ) : (
           <table className="files-table">
             <thead>
@@ -715,7 +717,7 @@ export default function UploadedFiles() {
             <label htmlFor="file-upload" className="upload-label">
               {isUploading ? (
                 <div className="uploading-state">
-                  <LoadingSpinner size="lg" />
+                  <VigicaLoader variant="minimal" size="md" />
                   <p>Processing upload...</p>
                 </div>
               ) : (

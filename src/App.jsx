@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import { logout, setUser } from "./utils/auth";
 
 import { useAuthStore } from "./store/auth";
@@ -13,22 +13,26 @@ import {
 import PrivateRoute from "./routes/PrivateRoutes";
 import RequireRole from "./routes/RequireRole";
 
+// Eagerly load critical pages
 import Login from "./pages/Login";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import Logout from "./pages/Logout";
-import OtpverifyPage from "./pages/OtpVerifyPage";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import AboutPage from "./pages/AboutPage";
-import TeamPage from "./pages/TeamPage";
-import TeamMemberProfile from "./pages/TeamMemberProfile";
-import TeamApplicationForm from "./pages/TeamApplicationForm";
-import TeamDashboard from "./pages/TeamDashboard";
-import BookAppointment from "./pages/BookAppointment";
-import ChatWidget from "./components/shared/ChatWidget";
+import VigicaLoader from "./components/shared/VigicaLoader";
+
+// Lazy load non-critical pages for faster initial load
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Logout = lazy(() => import("./pages/Logout"));
+const OtpverifyPage = lazy(() => import("./pages/OtpVerifyPage"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const TeamPage = lazy(() => import("./pages/TeamPage"));
+const TeamMemberProfile = lazy(() => import("./pages/TeamMemberProfile"));
+const TeamApplicationForm = lazy(() => import("./pages/TeamApplicationForm"));
+const TeamDashboard = lazy(() => import("./pages/TeamDashboard"));
+const BookAppointment = lazy(() => import("./pages/BookAppointment"));
+const ChatWidget = lazy(() => import("./components/shared/ChatWidget"));
 
 // Component to redirect to appropriate dashboard based on role
 function DashboardRedirect() {
@@ -61,97 +65,97 @@ function App() {
   // Show loading until hydrated and validation is complete
   if (!hydrated || loading) {
     return (
-      <div className="d-flex vh-100 justify-content-center align-items-center">
-        <div className="text-center">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-2">Loading...</p>
-          <small className="text-muted">
-            {!hydrated
-              ? "Initializing store..."
-              : "Validating authentication..."}
-          </small>
-        </div>
-      </div>
+      <VigicaLoader
+        variant="overlay"
+        size="xl"
+        text={!hydrated ? "Initializing..." : "Verifying your session..."}
+      />
     );
   }
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-otp" element={<OtpverifyPage />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/logout" element={<Logout />} />
+      <Suspense
+        fallback={
+          <VigicaLoader variant="inline" size="md" text="Loading page..." />
+        }
+      >
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify-otp" element={<OtpverifyPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/logout" element={<Logout />} />
 
-        {/* About Page */}
-        <Route path="/about" element={<AboutPage />} />
+          {/* About Page */}
+          <Route path="/about" element={<AboutPage />} />
 
-        {/* Team Pages - Public */}
-        <Route path="/team" element={<TeamPage />} />
-        <Route path="/team/apply" element={<TeamApplicationForm />} />
-        <Route path="/team/:id" element={<TeamMemberProfile />} />
+          {/* Team Pages - Public */}
+          <Route path="/team" element={<TeamPage />} />
+          <Route path="/team/apply" element={<TeamApplicationForm />} />
+          <Route path="/team/:id" element={<TeamMemberProfile />} />
 
-        {/* Team Member Dashboard - Only for TeamMember role */}
-        <Route
-          path="/team/dashboard"
-          element={
-            <PrivateRoute>
-              <RequireRole role="TeamMember">
-                <TeamDashboard />
-              </RequireRole>
-            </PrivateRoute>
-          }
-        />
+          {/* Team Member Dashboard - Only for TeamMember role */}
+          <Route
+            path="/team/dashboard"
+            element={
+              <PrivateRoute>
+                <RequireRole role="TeamMember">
+                  <TeamDashboard />
+                </RequireRole>
+              </PrivateRoute>
+            }
+          />
 
-        {/* Appointment Booking */}
-        <Route path="/book" element={<BookAppointment />} />
-        <Route path="/book/:teamMemberId" element={<BookAppointment />} />
+          {/* Appointment Booking */}
+          <Route path="/book" element={<BookAppointment />} />
+          <Route path="/book/:teamMemberId" element={<BookAppointment />} />
 
-        {/* Dashboard redirect route - redirects to appropriate dashboard based on role */}
-        <Route
-          path="/dashboard-redirect"
-          element={
-            <PrivateRoute>
-              <DashboardRedirect />
-            </PrivateRoute>
-          }
-        />
+          {/* Dashboard redirect route - redirects to appropriate dashboard based on role */}
+          <Route
+            path="/dashboard-redirect"
+            element={
+              <PrivateRoute>
+                <DashboardRedirect />
+              </PrivateRoute>
+            }
+          />
 
-        {/* User Dashboard - Only for Students */}
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <RequireRole role="User">
-                <Dashboard
-                  key={window.location.pathname + window.location.search}
-                />
-              </RequireRole>
-            </PrivateRoute>
-          }
-        />
+          {/* User Dashboard - Only for Students */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <RequireRole role="User">
+                  <Dashboard
+                    key={window.location.pathname + window.location.search}
+                  />
+                </RequireRole>
+              </PrivateRoute>
+            }
+          />
 
-        {/* Admin Dashboard - Only for admins */}
-        <Route
-          path="/admin-dashboard"
-          element={
-            <PrivateRoute>
-              <RequireRole role="Admin">
-                <AdminDashboard />
-              </RequireRole>
-            </PrivateRoute>
-          }
-        />
+          {/* Admin Dashboard - Only for admins */}
+          <Route
+            path="/admin-dashboard"
+            element={
+              <PrivateRoute>
+                <RequireRole role="Admin">
+                  <AdminDashboard />
+                </RequireRole>
+              </PrivateRoute>
+            }
+          />
 
-        {/* Catch all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-      <ChatWidget />
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+      <Suspense fallback={null}>
+        <ChatWidget />
+      </Suspense>
     </Router>
   );
 }

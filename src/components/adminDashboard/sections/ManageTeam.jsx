@@ -25,6 +25,7 @@ import {
 import axios from "axios";
 import Cookies from "js-cookie";
 import LoadingSpinner from "../../shared/LoadingSpinner";
+import VigicaLoader from "../../shared/VigicaLoader";
 
 const API_BASE_URL = import.meta.env.PROD
   ? "https://teamapi-production.up.railway.app/api/v1"
@@ -378,7 +379,7 @@ const ManageTeam = () => {
             padding: "60px 0",
           }}
         >
-          <LoadingSpinner size="xl" text="Loading..." />
+          <VigicaLoader variant="inline" size="lg" text="Loading..." />
         </div>
       ) : activeTab === "members" ? (
         <>

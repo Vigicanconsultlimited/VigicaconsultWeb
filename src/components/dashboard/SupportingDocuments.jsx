@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/auth";
 import apiInstance from "../../utils/axios";
 import Swal from "sweetalert2";
+import VigicaLoader from "../shared/VigicaLoader";
 import "./styles/SupportingDocuments.css";
 
 // Toast
@@ -119,7 +120,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
       }
       try {
         const { data } = await apiInstance.get(
-          `StudentPersonalInfo/user/${authData.uid}`
+          `StudentPersonalInfo/user/${authData.uid}`,
         );
         const sid = data?.result?.id;
         if (!sid) throw new Error("StudentPersonalInformationId missing");
@@ -127,7 +128,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
 
         try {
           const appResp = await apiInstance.get(
-            `StudentApplication/application?StudentPersonalInformationId=${sid}`
+            `StudentApplication/application?StudentPersonalInformationId=${sid}`,
           );
           if (appResp?.data?.result) {
             setApplicationStatus(appResp.data.result.applicationStatus);
@@ -141,7 +142,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
         // Check if PhD program
         try {
           const acadRes = await apiInstance.get(
-            `Academic/StudentInformationId?PersonalInformationId=${sid}`
+            `Academic/StudentInformationId?PersonalInformationId=${sid}`,
           );
           if (acadRes?.data?.result?.program?.programLevel === 2) {
             setIsPhDProgram(true);
@@ -161,7 +162,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
             const docId = idResp?.data?.result?.id;
             if (!docId) continue;
             const det = await apiInstance.get(
-              `${cfg.statusUrl}?DocId=${docId}`
+              `${cfg.statusUrl}?DocId=${docId}`,
             );
             const res = det?.data?.result;
             if (!res) continue;
@@ -215,7 +216,7 @@ export default function SupportingDocuments({ onContinue, onBack }) {
 
       try {
         const fileIdResp = await apiInstance.get(
-          `${cfg.uploadUrl}/${studentId}`
+          `${cfg.uploadUrl}/${studentId}`,
         );
         const docId = fileIdResp?.data?.result?.id;
         if (docId) {
@@ -322,12 +323,11 @@ export default function SupportingDocuments({ onContinue, onBack }) {
 
   if (loading)
     return (
-      <div className="loading-overlay">
-        <div className="spinner-container">
-          <div className="loading-spinner" />
-          <p>Loading your Documents...</p>
-        </div>
-      </div>
+      <VigicaLoader
+        variant="inline"
+        size="md"
+        text="Loading your Documents..."
+      />
     );
 
   return (

@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { publicBookingApi } from "../utils/teamAuthApi";
 import Header from "../components/landing/Header";
+import VigicaLoader from "../components/shared/VigicaLoader";
 import "../styles/BookAppointment.css";
 
 // Default profile image
@@ -138,10 +139,7 @@ function BookAppointment() {
     return (
       <div className="book-appointment-page">
         <Header />
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Loading...</p>
-        </div>
+        <VigicaLoader variant="inline" size="lg" text="Loading booking..." />
       </div>
     );
   }
@@ -285,7 +283,10 @@ function BookAppointment() {
                       </label>
                       {slotsLoading ? (
                         <div className="slots-loading">
-                          Loading available times...
+                          <VigicaLoader variant="minimal" size="sm" />
+                          <span style={{ marginLeft: "0.5rem" }}>
+                            Loading available times...
+                          </span>
                         </div>
                       ) : availableSlots.length === 0 ? (
                         <p className="no-slots">

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
+import VigicaLoader from "../shared/VigicaLoader";
 import "./styles/ApplicationStatus.css";
 
 const documentTypes = [
@@ -125,7 +126,7 @@ const ApplicationStatus = () => {
       setLoading(true);
       try {
         const personalRes = await apiInstance.get(
-          `StudentPersonalInfo/user/${authData.uid}`
+          `StudentPersonalInfo/user/${authData.uid}`,
         );
         const studentId = personalRes?.data?.result?.id;
         if (!studentId) {
@@ -156,7 +157,7 @@ const ApplicationStatus = () => {
                 }
                 // Now fetch document details
                 const detailRes = await apiInstance.get(
-                  `${statusUrl}?DocId=${docId}`
+                  `${statusUrl}?DocId=${docId}`,
                 );
                 const detail = detailRes?.data?.result;
                 if (!detail) {
@@ -193,7 +194,7 @@ const ApplicationStatus = () => {
                   };
                 }
                 const detailRes = await apiInstance.get(
-                  `${statusUrl}?DocId=${docId}`
+                  `${statusUrl}?DocId=${docId}`,
                 );
                 const detail = detailRes?.data?.result;
                 if (!detail) {
@@ -226,7 +227,7 @@ const ApplicationStatus = () => {
                 updatedAt: null,
               };
             }
-          })
+          }),
         );
         setDocs(results);
       } catch (e) {
@@ -264,7 +265,7 @@ const ApplicationStatus = () => {
           statusFilter === "all" || d.statusKey === statusFilter;
         return matchesText && matchesStatus;
       }),
-    [docs, search, statusFilter]
+    [docs, search, statusFilter],
   );
 
   const toggleExpandMobile = (type) =>
@@ -272,12 +273,11 @@ const ApplicationStatus = () => {
 
   if (loading) {
     return (
-      <div className="loading-overlay app-status-loading">
-        <div className="spinner-container">
-          <div className="loading-spinner" />
-          <p>Loading Application Status...</p>
-        </div>
-      </div>
+      <VigicaLoader
+        variant="inline"
+        size="md"
+        text="Loading Application Status..."
+      />
     );
   }
 
@@ -363,7 +363,7 @@ const ApplicationStatus = () => {
                 ></span>
                 <span>{statusMeta[k].label}</span>
               </div>
-            )
+            ),
           )}
         </div>
       </div>

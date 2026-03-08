@@ -1,0 +1,664 @@
+/* ============================================================
+   VIGICA Design System — Global Tokens & Mobile-First Base
+   ============================================================ */
+
+:root {
+  /* ── Brand Colors ── */
+  --vigica-primary: #1e40af;
+  --vigica-primary-light: #3b82f6;
+  --vigica-primary-dark: #1e3a8a;
+  --vigica-accent: #2563eb;
+  --vigica-gold: #f59e0b;
+  --vigica-gold-dark: #d97706;
+  --vigica-success: #10b981;
+  --vigica-danger: #ef4444;
+  --vigica-warning: #f59e0b;
+
+  /* ── Neutral Palette ── */
+  --vigica-bg: #f8fafc;
+  --vigica-bg-alt: #f1f5f9;
+  --vigica-surface: #ffffff;
+  --vigica-border: #e2e8f0;
+  --vigica-border-light: #f1f5f9;
+  --vigica-text: #1e293b;
+  --vigica-text-secondary: #64748b;
+  --vigica-text-muted: #94a3b8;
+
+  /* ── Typography ── */
+  --font-heading: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --font-body: "Poppins", "Inter", system-ui, sans-serif;
+
+  /* ── Spacing Scale ── */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* ── Border Radius ── */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* ── Layout ── */
+  --header-height: 64px;
+  --sidebar-width: 260px;
+  --container-max: 1200px;
+}
+
+/* ── Global Reset Enhancements ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--vigica-text);
+  background: var(--vigica-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Prevent iOS zoom on input focus */
+input,
+select,
+textarea {
+  font-size: 16px !important;
+}
+
+@media (min-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: inherit !important;
+  }
+}
+
+/* ── Smooth image loading ── */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Focus visible for accessibility ── */
+:focus-visible {
+  outline: 2px solid var(--vigica-primary-light);
+  outline-offset: 2px;
+}
+
+/* ── Utility: Container ── */
+.vigica-container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .vigica-container {
+    padding: 0 var(--space-lg);
+  }
+}
+
+/* ============================================================
+   VIGICA Logo Spinner — Global Loading Animation
+   ============================================================ */
+
+/* Full-page overlay loader */
+.vigica-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  gap: var(--space-lg);
+}
+
+/* Inline/section loader — lightweight, sits inside its parent */
+.vigica-loader-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-md);
+  gap: var(--space-sm);
+  min-height: 60vh;
+}
+
+/* Spinner container */
+.vigica-spinner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vigica-spinner--sm {
+  width: 28px;
+  height: 28px;
+}
+
+.vigica-spinner--md {
+  width: 72px;
+  height: 72px;
+}
+
+.vigica-spinner--lg {
+  width: 100px;
+  height: 100px;
+}
+
+.vigica-spinner--xl {
+  width: 120px;
+  height: 120px;
+}
+
+/* Spinning circle ring */
+.vigica-spinner__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: var(--vigica-primary-light);
+  border-right-color: var(--vigica-gold);
+  animation: vigica-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.vigica-spinner--lg .vigica-spinner__ring,
+.vigica-spinner--xl .vigica-spinner__ring {
+  border-width: 4px;
+}
+
+/* Second ring for large sizes (counter-rotate for visual interest) */
+.vigica-spinner__ring--outer {
+  inset: -6px;
+  border-width: 2px;
+  border-top-color: var(--vigica-gold);
+  border-right-color: transparent;
+  border-bottom-color: var(--vigica-primary-light);
+  border-left-color: transparent;
+  animation: vigica-spin-reverse 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  opacity: 0.6;
+}
+
+/* Pulsing glow behind the logo */
+.vigica-spinner__glow {
+  position: absolute;
+  inset: 10%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.15) 0%,
+    transparent 70%
+  );
+  animation: vigica-pulse 2s ease-in-out infinite;
+}
+
+/* Logo in the center */
+.vigica-spinner__logo {
+  position: relative;
+  z-index: 1;
+  border-radius: 50%;
+  object-fit: contain;
+  animation: vigica-logo-breathe 2.5s ease-in-out infinite;
+}
+
+.vigica-spinner--sm .vigica-spinner__logo {
+  width: 16px;
+  height: 16px;
+}
+
+.vigica-spinner--md .vigica-spinner__logo {
+  width: 40px;
+  height: 40px;
+}
+
+.vigica-spinner--lg .vigica-spinner__logo {
+  width: 56px;
+  height: 56px;
+}
+
+.vigica-spinner--xl .vigica-spinner__logo {
+  width: 64px;
+  height: 64px;
+}
+
+/* Loading text */
+.vigica-loader__text {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--vigica-text-secondary);
+}
+
+.vigica-loader-overlay .vigica-loader__text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  animation: vigica-text-fade 2s ease-in-out infinite;
+}
+
+/* No animation on inline text — keep it calm */
+.vigica-loader-inline .vigica-loader__text {
+  color: var(--vigica-text-muted);
+}
+
+/* Progress dots */
+.vigica-loader__dots {
+  display: flex;
+  gap: 6px;
+}
+
+.vigica-loader__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: vigica-dot-bounce 1.4s ease-in-out infinite;
+}
+
+.vigica-loader-overlay .vigica-loader__dot {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.vigica-loader-inline .vigica-loader__dot {
+  background: var(--vigica-primary-light);
+  opacity: 0.5;
+}
+
+.vigica-loader__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.vigica-loader__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ── Keyframes ── */
+@keyframes vigica-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes vigica-spin-reverse {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes vigica-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.6;
+  }
+}
+
+@keyframes vigica-logo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes vigica-text-fade {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes vigica-dot-bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.3;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   Mobile-First Utility Overrides
+   ============================================================ */
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--vigica-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vigica-text-muted);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vigica-text-secondary);
+}
+
+/* Mobile touch improvements */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  /* Bigger touch targets on mobile */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text from being too small on mobile */
+  body {
+    font-size: 15px;
+  }
+}
+
+/* ============================================================
+   Consistent Card Styles
+   ============================================================ */
+.vigica-card {
+  background: var(--vigica-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--vigica-border);
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
+}
+
+.vigica-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================
+   Consistent Button Styles
+   ============================================================ */
+.vigica-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+.vigica-btn--primary {
+  background: linear-gradient(
+    135deg,
+    var(--vigica-primary) 0%,
+    var(--vigica-accent) 100%
+  );
+  color: white;
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+}
+
+.vigica-btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+  color: white;
+}
+
+.vigica-btn--secondary {
+  background: var(--vigica-bg-alt);
+  color: var(--vigica-text);
+  border: 1px solid var(--vigica-border);
+}
+
+.vigica-btn--secondary:hover {
+  background: var(--vigica-border);
+}
+
+.vigica-btn--gold {
+  background: linear-gradient(
+    135deg,
+    var(--vigica-gold) 0%,
+    var(--vigica-gold-dark) 100%
+  );
+  color: white;
+}
+
+/* ============================================================
+   Page Entrance Animations
+   ============================================================ */
+@keyframes vigica-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vigica-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes vigica-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.vigica-animate-in {
+  animation: vigica-fade-in 0.4s ease-out forwards;
+}
+
+.vigica-animate-slide-up {
+  animation: vigica-slide-up 0.5s ease-out forwards;
+}
+
+/* ============================================================
+   Responsive Text Utilities
+   ============================================================ */
+.vigica-heading-xl {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: var(--vigica-text);
+}
+
+.vigica-heading-lg {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.375rem;
+  line-height: 1.3;
+  color: var(--vigica-text);
+}
+
+@media (min-width: 768px) {
+  .vigica-heading-xl {
+    font-size: 2.25rem;
+  }
+  .vigica-heading-lg {
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .vigica-heading-xl {
+    font-size: 2.75rem;
+  }
+  .vigica-heading-lg {
+    font-size: 2rem;
+  }
+}
+
+/* ============================================================
+   Responsive Grid Helpers
+   ============================================================ */
+.vigica-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.vigica-grid--2 {
+  grid-template-columns: 1fr;
+}
+
+.vigica-grid--3 {
+  grid-template-columns: 1fr;
+}
+
+.vigica-grid--4 {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .vigica-grid--2,
+  .vigica-grid--3,
+  .vigica-grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .vigica-grid--3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .vigica-grid--4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ============================================================
+   Mobile Footer Improvements
+   ============================================================ */
+@media (max-width: 767px) {
+  .footer-section.footer-variant-2 {
+    padding: 2rem 0 1rem;
+  }
+
+  .footer-section .row {
+    text-align: center;
+  }
+
+  .footer-logo {
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .footer-social-icons {
+    justify-content: center;
+  }
+
+  .footer-links-variant2 li {
+    justify-content: center;
+  }
+}
+
+/* ============================================================
+   Login / Auth Pages Mobile Enhancement
+   ============================================================ */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 12px !important;
+  }
+
+  .login-card .card-body {
+    padding: 1.25rem !important;
+  }
+
+  .login-card .card-body img {
+    max-width: 150px !important;
+  }
+}
+
+/* ============================================================
+   Safe Area Handling for Modern Devices
+   ============================================================ */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .footer-section,
+  .team-dashboard-layout,
+  .admin-dashboard {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ============================================================
+   Print Styles — Clean output
+   ============================================================ */
+@media print {
+  .vigica-loader-overlay,
+  .vigica-loader-inline {
+    display: none !important;
+  }
+}

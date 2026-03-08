@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
 import { useNavigate } from "react-router-dom";
+import VigicaLoader from "../shared/VigicaLoader";
 import "./styles/StudentDashboard.css";
 import Swal from "sweetalert2";
 
@@ -45,7 +46,7 @@ export default function StudentDashboard({
         // Personal Info
         try {
           const personalRes = await apiInstance.get(
-            `StudentPersonalInfo/user/${userId}`
+            `StudentPersonalInfo/user/${userId}`,
           );
           const personalInfo = personalRes?.data?.result;
           currentPersonalInfoId = personalInfo?.id;
@@ -53,7 +54,7 @@ export default function StudentDashboard({
 
           if (personalInfo?.firstName && personalInfo?.lastName) {
             setDisplayName(
-              `${personalInfo.firstName} ${personalInfo.lastName}`
+              `${personalInfo.firstName} ${personalInfo.lastName}`,
             );
           }
 
@@ -61,7 +62,7 @@ export default function StudentDashboard({
           if (currentPersonalInfoId) {
             try {
               const appResponse = await apiInstance.get(
-                `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`
+                `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`,
               );
               if (appResponse?.data?.result) {
                 const status = appResponse.data.result.applicationStatus;
@@ -76,11 +77,11 @@ export default function StudentDashboard({
             // Submitted Applications (general)
             try {
               const submittedAppRes = await apiInstance.get(
-                `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`
+                `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`,
               );
               submittedApps = submittedAppRes?.data?.result || [];
               setApplications(
-                Array.isArray(submittedApps) ? submittedApps : [submittedApps]
+                Array.isArray(submittedApps) ? submittedApps : [submittedApps],
               );
             } catch {
               /* ignore */
@@ -89,7 +90,7 @@ export default function StudentDashboard({
             // Academic Applications
             try {
               const academicAppRes = await apiInstance.get(
-                `Academic/StudentInformationId?PersonalInformationId=${currentPersonalInfoId}`
+                `Academic/StudentInformationId?PersonalInformationId=${currentPersonalInfoId}`,
               );
 
               if (
@@ -198,7 +199,7 @@ export default function StudentDashboard({
   // Contact Support
   const handleContactSupport = async (
     applicationId = null,
-    applicationDetails = null
+    applicationDetails = null,
   ) => {
     const { value: formValues } = await Swal.fire({
       title: "Contact Support",
@@ -225,7 +226,7 @@ export default function StudentDashboard({
               <small>School: ${applicationDetails.school}</small><br>
               <small>Program: ${applicationDetails.description}</small><br>
               <small>Status: ${getStatusText(
-                applicationDetails.applicationStatus
+                applicationDetails.applicationStatus,
               )}</small>
             </div>
           `
@@ -261,7 +262,7 @@ export default function StudentDashboard({
         }
         if (!message || message.trim().length < 10) {
           Swal.showValidationMessage(
-            "Please enter at least 10 characters for the message"
+            "Please enter at least 10 characters for the message",
           );
           return false;
         }
@@ -352,7 +353,7 @@ export default function StudentDashboard({
           didOpen: () => Swal.showLoading(),
         });
         await apiInstance.delete(
-          `Academic?StudentPersonalInformationId=${personalInfoId}`
+          `Academic?StudentPersonalInformationId=${personalInfoId}`,
         );
         setSubmittedAcademicApps([]);
         setApplicationStatus(null);
@@ -377,17 +378,16 @@ export default function StudentDashboard({
   const hasAnyApplications = totalApplications > 0;
   const hasSubmittedApplications = hasAnyApplications;
   const hasSubmittedNonEditableApp = submittedAcademicApps.some(
-    (app) => !canEditApplication(app)
+    (app) => !canEditApplication(app),
   );
 
   if (!initialLoadComplete) {
     return (
-      <div className="loading-overlay">
-        <div className="spinner-container">
-          <div className="loading-spinner"></div>
-          <p>Loading your dashboard...</p>
-        </div>
-      </div>
+      <VigicaLoader
+        variant="inline"
+        size="lg"
+        text="Loading your dashboard..."
+      />
     );
   }
 
@@ -405,7 +405,7 @@ export default function StudentDashboard({
             {applicationStatus && (
               <div
                 className={`application-status ${getStatusText(
-                  applicationStatus
+                  applicationStatus,
                 )
                   .toLowerCase()
                   .replace(" ", "-")}`}
@@ -587,8 +587,8 @@ export default function StudentDashboard({
                   const rowStateClass = isThisProgramApplied
                     ? "applied-row"
                     : isAnyOtherProgramApplied
-                    ? "locked-row"
-                    : "open-row";
+                      ? "locked-row"
+                      : "open-row";
 
                   return (
                     <tr key={index} className={rowStateClass}>
@@ -616,8 +616,8 @@ export default function StudentDashboard({
                             isThisProgramApplied
                               ? "btn-applied"
                               : isAnyOtherProgramApplied
-                              ? "btn-locked"
-                              : "btn-open"
+                                ? "btn-locked"
+                                : "btn-open"
                           }`}
                           onClick={() =>
                             !isThisProgramApplied &&
@@ -631,15 +631,15 @@ export default function StudentDashboard({
                             isThisProgramApplied
                               ? "You have already applied for this program"
                               : isAnyOtherProgramApplied
-                              ? "You have an open application. Delete it (if status allows) to switch."
-                              : "Apply for this program"
+                                ? "You have an open application. Delete it (if status allows) to switch."
+                                : "Apply for this program"
                           }
                         >
                           {isThisProgramApplied
                             ? "✅ Applied"
                             : isAnyOtherProgramApplied
-                            ? "🚫 You have an Open Application"
-                            : "➕ Apply"}
+                              ? "🚫 You have an Open Application"
+                              : "➕ Apply"}
                         </button>
                       </td>
                     </tr>
