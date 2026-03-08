@@ -322,7 +322,18 @@
   font-size: 0.9rem;
   color: #64748b;
   font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.speech-topic {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e40af;
   margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #dbeafe;
+  line-height: 1.4;
+  font-style: italic;
 }
 
 .speech-quote-icon {

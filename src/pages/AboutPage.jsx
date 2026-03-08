@@ -14,6 +14,7 @@ import {
 import Header from "../components/landing/Header";
 import "../styles/AboutPage.css";
 import drGideon from "../assets/images/dr-gideon.jpg";
+import emmanuel from "../assets/images/emmanuel-ceo.jpeg";
 import UoGMAward from "../assets/images/UoGM-award.jpg";
 import UoGMAwardDrGideon from "../assets/images/UoGM-award-dr-gideon.jpg";
 import Isaiah from "../assets/images/Isaiah.jpg";
@@ -22,6 +23,8 @@ const CONSULTANT = {
   name: "Dr. Gideon Okorie",
   title: "Ebonyi State Scholarship Liaison Officer/Chief Consultant",
   photo: drGideon,
+  topic:
+    "Reflecting on the Mentorship Award and the Ebonyi State Scholarship Journey",
   speech: `While pursuing my MBA in Global Healthcare Management at the University of Greater Manchester, serving as both Class Representative and Student Ambassador strengthened my resolve to become a person of value rather than merely someone who is successful.
 
 My six years' experience at the National Agency for the Control of AIDS (NACA), largely focused on coordination, proved instrumental in shaping the role that ultimately led to this award. During my time there, I worked within teams coordinating activities related to the Millennium Development Goals, the Sustainable Development Goals and Global Fund initiatives. Although I will not dwell on my work at NACA in this piece, it laid a strong foundation for what was to come.
@@ -61,12 +64,17 @@ The journey continues. Watch this space for an activity-packed PhD programme ahe
 const MANAGER = {
   name: "Mr. Emmanuel Ajah",
   title: "CEO",
-  photo: "/default-profile.jpg",
-  speech: `Running the day-to-day operations at VIGICA Consult has given me a deep appreciation of what our clients go through — the excitement, the anxiety, and ultimately the triumph of seeing their dreams materialize.
+  photo: emmanuel,
+  topic: "Message from the CEO",
+  speech: `At VIGICA Consult Limited, we believe that strategic investment in education and human capital remains one of the most powerful drivers of sustainable national development. Our mission extends beyond facilitating international study opportunities; we are committed to designing and managing structured education programmes that deliver measurable, long-term value for individuals, institutions, governments, and society.
 
-Our operational team works tirelessly to ensure that every application, every document, every deadline is handled with precision and care. We have built systems and partnerships that allow us to offer a seamless experience from your first consultation to your arrival at your dream university.
+Through strong partnerships with public institutions, universities, and international stakeholders, we have developed a model built on strategic student placement, robust institutional relationships, rigorous academic monitoring, and disciplined financial oversight. This framework ensures that scholarship programmes and individual placements are administered with the highest standards of transparency, efficiency, and accountability.
 
-I personally oversee our partnerships with over 15 universities worldwide, and I can assure you — we only work with the best, so that you can be the best.`,
+Our work supporting the Ebonyi State Government’s international scholarship initiative demonstrates the impact that well-structured programmes can achieve. By guiding scholars from postgraduate study into advanced doctoral research at leading UK universities, the initiative illustrates how global academic exposure can cultivate highly skilled professionals capable of contributing meaningfully to national growth and innovation.
+
+A Chartered Accountant by training, I bring a strong foundation in financial stewardship, governance, and strategic leadership to the education sector. My professional background spans accounting, management consulting, and senior-level education advisory, enabling me to lead complex, multi-stakeholder engagements with clarity, compliance, and institutional alignment. This governance-driven approach underpins how we design, manage, and deliver programmes at VIGICA Consult Limited.
+
+As we look ahead, our focus remains clear: to deepen international partnerships and expand opportunities that empower the next generation of scholars, researchers, and leaders. We remain committed to delivering programmes defined by academic excellence, sound governance, and measurable impact for the individuals, institutions, and communities we serve.`,
 };
 
 const CLIENT_TESTIMONIALS = [
@@ -464,6 +472,9 @@ function AboutPage() {
               <span className="about-section-label">Our Consultant</span>
               <h2 className="speech-name">{CONSULTANT.name}</h2>
               <p className="speech-role">{CONSULTANT.title}</p>
+              {CONSULTANT.topic && (
+                <h3 className="speech-topic">{CONSULTANT.topic}</h3>
+              )}
               <FaQuoteLeft className="speech-quote-icon" />
               <ReadMoreParagraphs text={CONSULTANT.speech} visibleCount={2} />
             </div>
@@ -485,6 +496,9 @@ function AboutPage() {
               <span className="about-section-label">Our Manager</span>
               <h2 className="speech-name">{MANAGER.name}</h2>
               <p className="speech-role">{MANAGER.title}</p>
+              {MANAGER.topic && (
+                <h3 className="speech-topic">{MANAGER.topic}</h3>
+              )}
               <FaQuoteLeft className="speech-quote-icon" />
               <ReadMoreParagraphs text={MANAGER.speech} visibleCount={2} />
             </div>
