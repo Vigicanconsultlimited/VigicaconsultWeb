@@ -28,6 +28,7 @@ import TeamMemberProfile from "./pages/TeamMemberProfile";
 import TeamApplicationForm from "./pages/TeamApplicationForm";
 import TeamDashboard from "./pages/TeamDashboard";
 import BookAppointment from "./pages/BookAppointment";
+import ChatWidget from "./components/shared/ChatWidget";
 
 // Component to redirect to appropriate dashboard based on role
 function DashboardRedirect() {
@@ -150,6 +151,7 @@ function App() {
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <ChatWidget />
     </Router>
   );
 }
