@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import { teamApi } from "../utils/teamApi";
 import Header from "../components/landing/Header";
+import VigicaLoader from "../components/shared/VigicaLoader";
 import "../styles/TeamMemberProfile.css";
 
 // Default profile image
@@ -20,7 +21,8 @@ const defaultProfile = "/default-profile.jpg";
 
 // Vigica company social links — used as fallback when a member hasn't set their own
 const VIGICA_SOCIALS = {
-  linkedin: "https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true",
+  linkedin:
+    "https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true",
   twitter: "https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09",
   facebook: "https://www.facebook.com/profile.php?id=61579196807381",
   instagram: "https://www.instagram.com/vigicaconsult/",
@@ -69,10 +71,7 @@ function TeamMemberProfile() {
     return (
       <div className="profile-page">
         <Header />
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Loading profile...</p>
-        </div>
+        <VigicaLoader variant="inline" size="lg" text="Loading profile..." />
       </div>
     );
   }

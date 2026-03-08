@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Modal from "../../shared/Modal";
 import LoadingSpinner from "../../shared/LoadingSpinner";
+import VigicaLoader from "../../shared/VigicaLoader";
 import profile from "../../../assets/images/default-profile.jpg";
 import apiInstance from "../../../utils/axios";
 import "../styles/Applications.css";
@@ -69,7 +70,7 @@ export default function Applications() {
 
       try {
         const res = await apiInstance.get(
-          `StudentApplication/allapplicationspagenation?pageNumber=${page}&pageSize=${pageSize}`
+          `StudentApplication/allapplicationspagenation?pageNumber=${page}&pageSize=${pageSize}`,
         );
         if (res?.data?.data && Array.isArray(res.data.data)) {
           setApplications(res.data.data);
@@ -85,7 +86,7 @@ export default function Applications() {
         loadingState(false);
       }
     },
-    [pageSize]
+    [pageSize],
   );
 
   useEffect(() => {
@@ -98,13 +99,13 @@ export default function Applications() {
       applications.map(
         (app) =>
           app.academic?.schoolResponse?.name &&
-          app.academic.schoolResponse.name.trim()
-      )
-    )
+          app.academic.schoolResponse.name.trim(),
+      ),
+    ),
   ).filter(Boolean);
 
   const programLevels = Array.from(
-    new Set(applications.map((app) => app.academic?.program?.programLevel))
+    new Set(applications.map((app) => app.academic?.program?.programLevel)),
   ).filter(Boolean);
 
   const filteredApplications = applications.filter((app) => {
@@ -203,7 +204,7 @@ export default function Applications() {
     try {
       // First, get the first page to determine total pages
       const firstPageRes = await apiInstance.get(
-        `StudentApplication/allapplicationspagenation?pageNumber=1&pageSize=${pageSize}`
+        `StudentApplication/allapplicationspagenation?pageNumber=1&pageSize=${pageSize}`,
       );
 
       if (!firstPageRes?.data?.data) {
@@ -219,8 +220,8 @@ export default function Applications() {
         for (let page = 2; page <= totalPages; page++) {
           pagePromises.push(
             apiInstance.get(
-              `StudentApplication/allapplicationspagenation?pageNumber=${page}&pageSize=${pageSize}`
-            )
+              `StudentApplication/allapplicationspagenation?pageNumber=${page}&pageSize=${pageSize}`,
+            ),
           );
         }
 
@@ -423,10 +424,11 @@ export default function Applications() {
       {/* Applications Table */}
       <div className="table-container">
         {loadingApps ? (
-          <div className="loading-state">
-            <LoadingSpinner size="lg" />
-            <p>Loading applications...</p>
-          </div>
+          <VigicaLoader
+            variant="inline"
+            size="md"
+            text="Loading applications..."
+          />
         ) : filteredApplications.length === 0 ? (
           <div className="empty-state">
             <Users size={48} />
@@ -622,7 +624,7 @@ export default function Applications() {
               <button
                 onClick={() =>
                   window.open(
-                    `mailto:${selectedApplication.personalInformation.email}`
+                    `mailto:${selectedApplication.personalInformation.email}`,
                   )
                 }
                 className="btn btn-outline"

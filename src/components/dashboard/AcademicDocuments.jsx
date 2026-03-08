@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
+import VigicaLoader from "../shared/VigicaLoader";
 import "./styles/AcademicDocuments.css";
 import Swal from "sweetalert2";
 
@@ -109,7 +110,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
       try {
         const userId = authData.uid;
         const personalRes = await apiInstance.get(
-          `StudentPersonalInfo/user/${userId}`
+          `StudentPersonalInfo/user/${userId}`,
         );
         const personalInfo = personalRes?.data?.result;
         const personalId = personalInfo?.id;
@@ -122,7 +123,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         // Application status
         try {
           const appRes = await apiInstance.get(
-            `StudentApplication/application?StudentPersonalInformationId=${personalId}`
+            `StudentApplication/application?StudentPersonalInformationId=${personalId}`,
           );
           if (appRes?.data?.result) {
             setApplicationStatus(appRes.data.result.applicationStatus);
@@ -136,7 +137,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
         // Academic info for PhD detection
         try {
           const acadRes = await apiInstance.get(
-            `Academic/StudentInformationId?PersonalInformationId=${personalId}`
+            `Academic/StudentInformationId?PersonalInformationId=${personalId}`,
           );
           if (acadRes?.data?.result) {
             const level = acadRes.data.result?.program?.programLevel;
@@ -145,7 +146,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
               setDocumentTypes((prev) =>
                 prev.includes("Research Proposal")
                   ? prev
-                  : [...prev, "Research Proposal"]
+                  : [...prev, "Research Proposal"],
               );
             }
           }
@@ -160,7 +161,7 @@ export default function AcademicDocuments({ onContinue, onBack }) {
             setDocumentTypes((prev) =>
               prev.includes("Research Proposal")
                 ? prev
-                : [...prev, "Research Proposal"]
+                : [...prev, "Research Proposal"],
             );
           }
         }
@@ -172,12 +173,12 @@ export default function AcademicDocuments({ onContinue, onBack }) {
           if (!meta) return null;
           try {
             const fileRes = await apiInstance.get(
-              `${meta.uploadUrl}/${personalId}`
+              `${meta.uploadUrl}/${personalId}`,
             );
             const docId = fileRes?.data?.result?.id;
             if (!docId) return null;
             const docDetailsRes = await apiInstance.get(
-              `${meta.statusUrl}?DocId=${docId}`
+              `${meta.statusUrl}?DocId=${docId}`,
             );
             const data = docDetailsRes?.data?.result;
             if (!data) return null;
@@ -255,12 +256,12 @@ export default function AcademicDocuments({ onContinue, onBack }) {
       // Refetch doc metadata to get final URLs
       try {
         const fileRes = await apiInstance.get(
-          `${meta.uploadUrl}/${studentPersonalInfoId}`
+          `${meta.uploadUrl}/${studentPersonalInfoId}`,
         );
         const docId = fileRes?.data?.result?.id;
         if (docId) {
           const docDetailsRes = await apiInstance.get(
-            `${meta.statusUrl}?DocId=${docId}`
+            `${meta.statusUrl}?DocId=${docId}`,
           );
           const data = docDetailsRes?.data?.result;
           if (data) {
@@ -394,12 +395,11 @@ export default function AcademicDocuments({ onContinue, onBack }) {
 
   if (loading) {
     return (
-      <div className="loading-overlay">
-        <div className="spinner-container">
-          <div className="loading-spinner" />
-          <p>Loading your Documents...</p>
-        </div>
-      </div>
+      <VigicaLoader
+        variant="inline"
+        size="md"
+        text="Loading your Documents..."
+      />
     );
   }
 

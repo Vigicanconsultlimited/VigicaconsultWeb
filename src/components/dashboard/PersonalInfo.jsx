@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./styles/PersonalInfo.css";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
+import VigicaLoader from "../shared/VigicaLoader";
 import Swal from "sweetalert2";
 
 // SweetAlert Toast
@@ -94,7 +95,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
       try {
         const response = await apiInstance.get(
-          `StudentPersonalInfo/user/${userId}`
+          `StudentPersonalInfo/user/${userId}`,
         );
 
         if (response?.data?.result) {
@@ -114,11 +115,11 @@ export default function PersonalInfo({ onContinue, onBack }) {
             Id: savedData.id || "",
             PreferredPronoun: getLabelFromMappedValue(
               savedData.preferredPronoun,
-              pronounOptions
+              pronounOptions,
             ),
             FirstLanguage: getLabelFromMappedValue(
               savedData.firstLanguage,
-              languageOptions
+              languageOptions,
             ),
             Gender: getLabelFromMappedValue(savedData.gender, genderOptions),
           });
@@ -128,7 +129,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
           if (savedData.id) {
             try {
               const appResponse = await apiInstance.get(
-                `StudentApplication/application?StudentPersonalInformationId=${savedData.id}`
+                `StudentApplication/application?StudentPersonalInformationId=${savedData.id}`,
               );
               if (appResponse?.data?.result) {
                 setApplicationStatus(appResponse.data.result.applicationStatus);
@@ -190,7 +191,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
       "Gender",
     ];
     const complete = required.every(
-      (f) => formData[f] && formData[f].trim() !== ""
+      (f) => formData[f] && formData[f].trim() !== "",
     );
     if (!complete) {
       Toast.fire({ icon: "warning", title: "Complete all required fields." });
@@ -203,7 +204,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
       FirstLanguage: getMappedValue(formData.FirstLanguage, languageOptions),
       PreferredPronoun: getMappedValue(
         formData.PreferredPronoun,
-        pronounOptions
+        pronounOptions,
       ),
       Gender: getMappedValue(formData.Gender, genderOptions),
     }).forEach(([k, v]) => payload.append(k, v));
@@ -215,7 +216,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
         payload,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
       Swal.close();
       setIsFormSubmitted(true);
@@ -247,7 +248,7 @@ export default function PersonalInfo({ onContinue, onBack }) {
       FirstLanguage: getMappedValue(formData.FirstLanguage, languageOptions),
       PreferredPronoun: getMappedValue(
         formData.PreferredPronoun,
-        pronounOptions
+        pronounOptions,
       ),
       Gender: getMappedValue(formData.Gender, genderOptions),
     }).forEach(([k, v]) => payload.append(k, v));
@@ -278,12 +279,11 @@ export default function PersonalInfo({ onContinue, onBack }) {
 
   if (loading) {
     return (
-      <div className="loading-overlay">
-        <div className="spinner-container">
-          <div className="loading-spinner"></div>
-          <p>Loading Personal Info...</p>
-        </div>
-      </div>
+      <VigicaLoader
+        variant="inline"
+        size="md"
+        text="Loading Personal Info..."
+      />
     );
   }
 

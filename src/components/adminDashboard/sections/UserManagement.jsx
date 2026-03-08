@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Button from "../../shared/Button";
 import Modal from "../../shared/Modal";
 import LoadingSpinner from "../../shared/LoadingSpinner";
+import VigicaLoader from "../../shared/VigicaLoader";
 import profile from "../../../assets/images/default-profile.jpg";
 import apiInstance from "../../../utils/axios";
 import "../styles/UserManagement.css";
@@ -173,7 +174,7 @@ export default function UserManagement() {
   const startIndex = (currentPage - 1) * usersPerPage;
   const paginatedUsers = filteredUsers.slice(
     startIndex,
-    startIndex + usersPerPage
+    startIndex + usersPerPage,
   );
 
   // CRUD operations
@@ -225,7 +226,9 @@ export default function UserManagement() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setUsers(
-        users.map((user) => (user.id === selectedUser.id ? selectedUser : user))
+        users.map((user) =>
+          user.id === selectedUser.id ? selectedUser : user,
+        ),
       );
       setIsEditModalOpen(false);
       setSelectedUser(null);
@@ -253,7 +256,7 @@ export default function UserManagement() {
       const newStatus = user.status === "active" ? "inactive" : "active";
 
       setUsers(
-        users.map((u) => (u.id === userId ? { ...u, status: newStatus } : u))
+        users.map((u) => (u.id === userId ? { ...u, status: newStatus } : u)),
       );
     } catch (error) {
       setError("Failed to update user status. Please try again.");
@@ -270,7 +273,7 @@ export default function UserManagement() {
           user.status,
           user.joinDate,
           user.applications,
-        ].join(",")
+        ].join(","),
       )
       .join("\n");
 
@@ -530,10 +533,7 @@ export default function UserManagement() {
       {/* Users Table */}
       <div className="table-container">
         {loadingUsers ? (
-          <div className="loading-state">
-            <LoadingSpinner size="lg" />
-            <p>Loading users...</p>
-          </div>
+          <VigicaLoader variant="inline" size="md" text="Loading users..." />
         ) : filteredUsers.length === 0 ? (
           <div className="empty-state">
             <Users size={48} />
@@ -660,7 +660,7 @@ export default function UserManagement() {
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .slice(
                       Math.max(0, currentPage - 2),
-                      Math.min(totalPages, currentPage + 1)
+                      Math.min(totalPages, currentPage + 1),
                     )
                     .map((page) => (
                       <button

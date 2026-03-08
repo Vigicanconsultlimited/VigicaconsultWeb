@@ -288,6 +288,7 @@ function Register() {
               </Link>
             </div>
 
+            {/* TODO: Implement OAuth — uncomment when ready
             <button
               className="btn btn-outline-secondary w-100 mb-2 d-flex align-items-center justify-content-center gap-2"
               type="button"
@@ -341,6 +342,7 @@ function Register() {
               </svg>
               Continue with Apple
             </button>
+            */}
           </form>
         </div>
       </div>

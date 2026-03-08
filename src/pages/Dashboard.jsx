@@ -11,6 +11,7 @@ import StudentDashboard from "../components/dashboard/StudentDashboard";
 
 import Inbox from "../components/dashboard/Inbox";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../styles/DashboardLayout.css";
 import ApplicationStatus from "../components/dashboard/ApplicationStatus";
 import apiInstance from "../utils/axios";
 import ApplicationSummary from "../components/dashboard/ApplicationSummary";
@@ -121,12 +122,9 @@ function Dashboard() {
       {isLoggedIn() ? (
         <>
           <DashboardNavbar />
-          <div className="d-flex" style={{ height: "100vh" }}>
+          <div className="dashboard-layout">
             <SidebarMenu setCurrentStep={setCurrentStep} />
-            <div
-              className="flex-grow-1 p-4"
-              style={{ backgroundColor: "#f8f9fa" }}
-            >
+            <div className="dashboard-content-area">
               {steps[currentStep]?.component || <h3>Invalid step</h3>}
             </div>
           </div>

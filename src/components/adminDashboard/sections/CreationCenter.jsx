@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "../../shared/Modal";
 import LoadingSpinner from "../../shared/LoadingSpinner";
+import VigicaLoader from "../../shared/VigicaLoader";
 import apiInstance from "../../../utils/axios";
 import Swal from "sweetalert2";
 
@@ -538,10 +539,11 @@ export default function CreationCenter() {
       {/* Content Area */}
       <div className="content-area">
         {loading ? (
-          <div className="loading-state">
-            <LoadingSpinner size="lg" />
-            <p>Loading {activeTab}...</p>
-          </div>
+          <VigicaLoader
+            variant="inline"
+            size="md"
+            text={`Loading ${activeTab}...`}
+          />
         ) : (
           <>
             {/* Programs Table */}

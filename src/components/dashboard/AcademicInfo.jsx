@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import "./styles/AcademicInfo.css";
 import apiInstance from "../../utils/axios";
 import { useAuthStore } from "../../store/auth";
+import VigicaLoader from "../shared/VigicaLoader";
 import Swal from "sweetalert2";
 
 // SweetAlert Toast
@@ -78,7 +79,7 @@ export default function AcademicInfo({
   const getSchoolName = (id) => schools.find((s) => s.id === id)?.name || "";
   const getCourseName = (id) => courses.find((c) => c.id === id)?.name || "";
   const selectedProgram = programs.find(
-    (p) => p.id === formData.AcademicProgramId
+    (p) => p.id === formData.AcademicProgramId,
   );
 
   // Load personal info & existing academic record
@@ -91,7 +92,7 @@ export default function AcademicInfo({
       const userId = authData.uid;
       try {
         const personalRes = await apiInstance.get(
-          `StudentPersonalInfo/user/${userId}`
+          `StudentPersonalInfo/user/${userId}`,
         );
         const personalInfo = personalRes?.data?.result;
         if (personalInfo) {
@@ -101,7 +102,7 @@ export default function AcademicInfo({
 
           try {
             const statusRes = await apiInstance.get(
-              `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`
+              `StudentApplication/application?StudentPersonalInformationId=${personalInfoId}`,
             );
             if (statusRes?.data?.result) {
               setApplicationStatus(statusRes.data.result.applicationStatus);
@@ -114,7 +115,7 @@ export default function AcademicInfo({
 
           try {
             const acadRes = await apiInstance.get(
-              `Academic/StudentInformationId?PersonalInformationId=${personalInfoId}`
+              `Academic/StudentInformationId?PersonalInformationId=${personalInfoId}`,
             );
             if (acadRes?.data?.result && acadRes.data.statusCode === 201) {
               const saved = acadRes.data.result;
@@ -173,7 +174,7 @@ export default function AcademicInfo({
         return;
       try {
         const r = await apiInstance.get(
-          `Academic/StudentInformationId?PersonalInformationId=${formData.PersonalInformationId}`
+          `Academic/StudentInformationId?PersonalInformationId=${formData.PersonalInformationId}`,
         );
         if (r?.data?.result && r.data.statusCode === 201) {
           const saved = r.data.result;
@@ -253,7 +254,7 @@ export default function AcademicInfo({
       "CourseOfInterestId",
     ];
     const complete = required.every(
-      (f) => formData[f] && String(formData[f]).trim() !== ""
+      (f) => formData[f] && String(formData[f]).trim() !== "",
     );
     if (!complete) {
       Toast.fire({ icon: "warning", title: "Fill all required fields" });
@@ -345,17 +346,16 @@ export default function AcademicInfo({
 
   const handleContinue = useCallback(
     () => setTimeout(() => onContinue && onContinue(), 150),
-    [onContinue]
+    [onContinue],
   );
 
   if (loading) {
     return (
-      <div className="loading-overlay">
-        <div className="spinner-container">
-          <div className="loading-spinner" />
-          <p>Loading Academic Programs...</p>
-        </div>
-      </div>
+      <VigicaLoader
+        variant="inline"
+        size="md"
+        text="Loading Academic Programs..."
+      />
     );
   }
 

@@ -42,6 +42,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Header from "./Header";
 import Partners from "./Partners";
 import LoadingSpinner from "./LoadingSpinner";
+import VigicaLoader from "../shared/VigicaLoader";
 import { Email } from "@mui/icons-material";
 import apiInstance from "../../utils/axios";
 
@@ -731,7 +732,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {loading ? (
-        <LoadingSpinner />
+        <VigicaLoader
+          variant="inline"
+          size="md"
+          text="Loading your global opportunities..."
+        />
       ) : (
         <>
           <Header />

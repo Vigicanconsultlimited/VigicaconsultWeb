@@ -27,6 +27,7 @@ import {
   RotateCw,
 } from "lucide-react";
 import apiInstance from "../../../utils/axios";
+import VigicaLoader from "../../shared/VigicaLoader";
 import "../styles/DocumentReview.css";
 import Swal from "sweetalert2";
 
@@ -298,7 +299,7 @@ export default function DocumentReview() {
     setLoadingAcademicInfo(true);
     try {
       const res = await apiInstance.get(
-        `Academic/StudentInformationId?PersonalInformationId=${personalInformationId}`
+        `Academic/StudentInformationId?PersonalInformationId=${personalInformationId}`,
       );
 
       if (res?.data?.statusCode === 201 && res.data.result) {
@@ -380,7 +381,7 @@ export default function DocumentReview() {
           students.map(async (student) => {
             try {
               const appRes = await apiInstance.get(
-                `StudentApplication/application?StudentPersonalInformationId=${student.id}`
+                `StudentApplication/application?StudentPersonalInformationId=${student.id}`,
               );
 
               if (appRes?.data?.statusCode === 200 && appRes.data.result) {
@@ -401,7 +402,7 @@ export default function DocumentReview() {
               //);
             }
             return student;
-          })
+          }),
         );
 
         setStudentList(studentsWithStatus);
@@ -412,7 +413,7 @@ export default function DocumentReview() {
 
         if (isRefresh && selectedStudent) {
           const updatedSelectedStudent = studentsWithStatus.find(
-            (s) => s.id === selectedStudent.id
+            (s) => s.id === selectedStudent.id,
           );
           if (updatedSelectedStudent) {
             setSelectedStudent(updatedSelectedStudent);
@@ -450,7 +451,7 @@ export default function DocumentReview() {
     let filtered = studentList;
     if (searchText) {
       filtered = filtered.filter((s) =>
-        s.name.toLowerCase().includes(searchText.toLowerCase())
+        s.name.toLowerCase().includes(searchText.toLowerCase()),
       );
     }
     if (filterStatus !== "all") {
@@ -471,7 +472,7 @@ export default function DocumentReview() {
   // --- PAGE DATA ---
   const paginatedStudents = filteredStudentList.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    currentPage * pageSize,
   );
   const totalPages = Math.ceil(filteredStudentList.length / pageSize);
 
@@ -573,7 +574,7 @@ export default function DocumentReview() {
 
       try {
         const res = await apiInstance.get(
-          `StudentApplication/application?StudentPersonalInformationId=${selectedStudent.id}`
+          `StudentApplication/application?StudentPersonalInformationId=${selectedStudent.id}`,
         );
 
         const result = res?.data?.result;
@@ -590,14 +591,15 @@ export default function DocumentReview() {
             .map(async (doc) => {
               try {
                 const docRes = await apiInstance.get(
-                  `${doc.apiEndpoint}/${selectedStudent.id}`
+                  `${doc.apiEndpoint}/${selectedStudent.id}`,
                 );
                 if (docRes?.data?.statusCode === 200 && docRes.data.result) {
                   let docData = null;
                   if (Array.isArray(docRes.data.result)) {
                     docData = docRes.data.result.find(
                       (item) =>
-                        item.studentPersonalInformationId === selectedStudent.id
+                        item.studentPersonalInformationId ===
+                        selectedStudent.id,
                     );
                     if (!docData) return null;
                   } else {
@@ -628,7 +630,7 @@ export default function DocumentReview() {
             (async () => {
               try {
                 const rpRes = await apiInstance.get(
-                  `ResearchProposal/${selectedStudent.id}`
+                  `ResearchProposal/${selectedStudent.id}`,
                 );
                 if (
                   rpRes?.data?.statusCode === 200 &&
@@ -654,7 +656,7 @@ export default function DocumentReview() {
               } catch (error) {
                 return null;
               }
-            })()
+            })(),
           );
           const documentsResults = await Promise.all(documentsPromises);
           const documents = documentsResults.filter((doc) => doc !== null);
@@ -686,7 +688,7 @@ export default function DocumentReview() {
                   applicationStatusCode: applicationStatusCode,
                   fullApplicationData: result,
                 }
-              : prev
+              : prev,
           );
 
           setStudentList((prevList) =>
@@ -697,22 +699,24 @@ export default function DocumentReview() {
                     applicationStatus: mappedApplicationStatus,
                     applicationStatusCode: applicationStatusCode,
                   }
-                : student
-            )
+                : student,
+            ),
           );
         } else {
           //console.warn("No application data found for student");
           setSelectedStudent((prev) =>
             prev
               ? { ...prev, documents: [], applicationStatus: "pending" }
-              : prev
+              : prev,
           );
         }
       } catch (error) {
         //console.error(`Error fetching application details: ${error.message}`);
         //console.error("Full error:", error);
         setSelectedStudent((prev) =>
-          prev ? { ...prev, documents: [], applicationStatus: "pending" } : prev
+          prev
+            ? { ...prev, documents: [], applicationStatus: "pending" }
+            : prev,
         );
       }
       setSelectedDocument(null);
@@ -745,7 +749,7 @@ export default function DocumentReview() {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response?.data?.statusCode === 200) {
@@ -765,8 +769,8 @@ export default function DocumentReview() {
                   applicationStatus: newStatus,
                   applicationStatusCode: status,
                 }
-              : student
-          )
+              : student,
+          ),
         );
 
         Toast.fire({
@@ -840,7 +844,7 @@ export default function DocumentReview() {
           const updatedDocuments = prev.documents.map((doc) =>
             doc.documentId === document.documentId
               ? { ...doc, status: newStatus, rawStatus: status }
-              : doc
+              : doc,
           );
 
           return { ...prev, documents: updatedDocuments };
@@ -861,8 +865,8 @@ export default function DocumentReview() {
           prev.map((student) =>
             student.id === selectedStudent.id
               ? { ...student, documents: selectedStudent.documents }
-              : student
-          )
+              : student,
+          ),
         );
 
         Toast.fire({
@@ -871,17 +875,17 @@ export default function DocumentReview() {
             newStatus === "approved"
               ? "approved"
               : newStatus === "rejected"
-              ? "rejected"
-              : newStatus === "under review"
-              ? "marked as under review"
-              : "updated"
+                ? "rejected"
+                : newStatus === "under review"
+                  ? "marked as under review"
+                  : "updated"
           } successfully`,
         });
       } else {
         throw new Error(
           `Failed to update document status. Response: ${JSON.stringify(
-            response?.data
-          )}`
+            response?.data,
+          )}`,
         );
       }
     } catch (error) {
@@ -946,7 +950,7 @@ export default function DocumentReview() {
               Authorization: `Bearer ${token}`,
               Accept: "application/json",
             },
-          }
+          },
         );
 
         if (response?.data?.statusCode === 200 || response?.status === 200) {
@@ -954,7 +958,7 @@ export default function DocumentReview() {
             if (!prev) return prev;
 
             const updatedDocuments = prev.documents.filter(
-              (doc) => doc.documentId !== document.documentId
+              (doc) => doc.documentId !== document.documentId,
             );
 
             return { ...prev, documents: updatedDocuments };
@@ -964,8 +968,8 @@ export default function DocumentReview() {
             prev.map((student) =>
               student.id === selectedStudent.id
                 ? { ...student, documents: selectedStudent.documents }
-                : student
-            )
+                : student,
+            ),
           );
 
           if (
@@ -982,8 +986,8 @@ export default function DocumentReview() {
         } else {
           throw new Error(
             `Failed to delete document. Response: ${JSON.stringify(
-              response?.data
-            )}`
+              response?.data,
+            )}`,
           );
         }
       }
@@ -1101,7 +1105,7 @@ export default function DocumentReview() {
       } else if (type === "underReview" && !appToggleStates.underReview) {
         updateApplicationStatus(
           selectedStudent.id,
-          ApplicationStatus.UnderReview
+          ApplicationStatus.UnderReview,
         );
       } else if (type === "comment" && !appToggleStates.comment) {
         Toast.fire({
@@ -1145,7 +1149,7 @@ export default function DocumentReview() {
       if (selectedStudent) {
         updateApplicationStatus(
           selectedStudent.id,
-          ApplicationStatus.UnderReview
+          ApplicationStatus.UnderReview,
         );
       }
 
@@ -1263,10 +1267,11 @@ export default function DocumentReview() {
         <div className="documents-table-container">
           <div className="table-wrapper">
             {loadingStudents ? (
-              <div className="loading-container">
-                <div className="loading-spinner"></div>
-                Loading students...
-              </div>
+              <VigicaLoader
+                variant="inline"
+                size="md"
+                text="Loading students..."
+              />
             ) : (
               <table className="documents-table">
                 <thead>
@@ -1354,10 +1359,11 @@ export default function DocumentReview() {
         {/* Middle: Student Info & Documents, Review Actions */}
         <div className="review-details-panel">
           {loadingDetails ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              Loading student details...
-            </div>
+            <VigicaLoader
+              variant="inline"
+              size="md"
+              text="Loading student details..."
+            />
           ) : selectedStudent ? (
             <>
               {/* Enhanced Profile Header */}
@@ -1380,7 +1386,7 @@ export default function DocumentReview() {
                   <div className="profile-status">
                     <span
                       className={`enhanced-status-badge ${getStatusClass(
-                        deriveStatus(selectedStudent)
+                        deriveStatus(selectedStudent),
                       )}`}
                     >
                       <StatusIcon size={12} />
@@ -1584,7 +1590,7 @@ export default function DocumentReview() {
                               <div className="program-meta-enhanced">
                                 <span className="program-level-badge">
                                   {getProgramLevelText(
-                                    academicInfo.programLevel
+                                    academicInfo.programLevel,
                                   )}
                                 </span>
                                 {academicInfo.duration > 0 && (
@@ -1724,7 +1730,7 @@ export default function DocumentReview() {
                         <span className="status-label">Current Status:</span>
                         <span
                           className={`enhanced-status-badge large ${getStatusClass(
-                            deriveStatus(selectedStudent)
+                            deriveStatus(selectedStudent),
                           )}`}
                         >
                           <StatusIcon size={14} />
@@ -1905,23 +1911,23 @@ export default function DocumentReview() {
                             <td>
                               <span
                                 className={`enhanced-status-badge small ${getStatusClass(
-                                  doc.status
+                                  doc.status,
                                 )}`}
                               >
                                 {getStatusClass(doc.status).includes(
-                                  "approved"
+                                  "approved",
                                 ) && <CheckCircle size={12} />}
                                 {getStatusClass(doc.status).includes(
-                                  "rejected"
+                                  "rejected",
                                 ) && <XCircle size={12} />}
                                 {getStatusClass(doc.status).includes(
-                                  "under-review"
+                                  "under-review",
                                 ) && <Clock size={12} />}
                                 {getStatusClass(doc.status).includes(
-                                  "pending"
+                                  "pending",
                                 ) && <Clock size={12} />}
                                 {getStatusClass(doc.status).includes(
-                                  "uploaded"
+                                  "uploaded",
                                 ) && <CheckCircle size={12} />}
                                 {doc.status.charAt(0).toUpperCase() +
                                   doc.status.slice(1)}
@@ -1991,7 +1997,7 @@ export default function DocumentReview() {
                 <h4 className="document-preview-title">Document Preview</h4>
                 <span
                   className={`document-status-indicator ${getStatusClass(
-                    selectedDocument.status
+                    selectedDocument.status,
                   )}`}
                 >
                   {selectedDocument.status.charAt(0).toUpperCase() +
@@ -2019,7 +2025,7 @@ export default function DocumentReview() {
                       <span className="meta-label">Status:</span>
                       <span
                         className={`enhanced-status-badge small ${getStatusClass(
-                          selectedDocument.status
+                          selectedDocument.status,
                         )}`}
                       >
                         {selectedDocument.status.charAt(0).toUpperCase() +
