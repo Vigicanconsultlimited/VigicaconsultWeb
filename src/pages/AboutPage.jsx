@@ -15,14 +15,17 @@ import Header from "../components/landing/Header";
 import "../styles/AboutPage.css";
 import drGideon from "../assets/images/dr-gideon.jpg";
 import emmanuel from "../assets/images/emmanuel-ceo.jpeg";
-import UoGMAward from "../assets/images/UoGM-award.jpg";
-import UoGMAwardDrGideon from "../assets/images/UoGM-award-dr-gideon.jpg";
+import UoGMAward from "../assets/images/UoGM-award.jpeg";
+import UoGMAwardDrGideon from "../assets/images/UoGM-award-dr-gideon.jpeg";
 import Isaiah from "../assets/images/Isaiah.jpg";
 
 const CONSULTANT = {
   name: "Dr. Gideon Okorie",
   title: "Ebonyi State Scholarship Liaison Officer/Chief Consultant",
   photo: drGideon,
+  awardPhoto: UoGMAwardDrGideon,
+  awardCaption:
+    "Best Mentor of the Year – FON Scholars, University of Greater Manchester",
   topic:
     "Reflecting on the Mentorship Award and the Ebonyi State Scholarship Journey",
   speech: `While pursuing my MBA in Global Healthcare Management at the University of Greater Manchester, serving as both Class Representative and Student Ambassador strengthened my resolve to become a person of value rather than merely someone who is successful.
@@ -465,7 +468,21 @@ function AboutPage() {
                   }}
                 />
               </div>
-              <div className="speech-badge">{CONSULTANT.title}</div>
+              {CONSULTANT.awardPhoto && (
+                <div className="speech-award-wrap">
+                  <img
+                    src={CONSULTANT.awardPhoto}
+                    alt="Award"
+                    className="speech-award-photo"
+                    onError={(e) => {
+                      e.target.src = "/default-profile.jpg";
+                    }}
+                  />
+                  <p className="speech-award-caption">
+                    {CONSULTANT.awardCaption}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="speech-text-col">
@@ -514,7 +531,6 @@ function AboutPage() {
                   }}
                 />
               </div>
-              <div className="speech-badge">{MANAGER.title}</div>
             </div>
           </motion.div>
         </div>
