@@ -32,7 +32,7 @@ const TeamMemberProfile = lazy(() => import("./pages/TeamMemberProfile"));
 const TeamApplicationForm = lazy(() => import("./pages/TeamApplicationForm"));
 const TeamDashboard = lazy(() => import("./pages/TeamDashboard"));
 const BookAppointment = lazy(() => import("./pages/BookAppointment"));
-const ChatWidget = lazy(() => import("./components/shared/ChatWidget"));
+// const ChatWidget = lazy(() => import("./components/shared/ChatWidget"));
 
 // Component to redirect to appropriate dashboard based on role
 function DashboardRedirect() {
@@ -153,9 +153,9 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
-      <Suspense fallback={null}>
+      {/* <Suspense fallback={null}>
         <ChatWidget />
-      </Suspense>
+      </Suspense> */}
     </Router>
   );
 }

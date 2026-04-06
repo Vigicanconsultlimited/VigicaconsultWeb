@@ -45,6 +45,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import VigicaLoader from "../shared/VigicaLoader";
 import { Email } from "@mui/icons-material";
 import apiInstance from "../../utils/axios";
+import { prefetchTeam } from "../../utils/teamApi";
 
 // SweetAlert Toast configuration
 const Toast = Swal.mixin({
@@ -68,28 +69,56 @@ const statsData = [
 
 const servicesData = [
   {
-    title: "University Finder",
-    icon: GraduationCap,
-    points: ["F1 Student Visa", "Non Academic Visa", "Exchange Visitor Visa"],
-  },
-  {
-    title: "Student Application",
-    icon: FileCheck,
+    title: "Course Finder",
+    icon: Search,
     points: [
-      "Document Preparation",
-      "Application Review",
-      "Submission Support",
+      "Assessing Course Studied",
+      "Work Experience",
+      "Career Change",
+      "Scholarships",
     ],
   },
   {
-    title: "Document Review",
-    icon: Search,
-    points: ["Comprehensive Analysis", "Error Detection", "Compliance Check"],
+    title: "University Finder",
+    icon: GraduationCap,
+    points: [
+      "Foundation Study",
+      "Undergraduate",
+      "Postgraduate Taught (MSc)",
+      "Research (MRes/PhD)",
+    ],
   },
   {
-    title: "Visa Assistance",
+    title: "University Application Support",
+    icon: FileCheck,
+    points: [
+      "Document Preparation",
+      "Document Reviews",
+      "Submission Support",
+      "Pre-CAS Interview & Preparation",
+    ],
+  },
+  {
+    title: "Visa Application Assistance",
     icon: Shield,
-    points: ["Expert Guidance", "Interview Preparation", "Success Guarantee"],
+    points: [
+      "Document Review",
+      "CAS Application & Assessment",
+      "Credibility Interview (UKVI)",
+    ],
+  },
+  {
+    title: "Accommodation Support",
+    icon: Users,
+    points: ["Short Stay", "Airbnb", "Long Stay"],
+  },
+  {
+    title: "Partnership & Collaboration",
+    icon: ArrowRight,
+    points: [
+      "Government Sponsored Scholarship Programmes",
+      "Exchange Programmes Between Institutions",
+    ],
   },
 ];
 
@@ -631,6 +660,9 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    // Kick off team data fetch in the background so /team page loads instantly
+    prefetchTeam();
+
     const timer = setTimeout(() => {
       setLoading(false);
     }, 3000);
@@ -648,11 +680,230 @@ export default function Home() {
     });
   };
 
+  const COUNTRIES = [
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    "Belize",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Brunei",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cabo Verde",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Comoros",
+    "Congo (Brazzaville)",
+    "Congo (DRC)",
+    "Costa Rica",
+    "Croatia",
+    "Cuba",
+    "Cyprus",
+    "Czech Republic",
+    "Denmark",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Equatorial Guinea",
+    "Eritrea",
+    "Estonia",
+    "Eswatini",
+    "Ethiopia",
+    "Fiji",
+    "Finland",
+    "France",
+    "Gabon",
+    "Gambia",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Grenada",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Guyana",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kiribati",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Libya",
+    "Liechtenstein",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Marshall Islands",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Micronesia",
+    "Moldova",
+    "Monaco",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Myanmar",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "North Korea",
+    "North Macedonia",
+    "Norway",
+    "Oman",
+    "Pakistan",
+    "Palau",
+    "Palestine",
+    "Panama",
+    "Papua New Guinea",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome and Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "South Korea",
+    "South Sudan",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad and Tobago",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Tuvalu",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "United Kingdom",
+    "United States",
+    "Uruguay",
+    "Uzbekistan",
+    "Vanuatu",
+    "Vatican City",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe",
+  ];
+
+  const STUDY_DESTINATIONS = [
+    "UK",
+    "USA",
+    "Canada",
+    "Australia",
+    "Finland",
+    "Denmark",
+    "Germany",
+    "Hungary",
+    "Poland",
+    "Malaysia",
+  ];
+
   const [formData, setFormData] = useState({
-    email: "",
-    phone: "",
-    fullName: "",
-    message: "",
+    FullName: "",
+    EmailAddress: "",
+    MobileNumber: "",
+    FullMobileNumber: "",
+    DialCode: "",
+    Message: "",
+    IeltsStatus: "",
+    EnglishQualificationType: "",
+    CountryCode: "",
+    StudyDestination: "",
+    CurrentCountryOfResidence: "",
+    AgreeToPrivacyPolicy: false,
   });
 
   const scrollToSection = (sectionId) => {
@@ -665,21 +916,26 @@ export default function Home() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Form validation
-    if (!formData.email || !formData.fullName || !formData.message) {
-      Toast.fire({
-        icon: "error",
-        title: "Please fill in all required fields (Email, Name, and Message)",
-      });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.FullName.trim()) {
+      Toast.fire({ icon: "error", title: "Full name is required" });
       return;
     }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (
+      !formData.EmailAddress.trim() ||
+      !emailRegex.test(formData.EmailAddress)
+    ) {
+      Toast.fire({ icon: "error", title: "A valid email address is required" });
+      return;
+    }
+    if (!formData.MobileNumber.trim()) {
+      Toast.fire({ icon: "error", title: "Mobile number is required" });
+      return;
+    }
+    if (!formData.AgreeToPrivacyPolicy) {
       Toast.fire({
         icon: "error",
-        title: "Please enter a valid email address",
+        title: "You must agree to the privacy policy",
       });
       return;
     }
@@ -687,12 +943,41 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
-      // --- Send to VIGICA API ---
       const vigicaForm = new FormData();
-      vigicaForm.append("FullName", formData.fullName);
-      vigicaForm.append("SendersEmail", formData.email);
-      vigicaForm.append("SendersPhone", formData.phone);
-      vigicaForm.append("Message", formData.message);
+      vigicaForm.append("FullName", formData.FullName);
+      vigicaForm.append("EmailAddress", formData.EmailAddress);
+      vigicaForm.append("MobileNumber", formData.MobileNumber);
+      vigicaForm.append(
+        "FullMobileNumber",
+        formData.FullMobileNumber || formData.MobileNumber,
+      );
+      vigicaForm.append("DialCode", formData.DialCode);
+      vigicaForm.append("Message", formData.Message);
+      vigicaForm.append("IeltsStatus", formData.IeltsStatus);
+      vigicaForm.append(
+        "EnglishQualificationType",
+        formData.EnglishQualificationType,
+      );
+      vigicaForm.append(
+        "QualificationTypeDisplay",
+        formData.EnglishQualificationType,
+      );
+      vigicaForm.append("CountryCode", formData.CountryCode);
+      vigicaForm.append("CountryCodeDisplay", formData.CountryCode);
+      vigicaForm.append("StudyDestination", formData.StudyDestination);
+      vigicaForm.append("StudyDestinationDisplay", formData.StudyDestination);
+      vigicaForm.append(
+        "CurrentCountryOfResidence",
+        formData.CurrentCountryOfResidence,
+      );
+      vigicaForm.append(
+        "ResidenceCountryDisplay",
+        formData.CurrentCountryOfResidence,
+      );
+      vigicaForm.append(
+        "AgreeToPrivacyPolicy",
+        formData.AgreeToPrivacyPolicy ? "true" : "false",
+      );
 
       await apiInstance.post("Enquiry", vigicaForm, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -700,22 +985,28 @@ export default function Home() {
 
       Toast.fire({
         icon: "success",
-        title: "Message sent successfully! We'll get back to you soon.",
+        title: "Enquiry submitted! We'll get back to you soon.",
       });
 
-      // Reset form
       setFormData({
-        email: "",
-        phone: "",
-        fullName: "",
-        message: "",
+        FullName: "",
+        EmailAddress: "",
+        MobileNumber: "",
+        FullMobileNumber: "",
+        DialCode: "",
+        Message: "",
+        IeltsStatus: "",
+        EnglishQualificationType: "",
+        CountryCode: "",
+        StudyDestination: "",
+        CurrentCountryOfResidence: "",
+        AgreeToPrivacyPolicy: false,
       });
     } catch (error) {
-      console.error("Error sending email:", error);
+      console.error("Error sending enquiry:", error);
       Toast.fire({
         icon: "error",
-        title:
-          "Failed to send message. Please try again or contact us directly at +234 901 445 6659",
+        title: "Failed to submit. Please try again or call +234 913 543 0319",
       });
     } finally {
       setIsSubmitting(false);
@@ -935,7 +1226,7 @@ export default function Home() {
                 </p>
               </motion.div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {servicesData.map((service, index) => (
                   <motion.div
                     key={index}
@@ -1392,7 +1683,7 @@ export default function Home() {
                       <h3 className="text-xl font-bold text-gray-900 mb-2">
                         Requesting A Call
                       </h3>
-                      <p className="text-gray-600">+234 901 445 6659</p>
+                      <p className="text-gray-600">+234 913 543 0319</p>
                     </div>
                   </div>
 
@@ -1407,10 +1698,8 @@ export default function Home() {
                       </h3>
                       <div className="text-gray-600 flex flex-col lg:flex-row lg:items-center lg:gap-4 gap-2">
                         <p className="flex items-center gap-2"></p>
-                        <span className="hidden lg:inline">|</span>
                         <p className="flex items-center gap-2">
-                          <Email className="w-4 h-4" />{" "}
-                          signalls247@vigicaconsult.com
+                          <Email className="w-4 h-4" /> info@vigicaconsult.com
                         </p>
                       </div>
                     </div>
@@ -1439,7 +1728,8 @@ export default function Home() {
                         Location
                       </h3>
                       <p className="text-gray-600">
-                        Plot 114/115, Okay Water, Lugbe, Abuja
+                        Okay Centre, Okay Water Federal Housing Authority,
+                        Lugbe, Abuja.
                       </p>
                     </div>
                   </div>
@@ -1453,74 +1743,251 @@ export default function Home() {
                   transition={{ duration: 0.8 }}
                 >
                   <Card className="border-0 shadow-2xl">
-                    <CardContent className="p-8">
-                      <form onSubmit={handleFormSubmit} className="space-y-6">
-                        <div className="grid md:grid-cols-2 gap-6">
+                    <CardContent className="p-6 md:p-8">
+                      <form onSubmit={handleFormSubmit} className="space-y-4">
+                        {/* Full Name & Email */}
+                        <div className="grid md:grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-medium text-gray-700 mb-2 block">
-                              Your Email *
+                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                              Full Name <span className="text-red-500">*</span>
+                            </label>
+                            <Input
+                              type="text"
+                              placeholder="Enter your full name"
+                              value={formData.FullName}
+                              onChange={(e) =>
+                                handleInputChange("FullName", e.target.value)
+                              }
+                              className="rounded-xl border-gray-200 focus:border-blue-500"
+                              disabled={isSubmitting}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                              Email Address{" "}
+                              <span className="text-red-500">*</span>
                             </label>
                             <Input
                               type="email"
-                              placeholder="Enter Email Address"
-                              value={formData.email}
+                              placeholder="Enter email address"
+                              value={formData.EmailAddress}
                               onChange={(e) =>
-                                handleInputChange("email", e.target.value)
+                                handleInputChange(
+                                  "EmailAddress",
+                                  e.target.value,
+                                )
                               }
-                              className="rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                              className="rounded-xl border-gray-200 focus:border-blue-500"
                               disabled={isSubmitting}
-                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Dial Code & Mobile */}
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                              Dial Code
+                            </label>
+                            <Input
+                              type="text"
+                              placeholder="e.g. +234"
+                              value={formData.DialCode}
+                              onChange={(e) =>
+                                handleInputChange("DialCode", e.target.value)
+                              }
+                              className="rounded-xl border-gray-200 focus:border-blue-500"
+                              disabled={isSubmitting}
                             />
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-gray-700 mb-2 block">
-                              Your Phone
+                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                              Mobile Number{" "}
+                              <span className="text-red-500">*</span>
                             </label>
                             <Input
                               type="tel"
-                              placeholder="Enter Phone No."
-                              value={formData.phone}
-                              onChange={(e) =>
-                                handleInputChange("phone", e.target.value)
-                              }
-                              className="rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                              placeholder="Enter mobile number"
+                              value={formData.MobileNumber}
+                              onChange={(e) => {
+                                handleInputChange(
+                                  "MobileNumber",
+                                  e.target.value,
+                                );
+                                handleInputChange(
+                                  "FullMobileNumber",
+                                  (formData.DialCode || "") + e.target.value,
+                                );
+                              }}
+                              className="rounded-xl border-gray-200 focus:border-blue-500"
                               disabled={isSubmitting}
                             />
                           </div>
                         </div>
 
+                        {/* Country of Nationality & Country of Residence */}
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                              Country of Nationality
+                            </label>
+                            <select
+                              value={formData.CountryCode}
+                              onChange={(e) =>
+                                handleInputChange("CountryCode", e.target.value)
+                              }
+                              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                              disabled={isSubmitting}
+                            >
+                              <option value="">Select country</option>
+                              {COUNTRIES.map((c) => (
+                                <option key={c} value={c}>
+                                  {c}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                              Current Country of Residence
+                            </label>
+                            <select
+                              value={formData.CurrentCountryOfResidence}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  "CurrentCountryOfResidence",
+                                  e.target.value,
+                                )
+                              }
+                              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                              disabled={isSubmitting}
+                            >
+                              <option value="">Select country</option>
+                              {COUNTRIES.map((c) => (
+                                <option key={c} value={c}>
+                                  {c}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Study Destination & English Qualification */}
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                              Study Destination
+                            </label>
+                            <select
+                              value={formData.StudyDestination}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  "StudyDestination",
+                                  e.target.value,
+                                )
+                              }
+                              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                              disabled={isSubmitting}
+                            >
+                              <option value="">Select destination</option>
+                              {STUDY_DESTINATIONS.map((d) => (
+                                <option key={d} value={d}>
+                                  {d}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-700 mb-1 block">
+                              English Qualification Type
+                            </label>
+                            <select
+                              value={formData.EnglishQualificationType}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  "EnglishQualificationType",
+                                  e.target.value,
+                                )
+                              }
+                              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                              disabled={isSubmitting}
+                            >
+                              <option value="">Select qualification</option>
+                              <option value="IELTS">IELTS</option>
+                              <option value="WAEC">WAEC</option>
+                              <option value="NECO">NECO</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* IELTS Status */}
                         <div>
-                          <label className="text-sm font-medium text-gray-700 mb-2 block">
-                            Your Full Name *
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                            IELTS Status
                           </label>
-                          <Input
-                            type="text"
-                            placeholder="Enter name"
-                            value={formData.fullName}
+                          <select
+                            value={formData.IeltsStatus}
                             onChange={(e) =>
-                              handleInputChange("fullName", e.target.value)
+                              handleInputChange("IeltsStatus", e.target.value)
                             }
-                            className="rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
                             disabled={isSubmitting}
-                            required
+                          >
+                            <option value="">Select IELTS status</option>
+                            <option value="Yes">Yes — I have IELTS</option>
+                            <option value="No">No — I don't have IELTS</option>
+                            <option value="PreparingForIelts">
+                              Preparing for IELTS
+                            </option>
+                          </select>
+                        </div>
+
+                        {/* Message */}
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                            Message
+                          </label>
+                          <Textarea
+                            placeholder="Tell us about your study goals or any questions..."
+                            rows={3}
+                            value={formData.Message}
+                            onChange={(e) =>
+                              handleInputChange("Message", e.target.value)
+                            }
+                            className="rounded-xl border-gray-200 focus:border-blue-500"
+                            disabled={isSubmitting}
                           />
                         </div>
 
-                        <div>
-                          <label className="text-sm font-medium text-gray-700 mb-2 block">
-                            Message *
-                          </label>
-                          <Textarea
-                            placeholder="Write your message here..."
-                            rows={4}
-                            value={formData.message}
+                        {/* Privacy Policy */}
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            id="privacy"
+                            checked={formData.AgreeToPrivacyPolicy}
                             onChange={(e) =>
-                              handleInputChange("message", e.target.value)
+                              handleInputChange(
+                                "AgreeToPrivacyPolicy",
+                                e.target.checked,
+                              )
                             }
-                            className="rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                            className="mt-1 w-4 h-4 accent-blue-600 cursor-pointer"
                             disabled={isSubmitting}
-                            required
                           />
+                          <label
+                            htmlFor="privacy"
+                            className="text-sm text-gray-600 cursor-pointer"
+                          >
+                            I agree to the{" "}
+                            <a
+                              href="/privacy"
+                              className="text-blue-600 hover:underline font-medium"
+                            >
+                              Privacy Policy
+                            </a>{" "}
+                            and consent to VIGICA Consult contacting me about my
+                            enquiry. <span className="text-red-500">*</span>
+                          </label>
                         </div>
 
                         <Button
@@ -1531,11 +1998,11 @@ export default function Home() {
                         >
                           {isSubmitting ? (
                             <>
-                              <span className="mr-2">Sending...</span>
+                              <span className="mr-2">Submitting...</span>
                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                             </>
                           ) : (
-                            "Book Free Consultation"
+                            "Submit Enquiry"
                           )}
                         </Button>
                       </form>
