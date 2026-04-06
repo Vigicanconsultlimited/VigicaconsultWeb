@@ -20,7 +20,9 @@ const ContactBar = () => {
           <div className="col-12 col-md-auto py-1 py-md-0 text-center text-md-start me-md-4">
             <div className="text-white text-decoration-none d-inline-flex align-items-center contact-item">
               <FaMapMarkerAlt className="me-2" />
-              <span>Plot 114/115, Okay Water, Lugbe, Abuja</span>
+              <span>
+                Okay Centre, Okay Water Federal Housing Authority, Lugbe, Abuja.
+              </span>
             </div>
           </div>
 

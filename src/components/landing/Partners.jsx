@@ -6,6 +6,7 @@ import DMU from "../../assets/images/1499083809_Capture.avif";
 import Leed_Bekett from "../../assets/images/2018_LBU01_PURPLE_jpg-1024x430.jpg";
 import EBSG from "../../assets/images/ebonyiia.png";
 import Robert_Gordon from "../../assets/images/RobertGordon.jpg";
+import British_Council from "../../assets/images/british-council2.avif";
 //"C:\Users\User\Desktop\proj\VigicaconsultWeb\vigicanwebapp\src\assets\images\ebonyiia.png"
 // Partners data - easily extendable
 const partnersData = [
@@ -14,28 +15,35 @@ const partnersData = [
     name: "Leeds Beckett University",
     logo: Leed_Bekett,
     url: "https://www.leedsbeckett.ac.uk/",
-    description: "UK University Partner",
+    //description: "UK University Partner",
   },
   {
     id: 2,
     name: "De Montfort University",
     logo: DMU,
     url: "https://www.dmu.ac.uk/home.aspx",
-    description: "UK University Partner",
+    //description: "UK University Partner",
   },
   {
     id: 3,
     name: "Ebonyi State Government",
     logo: EBSG,
     url: "https://www.ebonyistate.gov.ng/",
-    description: "Government Partner",
+    //description: "Government Partner",
   },
   {
     id: 4,
     name: "Robert Gordon University, Aberdeen",
     logo: Robert_Gordon,
     url: "https://www.rgu.ac.uk/",
-    description: "Scholarship Partner",
+    //description: "Scholarship Partner",
+  },
+  {
+    id: 5,
+    name: "British Council",
+    logo: British_Council,
+    url: "https://www.britishcouncil.org/",
+    //description: "Cultural & Education Partner",
   },
 ];
 
@@ -69,7 +77,7 @@ const Partners = () => {
         </motion.div>
 
         {/* Partners Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8">
           {partnersData.map((partner, index) => (
             <motion.a
               key={partner.id}
@@ -112,25 +120,6 @@ const Partners = () => {
             </motion.a>
           ))}
         </div>
-
-        {/* Call to Action */}
-        <motion.div
-          className="text-center mt-12"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          viewport={{ once: true }}
-        >
-          <p className="text-gray-600">
-            Interested in partnering with us?{" "}
-            <a
-              href="#contact"
-              className="text-blue-600 font-semibold hover:text-blue-700 no-underline"
-            >
-              Get in touch
-            </a>
-          </p>
-        </motion.div>
       </div>
     </section>
   );

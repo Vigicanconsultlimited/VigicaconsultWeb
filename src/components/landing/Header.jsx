@@ -212,9 +212,9 @@ function Header() {
           <div className="md:hidden py-1">
             {/* Line 1: Phone • Email */}
             <div className="mobile-contact-row">
-              <a href="tel:+2349014456659" className="mc-link">
+              <a href="tel:+2349135430319" className="mc-link">
                 <FaPhone className="mc-icon" />
-                <span className="mc-text">+234 901 445 6659</span>
+                <span className="mc-text">+234 913 543 0319</span>
               </a>
               <span className="mc-dot" aria-hidden="true">
                 |
@@ -284,17 +284,17 @@ function Header() {
             <div className="flex items-center">
               <FaMapMarkerAlt className="mr-2" />
               <span className="text-sm">
-                Plot 114/115, Okay Water, Lugbe, Abuja
+                Okay Centre, Okay Water Federal Housing Authority, Lugbe, Abuja.
               </span>
             </div>
 
             <div className="flex items-center gap-4">
               <a
-                href="tel:+2349014456659"
+                href="tel:+2349135430319"
                 className="text-white no-underline flex items-center text-sm"
               >
                 <FaPhone className="mr-2" />
-                <span>+234 901 445 6659</span>
+                <span>+234 913 543 0319</span>
               </a>
               <a
                 href="mailto:info@vigicaconsult.com"

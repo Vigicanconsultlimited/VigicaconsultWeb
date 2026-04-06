@@ -15,6 +15,25 @@ const teamApiInstance = axios.create({
   },
 });
 
+// Module-level cache so team data is available instantly when /team is opened
+let _teamByCategory = null;
+let _teamByCategoryPromise = null;
+
+// Call this early (e.g. on the landing page) to warm the cache in the background
+export const prefetchTeam = () => {
+  if (_teamByCategory || _teamByCategoryPromise) return;
+  _teamByCategoryPromise = teamApiInstance
+    .get("team/by-category/")
+    .then((r) => {
+      _teamByCategory = r.data;
+      _teamByCategoryPromise = null;
+      return r.data;
+    })
+    .catch(() => {
+      _teamByCategoryPromise = null;
+    });
+};
+
 // Team API functions
 export const teamApi = {
   // Get all approved team members
@@ -23,10 +42,13 @@ export const teamApi = {
     return response.data;
   },
 
-  // Get team members grouped by category
+  // Get team members grouped by category — reads from cache if already prefetched
   getTeamMembersByCategory: async () => {
+    if (_teamByCategory) return _teamByCategory;
+    if (_teamByCategoryPromise) return _teamByCategoryPromise;
     const response = await teamApiInstance.get("team/by-category/");
-    return response.data;
+    _teamByCategory = response.data;
+    return _teamByCategory;
   },
 
   // Get all public categories
