@@ -26,13 +26,13 @@ const Footer = () => (
           </a>
 
           <a
-            href="https://www.instagram.com/vigicaconsult/"
+            href="https://www.instagram.com/vigica_consult?igsh=MXYzNmR3ZjZ3c3V2Zw=="
             className="footer-social-btn"
           >
             <i className="fa-brands fa-instagram"></i>
           </a>
           <a
-            href="https://www.facebook.com/profile.php?id=61579196807381"
+            href="https://www.facebook.com/profile.php?id=61587336548001"
             className="footer-social-btn"
           >
             <i className="fa-brands fa-facebook-f"></i>
