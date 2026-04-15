@@ -44,6 +44,7 @@ import Partners from "./Partners";
 import LoadingSpinner from "./LoadingSpinner";
 import VigicaLoader from "../shared/VigicaLoader";
 import { Email } from "@mui/icons-material";
+import axios from "axios";
 import apiInstance from "../../utils/axios";
 import { prefetchTeam } from "../../utils/teamApi";
 
@@ -116,8 +117,8 @@ const servicesData = [
     title: "Partnership & Collaboration",
     icon: ArrowRight,
     points: [
-      "Government Sponsored Scholarship Programmes",
-      "Exchange Programmes Between Institutions",
+      "Government Sponsored Scholarship",
+      "Institutional Exchange Programmes ",
     ],
   },
 ];
@@ -979,9 +980,13 @@ export default function Home() {
         formData.AgreeToPrivacyPolicy ? "true" : "false",
       );
 
-      await apiInstance.post("Enquiry", vigicaForm, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // Use bare axios (not apiInstance) so the default Accept: application/json
+      // header doesn't get sent — the server only accepts Accept: */*
+      await axios.post(
+        "https://vigica-001-site1.qtempurl.com/api/Enquiry",
+        vigicaForm,
+        { headers: { Accept: "*/*" } },
+      );
 
       Toast.fire({
         icon: "success",

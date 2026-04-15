@@ -252,7 +252,7 @@ function Header() {
                   <FaTwitter />
                 </a>
                 <a
-                  href="https://www.instagram.com/vigicaconsult/"
+                  href="https://www.instagram.com/vigica_consult?igsh=MXYzNmR3ZjZ3c3V2Zw=="
                   className="mc-social"
                   aria-label="Instagram"
                   title="Instagram"
@@ -260,7 +260,7 @@ function Header() {
                   <FaInstagram />
                 </a>
                 <a
-                  href="https://www.facebook.com/profile.php?id=61579196807381"
+                  href="https://www.facebook.com/profile.php?id=61587336548001"
                   className="mc-social"
                   aria-label="Facebook"
                   title="Facebook"
@@ -330,13 +330,13 @@ function Header() {
                   <FaTwitter />
                 </a>
                 <a
-                  href="https://www.instagram.com/VIGICA_Consult/"
+                  href="https://www.instagram.com/vigica_consult?igsh=MXYzNmR3ZjZ3c3V2Zw=="
                   className="text-white hover:text-blue-200 transition-colors"
                 >
                   <FaInstagram />
                 </a>
                 <a
-                  href="https://www.facebook.com/VIGICAConsult"
+                  href="https://www.facebook.com/profile.php?id=61587336548001"
                   className="text-white hover:text-blue-200 transition-colors"
                 >
                   <FaFacebook />
