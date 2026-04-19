@@ -38,10 +38,16 @@ const Footer = () => (
             <i className="fa-brands fa-facebook-f"></i>
           </a>
           <a
-            href="http://tiktok.com/@vigicaconsult"
+            href="https://www.tiktok.com/@vigica.consult.lt?_r=1&_t=ZS-95ZyJlHobrz"
             className="footer-social-btn"
           >
             <i className="fa-brands fa-tiktok"></i>
+          </a>
+          <a
+            href="https://youtube.com/@vigicaconsult?si=skz6_8ZB8qiAqWjh"
+            className="footer-social-btn"
+          >
+            <i className="fa-brands fa-youtube"></i>
           </a>
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
   FaFacebook,
   FaLinkedin,
   FaUserCircle,
+  FaYoutube,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../../store/auth";
@@ -268,12 +269,20 @@ function Header() {
                   <FaFacebook />
                 </a>
                 <a
-                  href="http://tiktok.com/@vigicaconsult"
+                  href="https://www.tiktok.com/@vigica.consult.lt?_r=1&_t=ZS-95ZyJlHobrz"
                   className="mc-social"
                   aria-label="TikTok"
                   title="TikTok"
                 >
                   <FaTiktok />
+                </a>
+                <a
+                  href="https://youtube.com/@vigicaconsult?si=skz6_8ZB8qiAqWjh"
+                  className="mc-social"
+                  aria-label="YouTube"
+                  title="YouTube"
+                >
+                  <FaYoutube />
                 </a>
               </div>
             </div>
@@ -342,10 +351,16 @@ function Header() {
                   <FaFacebook />
                 </a>
                 <a
-                  href="http://tiktok.com/@vigicaconsult"
+                  href="https://www.tiktok.com/@vigica.consult.lt?_r=1&_t=ZS-95ZyJlHobrz"
                   className="text-white hover:text-blue-200 transition-colors"
                 >
                   <FaTiktok />
+                </a>
+                <a
+                  href="https://youtube.com/@vigicaconsult?si=skz6_8ZB8qiAqWjh"
+                  className="text-white hover:text-blue-200 transition-colors"
+                >
+                  <FaYoutube />
                 </a>
               </div>
             </div>

@@ -8,7 +8,7 @@ const TEAM_API_BASE_URL = import.meta.env.PROD
 
 const teamApiInstance = axios.create({
   baseURL: TEAM_API_BASE_URL,
-  timeout: 10000,
+  timeout: 40000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
