@@ -18,6 +18,10 @@ import Login from "./pages/Login";
 import LandingPage from "./pages/LandingPage";
 import Register from "./pages/Register";
 import VigicaLoader from "./components/shared/VigicaLoader";
+import { prefetchTeam } from "./utils/teamApi";
+
+// Start fetching team data immediately — before any component mounts
+prefetchTeam();
 
 // Lazy load non-critical pages for faster initial load
 const Dashboard = lazy(() => import("./pages/Dashboard"));

@@ -46,7 +46,6 @@ import VigicaLoader from "../shared/VigicaLoader";
 import { Email } from "@mui/icons-material";
 import axios from "axios";
 import apiInstance from "../../utils/axios";
-import { prefetchTeam } from "../../utils/teamApi";
 
 // SweetAlert Toast configuration
 const Toast = Swal.mixin({
@@ -661,9 +660,6 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Kick off team data fetch in the background so /team page loads instantly
-    prefetchTeam();
-
     const timer = setTimeout(() => {
       setLoading(false);
     }, 3000);
@@ -1719,7 +1715,7 @@ export default function Home() {
                         Open Hours
                       </h3>
                       <p className="text-gray-600">
-                        8 am - 9pm (Closed on Sunday)
+                        Mon. - Sat: 9:00am - 6:00pm
                       </p>
                     </div>
                   </div>
