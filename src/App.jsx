@@ -36,7 +36,8 @@ const TeamMemberProfile = lazy(() => import("./pages/TeamMemberProfile"));
 const TeamApplicationForm = lazy(() => import("./pages/TeamApplicationForm"));
 const TeamDashboard = lazy(() => import("./pages/TeamDashboard"));
 const BookAppointment = lazy(() => import("./pages/BookAppointment"));
-// const ChatWidget = lazy(() => import("./components/shared/ChatWidget"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));   // 👈 added
+const TermsOfService = lazy(() => import("./pages/TermsOfService")); // 👈 added
 
 // Component to redirect to appropriate dashboard based on role
 function DashboardRedirect() {
@@ -57,16 +58,11 @@ function App() {
   const validateAuth = useAuthStore((state) => state.validateAuth);
 
   useEffect(() => {
-    // Only run validation after store is hydrated
     if (hydrated) {
-      //console.log(
-      //"App: Store hydrated, running validation - Time: 2025-07-28 12:36:28 UTC - User: NeduStack"
-      //);
       validateAuth();
     }
   }, [hydrated, validateAuth]);
 
-  // Show loading until hydrated and validation is complete
   if (!hydrated || loading) {
     return (
       <VigicaLoader
@@ -96,6 +92,10 @@ function App() {
           {/* About Page */}
           <Route path="/about" element={<AboutPage />} />
 
+          {/* Legal Pages - Public */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />  {/* 👈 added */}
+          <Route path="/terms" element={<TermsOfService />} />          {/* 👈 added */}
+
           {/* Team Pages - Public */}
           <Route path="/team" element={<TeamPage />} />
           <Route path="/team/apply" element={<TeamApplicationForm />} />
@@ -117,7 +117,7 @@ function App() {
           <Route path="/book" element={<BookAppointment />} />
           <Route path="/book/:teamMemberId" element={<BookAppointment />} />
 
-          {/* Dashboard redirect route - redirects to appropriate dashboard based on role */}
+          {/* Dashboard redirect route */}
           <Route
             path="/dashboard-redirect"
             element={
@@ -157,9 +157,6 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
-      {/* <Suspense fallback={null}>
-        <ChatWidget />
-      </Suspense> */}
     </Router>
   );
 }
