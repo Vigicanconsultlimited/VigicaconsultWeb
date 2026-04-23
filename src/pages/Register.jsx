@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
 import Swal from "sweetalert2";
 import vigicaLogo from "../assets/images/vigicaV2.png";
+import { useGoogleAuth } from "../hooks/useGoogleAuth";
 
 // SweetAlert Toast
 const Toast = Swal.mixin({
@@ -23,8 +24,26 @@ function Register() {
   const [showPasswordHint, setShowPasswordHint] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [backendError, setBackendError] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
+  const { signInWithGoogle } = useGoogleAuth({
+    onSuccess: (data) => {
+      setGoogleLoading(false);
+      navigate("/dashboard");
+    },
+    onError: (message) => {
+      setGoogleLoading(false);
+      setBackendError(message);
+    },
+  });
+
+  const handleGoogleClick = () => {
+    setGoogleLoading(true);
+    setBackendError("");
+    signInWithGoogle();
+  };
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -34,22 +53,15 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setBackendError(""); // Clear any previous backend errors
+    setBackendError("");
 
-    // Basic validation
     if (!email || !password || !password2) {
-      Toast.fire({
-        icon: "error",
-        title: "Please fill in all fields",
-      });
+      Toast.fire({ icon: "error", title: "Please fill in all fields" });
       return;
     }
 
     if (password !== password2) {
-      Toast.fire({
-        icon: "error",
-        title: "Passwords do not match",
-      });
+      Toast.fire({ icon: "error", title: "Passwords do not match" });
       return;
     }
 
@@ -58,14 +70,10 @@ function Register() {
     try {
       const { error } = await register(email, password, password2);
       if (error) {
-        // Display backend error and set it for persistent display
         setBackendError(error);
         Toast.fire({
           icon: "error",
-          title:
-            typeof error === "string"
-              ? error
-              : "Registration failed. Please try again.",
+          title: typeof error === "string" ? error : "Registration failed. Please try again.",
         });
         setIsLoading(false);
       } else {
@@ -73,22 +81,15 @@ function Register() {
           icon: "success",
           title: "Registration successful! Redirecting to verification...",
         });
-
-        // Small delay to show success message before navigation
         setTimeout(() => {
           navigate("/verify-otp", { state: { email } });
           setIsLoading(false);
         }, 1500);
       }
-    } catch (error) {
-      // Handle unexpected errors
-      const errorMessage =
-        error.message || "Registration failed. Please try again.";
+    } catch (err) {
+      const errorMessage = err.message || "Registration failed. Please try again.";
       setBackendError(errorMessage);
-      Toast.fire({
-        icon: "error",
-        title: errorMessage,
-      });
+      Toast.fire({ icon: "error", title: errorMessage });
       setIsLoading(false);
     }
   };
@@ -110,6 +111,7 @@ function Register() {
               />
             </div>
           </Link>
+
           <h2
             className="text-center mb-4"
             style={{ color: "#2135b0", fontWeight: 700, fontSize: "26px" }}
@@ -117,7 +119,6 @@ function Register() {
             Create a free account
           </h2>
 
-          {/* Backend Error Display */}
           {backendError && (
             <div className="alert alert-danger py-2 px-3 mb-3" role="alert">
               <small>{backendError}</small>
@@ -168,7 +169,6 @@ function Register() {
                 )}
               </span>
 
-              {/* Password Hint */}
               {showPasswordHint && (
                 <div
                   className="mt-2 p-2 bg-light border rounded"
@@ -271,8 +271,36 @@ function Register() {
               <div className="flex-grow-1 border-top" />
             </div>
 
+            <button
+              className="btn btn-outline-secondary w-100 mb-2 d-flex align-items-center justify-content-center gap-2"
+              type="button"
+              onClick={handleGoogleClick}
+              disabled={googleLoading}
+              style={{
+                borderWidth: "1.5px",
+                fontWeight: 500,
+                fontSize: "16px",
+                background: "#fff",
+                borderColor: "#d1d5db",
+              }}
+            >
+              {googleLoading ? (
+                <span className="spinner-border spinner-border-sm" role="status" />
+              ) : (
+                <svg width={20} height={20} viewBox="0 0 20 20">
+                  <g>
+                    <path fill="#4285F4" d="M19.6 10.23c0-.68-.06-1.36-.17-2H10v3.79h5.43a4.63 4.63 0 0 1-2.01 3.04v2.52h3.25c1.9-1.75 2.98-4.32 2.98-7.35z" />
+                    <path fill="#34A853" d="M10 20c2.7 0 4.96-.89 6.62-2.41l-3.25-2.52c-.9.6-2.07.95-3.37.95-2.59 0-4.78-1.75-5.56-4.1H1.06v2.58A9.99 9.99 0 0 0 10 20z" />
+                    <path fill="#FBBC05" d="M4.44 12.92A5.98 5.98 0 0 1 4.07 10c0-.51.09-1.01.16-1.49V5.93H1.06A10.01 10.01 0 0 0 0 10c0 1.61.39 3.13 1.06 4.47l3.38-2.55z" />
+                    <path fill="#EA4335" d="M10 4.04c1.48 0 2.81.51 3.85 1.51l2.89-2.89C14.95 1.03 12.7 0 10 0A9.99 9.99 0 0 0 1.06 5.93l3.38 2.58C5.22 5.79 7.41 4.04 10 4.04z" />
+                  </g>
+                </svg>
+              )}
+              {googleLoading ? "Signing in..." : "Continue with Google"}
+            </button>
+
             <div
-              className="text-center mb-4"
+              className="text-center mt-3"
               style={{ fontSize: "15px", color: "#444" }}
             >
               Already have an account?{" "}
@@ -287,68 +315,11 @@ function Register() {
                 Sign in
               </Link>
             </div>
-
-            {/* TODO: Implement OAuth — uncomment when ready
-            <button
-              className="btn btn-outline-secondary w-100 mb-2 d-flex align-items-center justify-content-center gap-2"
-              type="button"
-              style={{
-                borderWidth: "1.5px",
-                fontWeight: 500,
-                fontSize: "16px",
-                background: "#fff",
-                borderColor: "#d1d5db",
-              }}
-            >
-              <svg width={20} height={20} viewBox="0 0 20 20">
-                <g>
-                  <path
-                    fill="#4285F4"
-                    d="M19.6 10.23c0-.68-.06-1.36-.17-2H10v3.79h5.43a4.63 4.63 0 0 1-2.01 3.04v2.52h3.25c1.9-1.75 2.98-4.32 2.98-7.35z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M10 20c2.7 0 4.96-.89 6.62-2.41l-3.25-2.52c-.9.6-2.07.95-3.37.95-2.59 0-4.78-1.75-5.56-4.1H1.06v2.58A9.99 9.99 0 0 0 10 20z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M4.44 12.92A5.98 5.98 0 0 1 4.07 10c0-.51.09-1.01.16-1.49V5.93H1.06A10.01 10.01 0 0 0 0 10c0 1.61.39 3.13 1.06 4.47l3.38-2.55z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M10 4.04c1.48 0 2.81.51 3.85 1.51l2.89-2.89C14.95 1.03 12.7 0 10 0A9.99 9.99 0 0 0 1.06 5.93l3.38 2.58C5.22 5.79 7.41 4.04 10 4.04z"
-                  />
-                </g>
-              </svg>
-              Continue with Google
-            </button>
-
-            <button
-              className="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2"
-              type="button"
-              style={{
-                borderWidth: "1.5px",
-                fontWeight: 500,
-                fontSize: "16px",
-                background: "#fff",
-                borderColor: "#d1d5db",
-              }}
-            >
-              <svg width={30} height={30} viewBox="0 0 22 22">
-                <path
-                  d="M16.84 11.44c-.02-2.13 1.74-3.15 1.81-3.19-1-1.45-2.56-1.65-3.1-1.67-1.32-.13-2.56.77-3.22.77-.66 0-1.7-.75-2.8-.72-1.44.02-2.77.84-3.5 2.13-1.5 2.59-.38 6.42 1.07 8.52.72 1.05 1.57 2.22 2.7 2.17 1.09-.04 1.5-.7 2.81-.7 1.3 0 1.67.7 2.8.69 1.16-.02 1.89-1.08 2.6-2.13.82-1.2 1.16-2.35 1.17-2.41-.03-.01-2.22-.85-2.24-3.39zm-2.64-6.17c.6-.73 1-1.75.89-2.77-.86.03-1.9.57-2.52 1.29-.55.63-1.04 1.65-.86 2.62.95.07 1.9-.48 2.49-1.14z"
-                  fill="#000"
-                />
-              </svg>
-              Continue with Apple
-            </button>
-            */}
           </form>
         </div>
       </div>
 
-      {/* Inline styles for the animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -359,7 +330,6 @@ function Register() {
             transform: translateY(0);
           }
         }
-
         .alert-danger {
           background-color: #f8d7da !important;
           border-color: #f5c6cb !important;
@@ -367,11 +337,9 @@ function Register() {
           border-radius: 6px !important;
           font-size: 14px !important;
         }
-
         .eye-toggle:hover {
           color: #2135b0 !important;
         }
-
         @media (max-width: 768px) {
           .password-hint {
             font-size: 11px !important;
