@@ -1,17 +1,17 @@
 /* SidebarMenu.css - Fixed z-index issues */
 
-/* Hamburger button - Updated to ensure visibility */
+/* Hamburger button */
 .hamburger-btn {
   position: fixed;
-  top: 15px;
-  left: 15px;
-  z-index: 2000; /* Increased to be above everything */
-  background: #2135b0;
+  top: 10px;
+  left: 10px;
+  z-index: 2000;
+  background: rgba(255, 255, 255, 0.15);
   border: none;
   color: #fff;
   font-size: 20px;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -57,17 +57,20 @@
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
 }
 
-@supports (height: 100svh) {
-  .sidebar-menu {
-    height: 100svh;
-    max-height: 100svh;
+/* Dynamic viewport height — mobile only (desktop keeps 100vh for sticky) */
+@media (max-width: 767.98px) {
+  @supports (height: 100svh) {
+    .sidebar-menu {
+      height: 100svh;
+      max-height: 100svh;
+    }
   }
-}
 
-@supports (height: 100dvh) {
-  .sidebar-menu {
-    height: 100dvh;
-    max-height: 100dvh;
+  @supports (height: 100dvh) {
+    .sidebar-menu {
+      height: 100dvh;
+      max-height: 100dvh;
+    }
   }
 }
 
@@ -227,13 +230,17 @@
 
   .sidebar-menu {
     transform: translateX(0) !important;
+    /* Fills the height remaining below the navbar; scrolls internally */
     position: relative;
-    box-shadow: none;
-    /* Desktop: let it grow with container */
-    height: 100% !important;
-    max-height: none;
-    z-index: 1; /* Normal flow on desktop */
-    overscroll-behavior: auto;
+    width: 280px;
+    min-width: 280px;
+    flex-shrink: 0;
+    height: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+    z-index: 10;
+    overscroll-behavior: contain;
   }
 
   /* Reset navbar z-index on desktop */

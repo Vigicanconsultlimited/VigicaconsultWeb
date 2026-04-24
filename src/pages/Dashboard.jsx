@@ -120,7 +120,7 @@ function Dashboard() {
   return (
     <>
       {isLoggedIn() ? (
-        <>
+        <div className="dashboard-page">
           <DashboardNavbar />
           <div className="dashboard-layout">
             <SidebarMenu setCurrentStep={setCurrentStep} />
@@ -128,7 +128,7 @@ function Dashboard() {
               {steps[currentStep]?.component || <h3>Invalid step</h3>}
             </div>
           </div>
-        </>
+        </div>
       ) : (
         <div className="text-center mt-5">
           <h1>Welcome</h1>
