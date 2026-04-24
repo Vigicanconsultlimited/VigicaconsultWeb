@@ -197,7 +197,7 @@ export default function EnquiryForm() {
               value={formData.CountryCode}
               onChange={(e) => set("CountryCode", e.target.value)}
             >
-              <option value="">Country</option>
+              <option value="">Country Code</option>
               {COUNTRY_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
@@ -220,7 +220,7 @@ export default function EnquiryForm() {
               value={formData.CurrentCountryOfResidence}
               onChange={(e) => set("CurrentCountryOfResidence", e.target.value)}
             >
-              <option value="">Residence</option>
+              <option value="">Residence Country</option>
               {COUNTRY_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
