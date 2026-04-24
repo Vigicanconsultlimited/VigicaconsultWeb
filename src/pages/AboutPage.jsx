@@ -18,6 +18,7 @@ import emmanuel from "../assets/images/emmanuel-ceo.jpeg";
 import UoGMAward from "../assets/images/UoGM-award.jpeg";
 import UoGMAwardDrGideon from "../assets/images/UoGM-award-dr-gideon.jpeg";
 import Isaiah from "../assets/images/Isaiah.jpg";
+import DrSteve from "../assets/images/Dr_steve.jpeg";
 
 const CONSULTANT = {
   name: "Dr. Gideon Okorie",
@@ -84,44 +85,59 @@ const CLIENT_TESTIMONIALS = [
   {
     id: 1,
     type: "video",
-    videoId: "SB56MgkscJA",
+    videoId: "cPDbFdOF248",
+    isShort: true,
+    quote:
+      "Expert testimony from Partner organisation speaks on the collaboration with VIGICA Consult Ltd.",
+    name: "Mistry Puspa",
+    caption: "Leeds Beckett University, UK",
+    avatar: "/default-profile.jpg",
+  },
+  {
+    id: 2,
+    type: "video",
+    videoId: "gwZJCqX8SgI",
+    isShort: false,
+    quote:
+      "Testimonials from the Ebonyi State Scholarship Board on Successful completion by their scholars.",
+    name: "Ebonyi State Scholarship Board",
+    caption: "Scholarship Board Testimonial",
+    avatar: "/default-profile.jpg",
+  },
+  {
+    id: 3,
+    type: "video",
+    videoId: "ZwTFTwiqiF8",
+    isShort: true,
     quote:
       "VIGICA Consult made my study abroad dream a reality. Their guidance was exceptional from start to finish.",
-    name: "Ndubuisi Augustine",
+    name: "Nwankwo Evaristus",
     caption:
-      "Studying Software Engineering at University of Greater Manchester",
+      "MSc in Data Analytics and Technologies, University of Greater Manchester",
+    avatar: "/default-profile.jpg",
+  },
+  {
+    id: 4,
+    type: "video",
+    videoId: "oZ16_O34sFc",
+    isShort: true,
+    quote:
+      "The support and mentorship I received through VIGICA was truly life-changing.",
+    name: "Ugwoke Edward",
+    caption: "MSc in Software Engineering, University of Greater Manchester",
     avatar: Isaiah,
   },
-  // {
-  //   id: 2,
-  //   type: "quote",
-  //   videoId: null,
-  //   quote:
-  //     "I was initially overwhelmed by the application process, but VIGICA Consult made everything crystal clear. I am now studying Medicine at a top Canadian university thanks to their unwavering support.",
-  //   name: "Fatima Al-Hassan",
-  //   caption: "Medical Student, University of Toronto, Canada",
-  //   avatar: "/default-profile.jpg",
-  // },
-  // {
-  //   id: 3,
-  //   type: "video",
-  //   videoId: "SB56MgkscJA", // ← Replace with real YouTube video ID
-  //   quote:
-  //     "The scholarship support I received was incredible. I never believed I could study in the UK debt-free, but VIGICA made it happen!",
-  //   name: "Chisom Eze",
-  //   caption: "Scholarship Recipient, University of Manchester, UK",
-  //   avatar: "/default-profile.jpg",
-  // },
-  // {
-  //   id: 4,
-  //   type: "quote",
-  //   videoId: null,
-  //   quote:
-  //     "Professional, prompt, and truly caring. VIGICA Consult feels like family. They celebrated every milestone with me.",
-  //   name: "Musa Ibrahim",
-  //   caption: "Business Administration, Concordia University, Canada",
-  //   avatar: "/default-profile.jpg",
-  // },
+  {
+    id: 5,
+    type: "video",
+    videoId: "7nzqUUFqH4M",
+    isShort: true,
+    quote:
+      "VIGICA opened doors I never thought possible. I am proud to be studying AI at a top UK university.",
+    name: "Cynthia Uduma",
+    caption: "MSc in Artificial Intelligence, University of Greater Manchester",
+    avatar: "/default-profile.jpg",
+  },
 ];
 
 const EVENTS = [
@@ -200,7 +216,7 @@ const EXPERTS = [
     name: "Dr. Ikporo Stephen",
     title: "Secretary, Ebonyi State Scholarship Board",
     institution: "Ebonyi State Government",
-    photo: "/default-profile.jpg",
+    photo: DrSteve,
     remark:
       "VIGICA Consult stands out in the Nigerian consulting space for its holistic approach. They don't just place students — they prepare them for global success.",
   },
@@ -357,7 +373,10 @@ function ReadMoreParagraphs({ text, visibleCount = 2 }) {
 const getYoutubeThumbnail = (videoId) =>
   `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
-const getYoutubeUrl = (videoId) => `https://www.youtube.com/watch?v=${videoId}`;
+const getYoutubeUrl = (videoId, isShort = false) =>
+  isShort
+    ? `https://www.youtube.com/shorts/${videoId}`
+    : `https://www.youtube.com/watch?v=${videoId}`;
 
 const AwardIcon = ({ type }) => {
   switch (type) {
@@ -388,9 +407,16 @@ const stagger = {
 
 function AboutPage() {
   const eventsScrollRef = useRef(null);
+  const testimonialsScrollRef = useRef(null);
 
   const scrollEvents = (dir) => {
     const container = eventsScrollRef.current;
+    if (!container) return;
+    container.scrollBy({ left: dir * 320, behavior: "smooth" });
+  };
+
+  const scrollTestimonials = (dir) => {
+    const container = testimonialsScrollRef.current;
     if (!container) return;
     container.scrollBy({ left: dir * 320, behavior: "smooth" });
   };
@@ -531,6 +557,20 @@ function AboutPage() {
                   }}
                 />
               </div>
+              <div className="speech-award-wrap">
+                <img
+                  src={UoGMAward}
+                  alt="Outstanding Scholar Support Award"
+                  className="speech-award-photo"
+                  onError={(e) => {
+                    e.target.src = "/default-profile.jpg";
+                  }}
+                />
+                <p className="speech-award-caption">
+                  Outstanding Scholar Support – FON Scholars, University of
+                  Greater Manchester
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -553,23 +593,33 @@ function AboutPage() {
             </p>
           </motion.div>
 
-          <motion.div
-            className="testimonials-grid"
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {CLIENT_TESTIMONIALS.map((t) => (
-              <motion.div
-                key={t.id}
-                className="testimonial-card"
-                variants={fadeUp}
+          <div className="sub-section-header">
+            <h3 className="sub-section-title">Video Testimonials</h3>
+            <div className="scroll-controls">
+              <button
+                className="scroll-btn"
+                onClick={() => scrollTestimonials(-1)}
+                aria-label="Scroll left"
               >
-                {/* Video thumbnail (when type = "video") */}
+                <FaChevronLeft />
+              </button>
+              <button
+                className="scroll-btn"
+                onClick={() => scrollTestimonials(1)}
+                aria-label="Scroll right"
+              >
+                <FaChevronRight />
+              </button>
+            </div>
+          </div>
+
+          <div className="testimonials-scroll" ref={testimonialsScrollRef}>
+            {CLIENT_TESTIMONIALS.map((t) => (
+              <div key={t.id} className="testimonial-card">
+                {/* Video thumbnail */}
                 {t.type === "video" && t.videoId && (
                   <a
-                    href={getYoutubeUrl(t.videoId)}
+                    href={getYoutubeUrl(t.videoId, t.isShort)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="testimonial-video-thumb"
@@ -593,34 +643,24 @@ function AboutPage() {
                 {/* Quote body */}
                 <div className="testimonial-body">
                   <FaQuoteLeft className="testimonial-q-icon" />
-                  <p className="testimonial-quote">
-                    <ReadMoreText text={t.quote} limit={180} />
-                  </p>
+                  <p className="testimonial-quote">{t.quote}</p>
                 </div>
 
-                {/* Caption / Attribution */}
+                {/* Attribution */}
                 <div className="testimonial-footer">
-                  <img
-                    src={t.avatar}
-                    alt={t.name}
-                    className="testimonial-avatar"
-                    onError={(e) => {
-                      e.target.src = "/default-profile.jpg";
-                    }}
-                  />
                   <div>
                     <p className="testimonial-name">{t.name}</p>
                     <p className="testimonial-caption">{t.caption}</p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ── Activities ──────────────────────────────────────────────── */}
-      <section className="about-section activities-section">
+      {/* ── Activities (hidden — no events yet) ── */}
+      {/* <section className="about-section activities-section">
         <div className="about-container">
           <motion.div
             className="about-section-header"
@@ -636,22 +676,13 @@ function AboutPage() {
             </p>
           </motion.div>
 
-          {/* ── Events (horizontal scroll) ── */}
           <div className="sub-section-header">
             <h3 className="sub-section-title">Events</h3>
             <div className="scroll-controls">
-              <button
-                className="scroll-btn"
-                onClick={() => scrollEvents(-1)}
-                aria-label="Scroll left"
-              >
+              <button className="scroll-btn" onClick={() => scrollEvents(-1)} aria-label="Scroll left">
                 <FaChevronLeft />
               </button>
-              <button
-                className="scroll-btn"
-                onClick={() => scrollEvents(1)}
-                aria-label="Scroll right"
-              >
+              <button className="scroll-btn" onClick={() => scrollEvents(1)} aria-label="Scroll right">
                 <FaChevronRight />
               </button>
             </div>
@@ -659,25 +690,10 @@ function AboutPage() {
 
           <div className="events-scroll" ref={eventsScrollRef}>
             {EVENTS.map((event) => (
-              <a
-                key={event.id}
-                href={getYoutubeUrl(event.videoId)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="event-card"
-              >
+              <a key={event.id} href={getYoutubeUrl(event.videoId)} target="_blank" rel="noopener noreferrer" className="event-card">
                 <div className="event-thumb-wrap">
-                  <img
-                    src={getYoutubeThumbnail(event.videoId)}
-                    alt={event.title}
-                    className="event-thumb"
-                    onError={(e) => {
-                      e.target.src = "/default-profile.jpg";
-                    }}
-                  />
-                  <div className="event-play-overlay">
-                    <FaPlay className="event-play-icon" />
-                  </div>
+                  <img src={getYoutubeThumbnail(event.videoId)} alt={event.title} className="event-thumb" onError={(e) => { e.target.src = "/default-profile.jpg"; }} />
+                  <div className="event-play-overlay"><FaPlay className="event-play-icon" /></div>
                   <span className="event-date-badge">{event.date}</span>
                 </div>
                 <div className="event-info">
@@ -687,41 +703,8 @@ function AboutPage() {
               </a>
             ))}
           </div>
-
-          {/* ── Photo Shoots ── */}
-          <div className="sub-section-header" style={{ marginTop: "3.5rem" }}>
-            <h3 className="sub-section-title">Photo Highlights</h3>
-          </div>
-
-          <motion.div
-            className="photos-grid"
-            variants={stagger}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {PHOTOS.map((photo) => (
-              <motion.div
-                key={photo.id}
-                className="photo-card"
-                variants={fadeUp}
-              >
-                <img
-                  src={photo.src}
-                  alt={photo.caption}
-                  className="photo-img"
-                  onError={(e) => {
-                    e.target.src = "/default-profile.jpg";
-                  }}
-                />
-                <div className="photo-caption">
-                  <p>{photo.caption}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── What Experts Say ────────────────────────────────────────── */}
       <section className="about-section experts-section">

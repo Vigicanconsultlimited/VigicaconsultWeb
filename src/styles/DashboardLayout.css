@@ -1,22 +1,30 @@
-/* Student Dashboard Layout - Mobile First */
+/* Dashboard Page - full viewport, column layout */
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
 
+/* Row below the navbar — fills whatever height remains */
 .dashboard-layout {
   display: flex;
-  min-height: 100vh;
+  flex: 1;
+  overflow: hidden;
   background-color: #f8f9fa;
 }
 
+/* Main content scrolls independently */
 .dashboard-content-area {
   flex: 1;
-  padding: 1rem;
-  min-width: 0; /* Prevent flex child overflow */
+  min-width: 0;
+  overflow-y: auto;
   overflow-x: hidden;
+  padding: 1rem;
 }
 
-/* Desktop: sidebar takes space, content shifts */
 @media (min-width: 768px) {
   .dashboard-content-area {
-    margin-left: 280px; /* Sidebar width */
     padding: 1.5rem 2rem;
   }
 }

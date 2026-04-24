@@ -929,6 +929,30 @@ export default function Home() {
       Toast.fire({ icon: "error", title: "Mobile number is required" });
       return;
     }
+    if (!formData.EnglishQualificationType) {
+      Toast.fire({ icon: "error", title: "English Qualification Type is required" });
+      return;
+    }
+    if (!formData.IeltsStatus) {
+      Toast.fire({ icon: "error", title: "IELTS Status is required" });
+      return;
+    }
+    if (!formData.Message.trim()) {
+      Toast.fire({ icon: "error", title: "Message is required" });
+      return;
+    }
+    if (!formData.CurrentCountryOfResidence) {
+      Toast.fire({ icon: "error", title: "Current Country of Residence is required" });
+      return;
+    }
+    if (!formData.CountryCode) {
+      Toast.fire({ icon: "error", title: "Country of Nationality is required" });
+      return;
+    }
+    if (!formData.StudyDestination) {
+      Toast.fire({ icon: "error", title: "Study Destination is required" });
+      return;
+    }
     if (!formData.AgreeToPrivacyPolicy) {
       Toast.fire({
         icon: "error",
@@ -1784,53 +1808,31 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Dial Code & Mobile */}
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-gray-700 mb-1 block">
-                              Dial Code
-                            </label>
-                            <Input
-                              type="text"
-                              placeholder="e.g. +234"
-                              value={formData.DialCode}
-                              onChange={(e) =>
-                                handleInputChange("DialCode", e.target.value)
-                              }
-                              className="rounded-xl border-gray-200 focus:border-blue-500"
-                              disabled={isSubmitting}
-                            />
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-700 mb-1 block">
-                              Mobile Number{" "}
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Input
-                              type="tel"
-                              placeholder="Enter mobile number"
-                              value={formData.MobileNumber}
-                              onChange={(e) => {
-                                handleInputChange(
-                                  "MobileNumber",
-                                  e.target.value,
-                                );
-                                handleInputChange(
-                                  "FullMobileNumber",
-                                  (formData.DialCode || "") + e.target.value,
-                                );
-                              }}
-                              className="rounded-xl border-gray-200 focus:border-blue-500"
-                              disabled={isSubmitting}
-                            />
-                          </div>
+                        {/* Mobile */}
+                        <div>
+                          <label className="text-sm font-medium text-gray-700 mb-1 block">
+                            Mobile Number{" "}
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Input
+                            type="tel"
+                            placeholder="Enter mobile number"
+                            value={formData.MobileNumber}
+                            onChange={(e) => {
+                              handleInputChange("MobileNumber", e.target.value);
+                              handleInputChange("FullMobileNumber", e.target.value);
+                            }}
+                            className="rounded-xl border-gray-200 focus:border-blue-500"
+                            disabled={isSubmitting}
+                          />
                         </div>
 
                         {/* Country of Nationality & Country of Residence */}
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-medium text-gray-700 mb-1 block">
-                              Country of Nationality
+                              Country of Nationality{" "}
+                              <span className="text-red-500">*</span>
                             </label>
                             <select
                               value={formData.CountryCode}
@@ -1850,7 +1852,8 @@ export default function Home() {
                           </div>
                           <div>
                             <label className="text-sm font-medium text-gray-700 mb-1 block">
-                              Current Country of Residence
+                              Current Country of Residence{" "}
+                              <span className="text-red-500">*</span>
                             </label>
                             <select
                               value={formData.CurrentCountryOfResidence}
@@ -1877,7 +1880,8 @@ export default function Home() {
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-medium text-gray-700 mb-1 block">
-                              Study Destination
+                              Study Destination{" "}
+                              <span className="text-red-500">*</span>
                             </label>
                             <select
                               value={formData.StudyDestination}
@@ -1900,7 +1904,8 @@ export default function Home() {
                           </div>
                           <div>
                             <label className="text-sm font-medium text-gray-700 mb-1 block">
-                              English Qualification Type
+                              English Qualification Type{" "}
+                              <span className="text-red-500">*</span>
                             </label>
                             <select
                               value={formData.EnglishQualificationType}
@@ -1924,7 +1929,8 @@ export default function Home() {
                         {/* IELTS Status */}
                         <div>
                           <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            IELTS Status
+                            IELTS Status{" "}
+                            <span className="text-red-500">*</span>
                           </label>
                           <select
                             value={formData.IeltsStatus}
@@ -1946,7 +1952,8 @@ export default function Home() {
                         {/* Message */}
                         <div>
                           <label className="text-sm font-medium text-gray-700 mb-1 block">
-                            Message
+                            Message{" "}
+                            <span className="text-red-500">*</span>
                           </label>
                           <Textarea
                             placeholder="Tell us about your study goals or any questions..."
