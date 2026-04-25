@@ -13,9 +13,16 @@ export default function DashboardNavbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [logoError, setLogoError] = useState(false);
 
+  // ✅ Fixed — works for both regular and Google login
   const email =
-    user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
-  const userId = user?.uid;
+    user?.email ||
+    user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+    null;
+
+  const userId =
+    user?.id ||
+    user?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+    null;
 
   useEffect(() => {
     const fetchName = async () => {

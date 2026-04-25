@@ -24,7 +24,6 @@ export const useGoogleAuth = ({ onSuccess, onError }) => {
                 idToken: response.credential,
             });
 
-            console.log("Google auth response:", data); // remove after testing
 
             if (!data.token) {
                 onErrorRef.current?.("No token received from server.");
