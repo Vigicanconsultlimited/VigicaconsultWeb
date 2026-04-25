@@ -516,7 +516,7 @@ export default function Home() {
               <div className="grid lg:grid-cols-2 gap-16 items-center">
                 <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
                   <div className="relative">
-                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&h=400&fit=crop" alt="Students collaborating" className="w-full rounded-2xl shadow-2xl" />
+                    <img src="https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777145221/WEB_1_062247.jpg_hazony.jpg" alt="Students collaborating" className="w-full rounded-2xl shadow-2xl" />
                     <div className="absolute -bottom-6 -right-6 w-48 h-32 bg-white rounded-xl shadow-xl p-4 flex items-center justify-center">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-600 mb-1">500+</div>
@@ -595,7 +595,7 @@ export default function Home() {
               </motion.div>
               <div className="grid md:grid-cols-2 gap-12 items-center">
                 <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-                  <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&h=400&fit=crop" alt="University campus" className="w-full rounded-2xl shadow-2xl" />
+                  <img src="https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777145582/IMG_9633_1_afisjd.jpg" alt="University campus" className="w-full rounded-2xl shadow-2xl" />
                 </motion.div>
                 <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="space-y-6">
                   {[
