@@ -12,7 +12,7 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 });
 
-// Helper function to check token expiration
+// ── Token expiration check ────────────────────────────
 export const isTokenExpired = (token) => {
   try {
     const { exp } = jwtDecode(token);
@@ -22,7 +22,7 @@ export const isTokenExpired = (token) => {
   }
 };
 
-// Helper function to extract role from token
+// ── Extract role from token ───────────────────────────
 const getRoleFromToken = (token) => {
   try {
     const decoded = jwtDecode(token);
@@ -35,12 +35,42 @@ const getRoleFromToken = (token) => {
   }
 };
 
+// ── Extract email from token ──────────────────────────
+const getEmailFromToken = (token) => {
+  try {
+    const decoded = jwtDecode(token);
+    return (
+      decoded["email"] ||
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+      decoded["sub"] ||
+      null
+    );
+  } catch {
+    return null;
+  }
+};
+
+// ── Extract user ID from token ────────────────────────
+const getIdFromToken = (token) => {
+  try {
+    const decoded = jwtDecode(token);
+    return (
+      decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+      decoded["sub"] ||
+      null
+    );
+  } catch {
+    return null;
+  }
+};
+
+// ── Login ─────────────────────────────────────────────
 export const login = async (email, password) => {
   try {
     const { data } = await axios.post("user/login/", { email, password });
 
     if (data?.token) {
-      const userRole = data.userRole || getRoleFromToken(data.token); // Use userRole from response or extract from token
+      const userRole = data.userRole || getRoleFromToken(data.token);
 
       setAuthUser({
         token: data.token,
@@ -49,13 +79,7 @@ export const login = async (email, password) => {
         userRole: userRole,
       });
 
-      //console.log("Login successful:", data);
-      //console.log("User role:", userRole);
-
-      Toast.fire({
-        icon: "success",
-        title: "Login Successful",
-      });
+      Toast.fire({ icon: "success", title: "Login Successful" });
       return { data, error: null, userRole };
     }
 
@@ -70,35 +94,38 @@ export const login = async (email, password) => {
   }
 };
 
+// ── Set Auth User ─────────────────────────────────────
 export const setAuthUser = ({ token, refreshToken, user, userRole }) => {
   if (!token) return;
 
-  // Extract role from token if not provided
   const role = userRole || getRoleFromToken(token);
+  const decoded = jwtDecode(token);
 
-  // Set cookies with proper attributes
+  // ✅ Build clean user object — works for both regular and Google login
+  const userData = user || {
+    id: getIdFromToken(token),
+    email: getEmailFromToken(token),
+    ...decoded,
+  };
+
   Cookies.set("access_token", token, {
-    expires: new Date(jwtDecode(token).exp * 1000),
-    secure: false, // True in production
-    //secure: process.env.NODE_ENV === "production",
-    //sameSite: "Strict",
+    expires: new Date(decoded.exp * 1000),
+    secure: false, // set true in production
   });
 
   if (refreshToken) {
     Cookies.set("refresh_token", refreshToken, {
-      expires: 7, // 7 days
+      expires: 7,
       secure: false,
-      //secure: process.env.NODE_ENV === "production",
-      //sameSite: "Strict",
     });
   }
 
-  // Set user and role in store
-  useAuthStore.getState().setUser(user || jwtDecode(token));
+  useAuthStore.getState().setUser(userData);   // ✅ never null
   useAuthStore.getState().setUserRole(role);
   useAuthStore.getState().setLoading(false);
 };
 
+// ── Refresh Auth Token ────────────────────────────────
 export const refreshAuthToken = async () => {
   try {
     const refreshToken = Cookies.get("refresh_token");
@@ -118,11 +145,11 @@ export const refreshAuthToken = async () => {
       userRole: userRole,
     };
   } catch (error) {
-    //console.error("Token refresh failed:", error);
     return null;
   }
 };
 
+// ── Set User from Cookie ──────────────────────────────
 export const setUser = async () => {
   const accessToken = Cookies.get("access_token");
   const store = useAuthStore.getState();
@@ -142,31 +169,28 @@ export const setUser = async () => {
     const userRole = getRoleFromToken(accessToken);
     setAuthUser({
       token: accessToken,
-      user: jwtDecode(accessToken),
+      user: null,        // ✅ let setAuthUser build from token
       userRole: userRole,
     });
   } catch (error) {
-    //console.error("Auth error:", error);
     logout();
   } finally {
     store.setLoading(false);
   }
 };
 
+// ── Logout ────────────────────────────────────────────
 export const logout = () => {
   Cookies.remove("access_token");
   Cookies.remove("refresh_token");
 
   useAuthStore.getState().clearUser();
-
   localStorage.removeItem("auth-storage");
 
-  Toast.fire({
-    icon: "success",
-    title: "Signed out successfully",
-  });
+  Toast.fire({ icon: "success", title: "Signed out successfully" });
 };
 
+// ── Register ──────────────────────────────────────────
 export const register = async (email, password, password2) => {
   try {
     const { data } = await axios.post("user/create/", {
@@ -177,13 +201,7 @@ export const register = async (email, password, password2) => {
 
     await login(email, password);
 
-    //Alert - Signup up successfully
-
-    Toast.fire({
-      icon: "success",
-      title: "Account Created Successfully",
-    });
-
+    Toast.fire({ icon: "success", title: "Account Created Successfully" });
     return { data, error: null };
   } catch (error) {
     let errorMsg = "Something went wrong";
@@ -198,9 +216,6 @@ export const register = async (email, password, password2) => {
       errorMsg = error.message;
     }
 
-    return {
-      data: null,
-      error: errorMsg,
-    };
+    return { data: null, error: errorMsg };
   }
 };
