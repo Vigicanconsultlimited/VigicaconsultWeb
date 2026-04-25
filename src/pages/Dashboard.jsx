@@ -28,20 +28,18 @@ function Dashboard() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
+      // ✅ Check both — cookies (Google auth) and localStorage (regular auth)
+      const token = Cookies.get("access_token") || localStorage.getItem("token");
+
       if (token && !user) {
         try {
           const res = await apiInstance.get("/Auth/user");
           setUser(res.data);
-          //console.log("User data fetched after login:", res.data);
-        } catch (err) {
-          //console.error("Failed to fetch user data after login:", err);
-        }
+        } catch (err) { }
       }
     };
     fetchUserData();
   }, [user, setAllUserData]);
-
   useEffect(() => {
     setUser();
   }, []);
