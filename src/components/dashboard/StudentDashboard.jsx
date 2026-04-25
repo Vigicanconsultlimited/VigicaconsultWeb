@@ -30,9 +30,16 @@ export default function StudentDashboard({
   const [applicationStatus, setApplicationStatus] = useState(null);
 
   const navigate = useNavigate();
-  const userId = authData?.uid;
+  // ✅ Fix — try all possible formats for both regular and Google login
+  const userId =
+    authData?.id ||
+    authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+    null;
+
   const userEmail =
-    authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+    authData?.email ||
+    authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+    null;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -218,29 +225,27 @@ export default function StudentDashboard({
               <option value="Other">Other</option>
             </select>
           </div>
-          ${
-            applicationDetails
-              ? `
+          ${applicationDetails
+          ? `
             <div style="margin-bottom:15px;padding:10px;background:#f8fafc;border-radius:6px;border-left:4px solid #3b82f6;">
               <strong>Application Details:</strong><br>
               <small>School: ${applicationDetails.school}</small><br>
               <small>Program: ${applicationDetails.description}</small><br>
               <small>Status: ${getStatusText(
-                applicationDetails.applicationStatus,
-              )}</small>
+            applicationDetails.applicationStatus,
+          )}</small>
             </div>
           `
-              : ""
-          }
+          : ""
+        }
           <div style="margin-bottom:15px;">
             <label for="message" style="display:block;margin-bottom:5px;font-weight:600;color:#374151;">Message *</label>
             <textarea id="message" class="swal2-textarea" placeholder="Describe your issue..." style="width:100%;min-height:120px;padding:8px;border:2px solid #e5e7eb;border-radius:6px;resize:vertical;"></textarea>
           </div>
           <div style="margin-bottom:10px;">
             <label for="email" style="display:block;margin-bottom:5px;font-weight:600;color:#374151;">Contact Email</label>
-            <input id="email" class="swal2-input" type="email" value="${
-              userEmail || ""
-            }" placeholder="your.email@example.com" style="width:100%;padding:8px;border:2px solid #e5e7eb;border-radius:6px;margin:0;">
+            <input id="email" class="swal2-input" type="email" value="${userEmail || ""
+        }" placeholder="your.email@example.com" style="width:100%;padding:8px;border:2px solid #e5e7eb;border-radius:6px;margin:0;">
           </div>
           <div style="font-size:12px;color:#6b7280;margin-top:10px;">
             <i class="fas fa-info-circle"></i> We reply within 24-48 business hours.
@@ -516,9 +521,8 @@ export default function StudentDashboard({
                           <i className="fas fa-envelope"></i>
                         </button>
                         <button
-                          className={`icon-btn ${
-                            !canEditApplication(app) ? "disabled" : ""
-                          }`}
+                          className={`icon-btn ${!canEditApplication(app) ? "disabled" : ""
+                            }`}
                           onClick={() => handleEdit(app)}
                           title={
                             canEditApplication(app)
@@ -530,9 +534,8 @@ export default function StudentDashboard({
                           {canEditApplication(app) ? "✏️" : "🔒"}
                         </button>
                         <button
-                          className={`icon-btn ${
-                            !canEditApplication(app) ? "disabled" : ""
-                          }`}
+                          className={`icon-btn ${!canEditApplication(app) ? "disabled" : ""
+                            }`}
                           onClick={() => handleDeleteAcademic(app)}
                           title={
                             canEditApplication(app)
@@ -608,17 +611,15 @@ export default function StudentDashboard({
                       </td>
                       <td className="action" data-label="Action">
                         <button
-                          className={`apply-btn ${
-                            isThisProgramApplied || isAnyOtherProgramApplied
-                              ? "disabled"
-                              : ""
-                          } ${
-                            isThisProgramApplied
+                          className={`apply-btn ${isThisProgramApplied || isAnyOtherProgramApplied
+                            ? "disabled"
+                            : ""
+                            } ${isThisProgramApplied
                               ? "btn-applied"
                               : isAnyOtherProgramApplied
                                 ? "btn-locked"
                                 : "btn-open"
-                          }`}
+                            }`}
                           onClick={() =>
                             !isThisProgramApplied &&
                             !isAnyOtherProgramApplied &&

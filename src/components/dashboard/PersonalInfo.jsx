@@ -83,10 +83,16 @@ export default function PersonalInfo({ onContinue, onBack }) {
         setLoading(false);
         return;
       }
-      const userId = authData["uid"];
-      const email =
-        authData["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+      // ✅ Fixed — works for both regular and Google login
+      const userId =
+        authData?.id ||
+        authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+        null;
 
+      const email =
+        authData?.email ||
+        authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+        null;
       setFormData((prev) => ({
         ...prev,
         Email: email || "",
