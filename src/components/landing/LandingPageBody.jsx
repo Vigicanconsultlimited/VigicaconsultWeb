@@ -6,8 +6,8 @@ import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import Swal from "sweetalert2";
-import precious from "../../assets/images/img/vigica-img6.jpg";
-import mercy from "../../assets/images/mercy.png";
+//import precious from "../../assets/images/img/vigica-img6.jpg";
+//import mercy from "../../assets/images/mercy.png";
 import RentalHouse from "../../assets/images/houserental.jpg";
 import Modal from "./Modal";
 import FlightBookingModal from "./FlightBookingModal";
@@ -114,7 +114,7 @@ const servicesData = [
   },
 ];
 
-const testimonials = [
+/*const testimonials = [
   {
     name: "Precious Nweze",
     university: "University of Greater Manchester",
@@ -130,7 +130,7 @@ const testimonials = [
     rating: 5,
   },
 ];
-
+*/
 // ─── Testimonial Carousel ─────────────────────────────────────────────────────
 const TestimonialCarousel = ({ testimonials }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -434,7 +434,7 @@ export default function Home() {
   const [showAccomForm, setShowAccomForm] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 3000);
+    const timer = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -461,28 +461,57 @@ export default function Home() {
           <Header />
 
           {/* ── Hero ── */}
-          <section id="home" className="relative min-h-screen flex items-center justify-center pt-32 pb-16 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900">
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1920&h=1080&fit=crop')`, backgroundSize: "cover", backgroundPosition: "center" }} />
+          <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
+            <div className="absolute inset-0" style={{ backgroundImage: `url('https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777327100/ChatGPT_Image_Apr_27_2026_10_55_37_PM_i0ggjd.png')`, backgroundSize: "cover", backgroundPosition: "center right" }}>
+              <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(18, 37, 60, 0.92) 45%, rgba(18, 37, 60, 0.2) 100%)" }} />
             </div>
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-4xl mx-auto">
-                <motion.h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-                  Your trusted pathway to{" "}
-                  <span className="bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent">GLOBAL OPPORTUNITIES</span>
-                </motion.h1>
-                <motion.p className="text-xl md:text-2xl text-blue-100 mb-10 leading-relaxed max-w-3xl mx-auto" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
-                  A multidimensional consultancy firm offering specialized services in international education recruitment, advisory, programme coordination, travel logistics, and accommodation solutions.
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-32 pb-16">
+              <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-2xl">
+
+                {/* Top row: heading left, button right */}
+                <div className="flex items-start justify-between gap-8">
+                  <motion.h1
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", fontSize: "clamp(40px,5vw,64px)", fontWeight: 700, lineHeight: 1.12, color: "#fff", maxWidth: 720, marginBottom: 24, letterSpacing: "-0.5px" }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                  >
+                    Your trusted pathway to{" "}
+                    <em style={{ fontStyle: "italic", color: "#fed016" }}>
+                      GLOBAL OPPORTUNITIES
+                    </em>
+                  </motion.h1>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    className="flex-shrink-0 pt-[227px] ml-52"
+                  >
+                    <Link to="/register" className="text-decoration-none">
+                      <Button
+                        size="lg"
+                        className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-semibold px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 hover:-translate-y-1 transition-all duration-300 group"
+                      >
+                        Start Your Application
+                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
+                  </motion.div>
+                </div>
+
+                {/* Paragraph below */}
+                <motion.p
+                  className="text-xl md:text-2xl text-blue-100 mb-10 leading-relaxed"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  A multidimensional consultancy firm offering specialized services in
+                  international education recruitment, advisory, programme coordination,
+                  travel logistics, and accommodation solutions.
                 </motion.p>
-                <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}>
-                  <Link to="/register" className="text-decoration-none">
-                    <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-semibold px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 hover:-translate-y-1 transition-all duration-300 group">
-                      Start Your Application
-                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                </motion.div>
+
               </motion.div>
             </div>
           </section>
