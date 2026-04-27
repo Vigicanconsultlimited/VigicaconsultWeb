@@ -461,14 +461,28 @@ export default function Home() {
           <Header />
 
           {/* ── Hero ── */}
+          <style>{`
+  .hero-bg {
+    background-image: url('https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777327100/ChatGPT_Image_Apr_27_2026_10_55_37_PM_i0ggjd.png');
+    background-size: cover;
+    background-position: center right;
+  }
+  @media (max-width: 768px) {
+    .hero-bg {
+      background-position: center center;
+    }
+  }
+`}</style>
+
           <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
-            <div className="absolute inset-0" style={{ backgroundImage: `url('https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777327100/ChatGPT_Image_Apr_27_2026_10_55_37_PM_i0ggjd.png')`, backgroundSize: "cover", backgroundPosition: "center right" }}>
+            <div className="absolute inset-0 hero-bg">
               <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(18, 37, 60, 0.92) 45%, rgba(18, 37, 60, 0.2) 100%)" }} />
             </div>
+
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-32 pb-16">
               <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-2xl">
 
-                {/* Top row: heading left, button right */}
+                {/* Top row: heading left, button right — button hidden on mobile */}
                 <div className="flex items-start justify-between gap-8">
                   <motion.h1
                     style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", fontSize: "clamp(40px,5vw,64px)", fontWeight: 700, lineHeight: 1.12, color: "#fff", maxWidth: 720, marginBottom: 24, letterSpacing: "-0.5px" }}
@@ -482,11 +496,12 @@ export default function Home() {
                     </em>
                   </motion.h1>
 
+                  {/* Button: hidden on mobile, visible on md+ */}
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
-                    className="flex-shrink-0 pt-[227px] ml-52"
+                    className="hidden md:flex flex-shrink-0 pt-[227px] ml-52"
                   >
                     <Link to="/register" className="text-decoration-none">
                       <Button
@@ -511,6 +526,24 @@ export default function Home() {
                   international education recruitment, advisory, programme coordination,
                   travel logistics, and accommodation solutions.
                 </motion.p>
+
+                {/* Button: visible on mobile only, sits below paragraph */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                  className="md:hidden"
+                >
+                  <Link to="/register" className="text-decoration-none">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-semibold px-8 py-4 text-lg rounded-xl shadow-2xl hover:shadow-yellow-500/25 hover:-translate-y-1 transition-all duration-300 group"
+                    >
+                      Start Your Application
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                </motion.div>
 
               </motion.div>
             </div>

@@ -142,8 +142,7 @@ const css = `
   .about-page-v2 { font-family: 'Segoe UI', system-ui, sans-serif; background: #fff; color: #1C1714; }
 
   /* Hero */
-  /* Hero */
-  .ap-hero { position: relative; overflow: hidden; min-height: 560px; display: flex; align-items: center; padding: 80px 40px; padding-top: 160px; background: url('https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777323366/ChatGPT_Image_Apr_27_2026_09_55_36_PM_ob2y8d.png') center center / cover no-repeat; }
+  .ap-hero { position: relative; overflow: hidden; min-height: 560px; display: flex; align-items: center; padding: 80px 40px; padding: 160px 40px 60px; background: url('https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777323366/ChatGPT_Image_Apr_27_2026_09_55_36_PM_ob2y8d.png') center center / cover no-repeat; }
   .ap-hero-pattern { position: absolute; inset: 0; background: rgba(18, 37, 60, 0.55); }
   .ap-hero-ring { position: absolute; right: -120px; bottom: -120px; width: 560px; height: 560px; border-radius: 50%; border: 64px solid rgba(33,53,176,0.15); pointer-events: none; }
   .ap-hero-ring2 { position: absolute; right: 80px; bottom: 80px; width: 240px; height: 240px; border-radius: 50%; border: 2px solid rgba(33,53,176,0.25); pointer-events: none; }
@@ -265,23 +264,23 @@ const css = `
   .ap-btn-primary:hover { background: #1a2b99; transform: translateY(-1px); }
   .ap-btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: #2135b0; font-size: 15px; font-weight: 500; padding: 14px 28px; border-radius: 6px; border: 1.5px solid #2135b0; text-decoration: none; transition: background .2s; }
   .ap-btn-secondary:hover { background: #EEF1FF; }
-
-  /* Responsive */
-  @media (max-width: 900px) {
-    .ap-about-layout { grid-template-columns: 1fr; gap: 48px; }
-    .ap-services-grid { grid-template-columns: 1fr; }
-    .ap-why-grid { grid-template-columns: repeat(2,1fr); }
-    .ap-vm-grid { grid-template-columns: 1fr; }
-    .ap-services-header { flex-direction: column; }
-    .ap-speech-block, .ap-speech-block--rev { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 600px) {
-    .ap-section, .ap-speech-section, .ap-testimonials, .ap-cta { padding: 64px 20px; }
-    .ap-hero { padding: 60px 20px; }
-    .ap-why-grid { grid-template-columns: 1fr; }
-    .ap-stats { grid-template-columns: 1fr; }
-    .ap-vm { padding: 40px 28px; }
-  }
+/* Responsive */
+@media (max-width: 900px) {
+  .ap-about-layout { grid-template-columns: 1fr; gap: 48px; }
+  .ap-services-grid { grid-template-columns: 1fr; }
+  .ap-why-grid { grid-template-columns: repeat(2,1fr); }
+  .ap-vm-grid { grid-template-columns: 1fr; }
+  .ap-services-header { flex-direction: column; }
+  .ap-speech-block, .ap-speech-block--rev { grid-template-columns: 1fr; }
+  .ap-hero { padding-top: 130px; }
+}
+@media (max-width: 600px) {
+  .ap-section, .ap-speech-section, .ap-testimonials, .ap-cta { padding: 64px 20px; }
+  .ap-hero { padding: 110px 20px 60px; }
+  .ap-why-grid { grid-template-columns: 1fr; }
+  .ap-stats { grid-template-columns: 1fr; }
+  .ap-vm { padding: 40px 28px; }
+}
 `;
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -296,7 +295,7 @@ export default function AboutPage() {
   return (
     <>
       <style>{css}</style>
-      <div className="about-page-v2">
+      <div className="about-page-v2" style={{ paddingTop: "80px" }}>
         <Header />
 
         {/* ── Hero ──────────────────────────────────────────────── */}
