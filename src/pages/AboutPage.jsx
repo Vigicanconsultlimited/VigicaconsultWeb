@@ -61,10 +61,10 @@ As we look ahead, our focus remains clear: to deepen international partnerships 
 
 const CLIENT_TESTIMONIALS = [
   //{ id: 1, videoId: "cPDbFdOF248", isShort: true, quote: "Expert testimony from Partner organisation speaks on the collaboration with VIGICA Consult Ltd.", name: "Mistry Puspa", caption: "Leeds Beckett University, UK" },
-  { id: 2, videoId: "IXrWCvYuAes", isShort: false, quote: "The support and mentorship I received through VIGICA was immeasurable." },
-  { id: 3, videoId: "ZwTFTwiqiF8", isShort: true, quote: "VIGICA Consult made my study abroad dream a reality. Their guidance was exceptional from start to finish.", name: "Nwankwo Evaristus", caption: "MSc Data Analytics, University of Greater Manchester" },
-  { id: 4, videoId: "oZ16_O34sFc", isShort: true, quote: "The support and mentorship I received through VIGICA was truly life-changing.", name: "Ugwoke Edward", caption: "MSc Software Engineering, University of Greater Manchester" },
-  { id: 5, videoId: "7nzqUUFqH4M", isShort: true, quote: "VIGICA opened doors I never thought possible. I am proud to be studying AI at a top UK university.", name: "Cynthia Uduma", caption: "MSc Artificial Intelligence, University of Greater Manchester" },
+  { id: 2, videoId: "IXrWCvYuAes", isShort: false, quote: "The support and mentorship I received through VIGICA CONSULT LIMITED was immeasurable. Their guidance was exceptional from start to finishmst especially the timely disbursment of scholarship stipend", name: "Ezekiel Gabriel Nwibo", caption: "MSc Artificial Intelligence, University of Greater Manchester" },
+  { id: 3, videoId: "ZwTFTwiqiF8", isShort: true, quote: "VIGICA CONSULT LIMITED made my study abroad dream a reality. Their guidance was exceptional from start to finish.", name: "Nwankwo Evaristus", caption: "MSc Data Analytics, University of Greater Manchester" },
+  { id: 4, videoId: "oZ16_O34sFc", isShort: true, quote: "The support and mentorship I received through VIGICA CONSULT LIMITED was truly life-changing.", name: "Ugwoke Edward", caption: "MSc Software Engineering, University of Greater Manchester" },
+  { id: 5, videoId: "7nzqUUFqH4M", isShort: true, quote: "VIGICA CONSULT LIMITED opened doors I never thought possible. I am proud to be studying AI at a top UK university.", name: "Cynthia Uduma", caption: "MSc Artificial Intelligence, University of Greater Manchester" },
 ];
 
 const EXPERTS = [
