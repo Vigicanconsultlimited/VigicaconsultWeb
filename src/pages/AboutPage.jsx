@@ -13,6 +13,7 @@ import UoGMAward from "../assets/images/UoGM-award.jpeg";
 import UoGMAwardDrGideon from "../assets/images/UoGM-award-dr-gideon.jpeg";
 import Isaiah from "../assets/images/Isaiah.jpg";
 import DrSteve from "../assets/images/Dr_steve.jpeg";
+import Puspa from "../assets/images/Puspa.png";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -59,8 +60,8 @@ As we look ahead, our focus remains clear: to deepen international partnerships 
 };
 
 const CLIENT_TESTIMONIALS = [
-  { id: 1, videoId: "cPDbFdOF248", isShort: true, quote: "Expert testimony from Partner organisation speaks on the collaboration with VIGICA Consult Ltd.", name: "Mistry Puspa", caption: "Leeds Beckett University, UK" },
-  //{ id: 2, videoId: "gwZJCqX8SgI", isShort: false, quote: "Testimonials from the Ebonyi State Scholarship Board on Successful completion by their scholars.", name: "Ebonyi State Scholarship Board", caption: "Scholarship Board Testimonial" },
+  //{ id: 1, videoId: "cPDbFdOF248", isShort: true, quote: "Expert testimony from Partner organisation speaks on the collaboration with VIGICA Consult Ltd.", name: "Mistry Puspa", caption: "Leeds Beckett University, UK" },
+  { id: 2, videoId: "IXrWCvYuAes", isShort: false, quote: "The support and mentorship I received through VIGICA was immeasurable." },
   { id: 3, videoId: "ZwTFTwiqiF8", isShort: true, quote: "VIGICA Consult made my study abroad dream a reality. Their guidance was exceptional from start to finish.", name: "Nwankwo Evaristus", caption: "MSc Data Analytics, University of Greater Manchester" },
   { id: 4, videoId: "oZ16_O34sFc", isShort: true, quote: "The support and mentorship I received through VIGICA was truly life-changing.", name: "Ugwoke Edward", caption: "MSc Software Engineering, University of Greater Manchester" },
   { id: 5, videoId: "7nzqUUFqH4M", isShort: true, quote: "VIGICA opened doors I never thought possible. I am proud to be studying AI at a top UK university.", name: "Cynthia Uduma", caption: "MSc Artificial Intelligence, University of Greater Manchester" },
@@ -68,7 +69,9 @@ const CLIENT_TESTIMONIALS = [
 
 const EXPERTS = [
   { id: 1, name: "Dr. Ikporo Stephen", title: "Secretary, Ebonyi State Scholarship Board", institution: "Ebonyi State Government", photo: DrSteve, remark: "VIGICA CONSULT LIMITED stands out in the Nigerian consulting space for its holistic approach. They don't just place students they prepare them for global success." },
+  { id: 2, name: "Puspa Mistry", title: "Regional Manager (Middle East, Africa & Europe) International Recruitment and Partnerships", institution: "Leeds Beckett University", photo: Puspa, remark: "We have a strong partnership with Vigica Consult Limited that has produced a long lasting results and we are currently working on new projects" },
 ];
+
 
 const AWARDS = [
   { id: 1, title: "Outstanding Scholar Support", organization: "FON Scholars, University of Greater Manchester", year: "2025", description: "Recognised for excellence in student placement and support services.", icon: "trophy" },
@@ -335,19 +338,21 @@ export default function AboutPage() {
               </motion.div>
 
               <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-                <div className="ap-stats">
-                  {[
-                    { num: "128", label: "Scholars placed at UK universities", accent: false },
-                    { num: "98%", label: "Graduated with Distinction or Merit", accent: true },
-                    { num: "£2.56M", label: "In tuition savings secured", accent: false },
-                    { num: "100%", label: "Progressed to PhD programmes", accent: false },
-                  ].map((s, i) => (
-                    <motion.div key={i} variants={fadeUp} className={`ap-stat${s.accent ? " ap-stat--accent" : ""}`}>
-                      <div className="ap-stat-num">{s.num}</div>
-                      <div className="ap-stat-label">{s.label}</div>
-                    </motion.div>
-                  ))}
-                </div>
+                <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+                  <div className="ap-stats">
+                    {[
+                      { num: "128", label: "Ebonyi scholars placed at the University of Greater Manchester", accent: false },
+                      { num: "80%", label: "Graduated with Distinction", accent: true },
+                      { num: "20%", label: "Graduated with Merit", accent: false },
+                      { num: "1", label: "Corporate partnership coordinating all scholar placements", accent: false },
+                    ].map((s, i) => (
+                      <motion.div key={i} variants={fadeUp} className={`ap-stat${s.accent ? " ap-stat--accent" : ""}`}>
+                        <div className="ap-stat-num">{s.num}</div>
+                        <div className="ap-stat-label">{s.label}</div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
               </motion.div>
             </div>
           </div>
@@ -468,7 +473,7 @@ export default function AboutPage() {
             <div className="ap-test-header">
               <div>
                 <span className="ap-eyebrow">Testimonials</span>
-                <h2 className="ap-title">What Our students Say</h2>
+                <h2 className="ap-title">What Our Students Say</h2>
                 <p className="ap-sub">Real stories from students whose lives we have helped transform.</p>
               </div>
               <div style={{ display: "flex", gap: 10 }}>
