@@ -46,10 +46,10 @@ const statsData = [
 const servicesData = [
   { title: "Course Finder", icon: Search, points: ["Assessing Course Studied", "Work Experience", "Career Change", "Scholarships"] },
   { title: "University Finder", icon: GraduationCap, points: ["Foundation Study", "Undergraduate", "Postgraduate Taught (MSc)", "Research (MRes/PhD)"] },
-  { title: "University Application Support", icon: FileCheck, points: ["Document Preparation", "Document Reviews", "Submission Support", "Pre-CAS Interview & Preparation"] },
-  { title: "Visa Application Assistance", icon: Shield, points: ["Document Review", "CAS Application & Assessment", "Credibility Interview (UKVI)"] },
+  { title: "University Application Support", icon: FileCheck, points: ["Document Preparation", "Document Reviews", "Submission Support", "Pre-CAS Interview & Prep"] },
+  { title: "Visa Application Assistance", icon: Shield, points: ["Document Review", "CAS Application Assist", "Credibility Interview (UKVI)"] },
   { title: "Accommodation Support", icon: Users, points: ["Short Stay", "Airbnb", "Long Stay"] },
-  { title: "Partnership & Collaboration", icon: ArrowRight, points: ["Government Sponsored Scholarship", "Institutional Exchange Programmes"] },
+  { title: "Partnership & Collaboration", icon: ArrowRight, points: ["Government Scholarships", "Institutional Programmes"] },
 ];
 
 // ─── Testimonial Carousel ─────────────────────────────────────────────────────
@@ -355,6 +355,7 @@ export default function Home() {
     const element = document.getElementById(sectionId);
     if (element) element.scrollIntoView({ behavior: "smooth" });
   };
+  const [showEnquiry, setShowEnquiry] = useState(false);
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
@@ -483,7 +484,13 @@ export default function Home() {
                             </li>
                           ))}
                         </ul>
-                        <Button variant="outline" className="w-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">Learn More</Button>
+                        <Button
+                          variant="outline"
+                          className="w-full group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
+                          onClick={() => setShowEnquiry(true)}
+                        >
+                          Learn More
+                        </Button>
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -491,6 +498,15 @@ export default function Home() {
               </div>
             </div>
           </section>
+
+          {/* ── Enquiry Modal ── */}
+          {showEnquiry && (
+            <Modal open={showEnquiry} onClose={() => setShowEnquiry(false)} title="Make an Enquiry" size="md">
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+                <EnquiryForm />
+              </motion.div>
+            </Modal>
+          )}
 
           {/* ── Study Abroad ── */}
           <section id="study" className="py-20 bg-gradient-to-br from-indigo-50 to-blue-50">

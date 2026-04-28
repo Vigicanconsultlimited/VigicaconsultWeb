@@ -69,7 +69,7 @@ const CLIENT_TESTIMONIALS = [
 
 const EXPERTS = [
   { id: 1, name: "Dr. Ikporo Stephen", title: "Secretary, Ebonyi State Scholarship Board", institution: "Ebonyi State Government", photo: DrSteve, remark: "VIGICA CONSULT LIMITED stands out in the Nigerian consulting space for its holistic approach. They don't just place students they prepare them for global success." },
-  { id: 2, name: "Puspa Mistry", title: "Regional Manager (Middle East, Africa & Europe) International Recruitment and Partnerships", institution: "Leeds Beckett University", photo: Puspa, remark: "We have a strong partnership with Vigica Consult Limited that has produced a long lasting results and we are currently working on new projects" },
+  { id: 2, name: "Puspa Mistry", title: "Regional Manager (Middle East, Africa & Europe) International Recruitment and Partnerships", institution: "Leeds Beckett University", photo: Puspa, remark: "We have a strong partnership with VIGICA CONSULT LIMITED that has produced a long lasting results and we are currently working on new projects" },
 ];
 
 
