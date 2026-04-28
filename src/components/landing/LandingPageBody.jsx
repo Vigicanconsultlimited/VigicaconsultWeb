@@ -635,65 +635,103 @@ export default function Home() {
 
           {/* ── Accommodation Modal ── */}
           <Modal open={showAccomForm} onClose={() => setShowAccomForm(false)} title="Accommodation Booking Assistance" size="md">
-            <form className="space-y-4" onSubmit={async (e) => {
-              e.preventDefault();
-              if (!accomForm.fullName || !accomForm.gender || !accomForm.contactTelephone || !accomForm.email || !accomForm.destination || !accomForm.accommodationType || !accomForm.budget) {
-                Toast.fire({ icon: "warning", title: "Please fill in all fields" });
-                return;
-              }
-              setAccomLoading(true);
-              try {
-                const response = await fetch("https://vigica-001-site1.qtempurl.com/api/Enquiry/accomodation", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    fullName: accomForm.fullName,
-                    gender: accomForm.gender,
-                    contactTelephone: accomForm.contactTelephone,
-                    email: accomForm.email,
-                    destination: accomForm.destination,
-                    accommodationType: accomForm.accommodationType,
-                    budget: accomForm.budget,
-                  }),
-                });
-                const data = await response.json();
-                if (response.ok) {
-                  Toast.fire({ icon: "success", title: data.message || "Enquiry sent successfully!" });
-                  setShowAccomForm(false);
-                  setAccomForm({ fullName: "", gender: "", contactTelephone: "", email: "", destination: "", accommodationType: "", budget: "" });
-                } else {
-                  Toast.fire({ icon: "error", title: data.message || "Something went wrong. Please try again." });
+            <form
+              className="space-y-4"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!accomForm.fullName || !accomForm.gender || !accomForm.contactTelephone || !accomForm.email || !accomForm.destination || !accomForm.accommodationType || !accomForm.budget) {
+                  Toast.fire({ icon: "warning", title: "Please fill in all fields" });
+                  return;
                 }
-              } catch (err) {
-                Toast.fire({ icon: "error", title: "Network error. Please check your connection." });
-              } finally {
-                setAccomLoading(false);
-              }
-            }}>
+                setAccomLoading(true);
+                try {
+                  const fd = new FormData();
+                  fd.append("FullName", accomForm.fullName);
+                  fd.append("Gender", accomForm.gender);
+                  fd.append("ContactTelephone", accomForm.contactTelephone);
+                  fd.append("Email", accomForm.email);
+                  fd.append("Destination", accomForm.destination);
+                  fd.append("AccommodationType", accomForm.accommodationType);
+                  fd.append("Budget", accomForm.budget);
+
+                  const response = await fetch("https://vigica-001-site1.qtempurl.com/api/Enquiry/accomodation", {
+                    method: "POST",
+                    body: fd,
+                  });
+                  const data = await response.json();
+                  if (response.ok) {
+                    Toast.fire({ icon: "success", title: data.message || "Enquiry sent successfully!" });
+                    setShowAccomForm(false);
+                    setAccomForm({ fullName: "", gender: "", contactTelephone: "", email: "", destination: "", accommodationType: "", budget: "" });
+                  } else {
+                    Toast.fire({ icon: "error", title: data.message || "Something went wrong. Please try again." });
+                  }
+                } catch (err) {
+                  Toast.fire({ icon: "error", title: "Network error. Please check your connection." });
+                } finally {
+                  setAccomLoading(false);
+                }
+              }}
+            >
+              {/* Full Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <Input type="text" className="w-full" value={accomForm.fullName} onChange={(e) => setAccomForm({ ...accomForm, fullName: e.target.value })} placeholder="Enter your full name" />
+                <Input
+                  type="text"
+                  className="w-full"
+                  value={accomForm.fullName}
+                  onChange={(e) => setAccomForm({ ...accomForm, fullName: e.target.value })}
+                  placeholder="Enter your full name"
+                />
               </div>
+
+              {/* Gender */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none bg-white" value={accomForm.gender} onChange={(e) => setAccomForm({ ...accomForm, gender: e.target.value })}>
+                <select
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none bg-white"
+                  value={accomForm.gender}
+                  onChange={(e) => setAccomForm({ ...accomForm, gender: e.target.value })}
+                >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
                 </select>
               </div>
+
+              {/* Contact Telephone */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contact Telephone</label>
-                <Input type="tel" className="w-full" value={accomForm.contactTelephone} onChange={(e) => setAccomForm({ ...accomForm, contactTelephone: e.target.value })} placeholder="+44 7000 000000" />
+                <Input
+                  type="tel"
+                  className="w-full"
+                  value={accomForm.contactTelephone}
+                  onChange={(e) => setAccomForm({ ...accomForm, contactTelephone: e.target.value })}
+                  placeholder="+44 7000 000000"
+                />
               </div>
+
+              {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <Input type="email" className="w-full" value={accomForm.email} onChange={(e) => setAccomForm({ ...accomForm, email: e.target.value })} placeholder="your@email.com" />
+                <Input
+                  type="email"
+                  className="w-full"
+                  value={accomForm.email}
+                  onChange={(e) => setAccomForm({ ...accomForm, email: e.target.value })}
+                  placeholder="your@email.com"
+                />
               </div>
+
+              {/* Destination */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Destination</label>
-                <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none bg-white" value={accomForm.destination} onChange={(e) => setAccomForm({ ...accomForm, destination: e.target.value })}>
+                <select
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none bg-white"
+                  value={accomForm.destination}
+                  onChange={(e) => setAccomForm({ ...accomForm, destination: e.target.value })}
+                >
                   <option value="">Select Destination</option>
                   <option value="United Kingdom">United Kingdom</option>
                   <option value="United States">United States</option>
@@ -705,9 +743,15 @@ export default function Home() {
                   <option value="Ireland">Ireland</option>
                 </select>
               </div>
+
+              {/* Accommodation Type */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Accommodation Type</label>
-                <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none bg-white" value={accomForm.accommodationType} onChange={(e) => setAccomForm({ ...accomForm, accommodationType: e.target.value })}>
+                <select
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none bg-white"
+                  value={accomForm.accommodationType}
+                  onChange={(e) => setAccomForm({ ...accomForm, accommodationType: e.target.value })}
+                >
                   <option value="">Select Accommodation Type</option>
                   <option value="Student Hostel (10 months) tenor">Student Hostel (10 months) tenor</option>
                   <option value="1-Bedroom apartment (6 months) assured tenancy (AST)">1-Bedroom apartment (6 months) AST</option>
@@ -716,9 +760,15 @@ export default function Home() {
                   <option value="Service accommodation (short stay)">Service accommodation (short stay)</option>
                 </select>
               </div>
+
+              {/* Budget */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Budget (per night/month)</label>
-                <select className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none bg-white" value={accomForm.budget} onChange={(e) => setAccomForm({ ...accomForm, budget: e.target.value })}>
+                <select
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-purple-500 focus:outline-none bg-white"
+                  value={accomForm.budget}
+                  onChange={(e) => setAccomForm({ ...accomForm, budget: e.target.value })}
+                >
                   <option value="">Select Budget Range</option>
                   <option value="Under £500">Under £500</option>
                   <option value="£500 - £800">£500 - £800</option>
@@ -728,59 +778,27 @@ export default function Home() {
                   <option value="£2,500+">£2,500+</option>
                 </select>
               </div>
+
+              {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <Button type="submit" disabled={accomLoading} className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5">
+                <Button
+                  type="submit"
+                  disabled={accomLoading}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2.5"
+                >
                   {accomLoading ? "Sending..." : "Request Options"}
                 </Button>
-                <Button type="button" variant="outline" className="flex-1" onClick={() => setShowAccomForm(false)}>Cancel</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowAccomForm(false)}
+                >
+                  Cancel
+                </Button>
               </div>
             </form>
           </Modal>
-
-          {/* ── Partners ── */}
-          <Partners />
-
-          {/* ── Contact ── */}
-          <section id="contact" className="py-20 bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <motion.div className="text-center mb-16" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                <Badge className="bg-blue-100 text-blue-700 mb-4 px-3 py-1">Contact Us</Badge>
-                <h2 className="text-4xl font-bold text-gray-900 mb-6">Book a Free Consultation Today</h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">Get personalized guidance for your study abroad journey, travel plans, or hotel bookings. Our experts are here to assist you with all your needs.</p>
-              </motion.div>
-              <div className="grid lg:grid-cols-2 gap-16">
-                <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }} className="space-y-8">
-                  {[
-                    { icon: Phone, title: "Requesting A Call", text: "+234 913 543 0319" },
-                    { icon: Clock, title: "Open Hours", text: "Mon. - Sat: 9:00am - 6:00pm" },
-                    { icon: MapPin, title: "Location", text: "Okay Centre, Okay Water Federal Housing Authority, Lugbe, Abuja." },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start space-x-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                        <item.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                        <p className="text-gray-600">{item.text}</p>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                      <Info className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">Got issues? Call Our Tech Team</h3>
-                      <p className="text-gray-600 flex items-center gap-2"><Email className="w-4 h-4" /> info@vigicaconsult.com</p>
-                    </div>
-                  </div>
-                </motion.div>
-                <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-                  <EnquiryForm />
-                </motion.div>
-              </div>
-            </div>
-          </section>
         </>
       )}
     </div>
