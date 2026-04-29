@@ -30,7 +30,7 @@ export default function StudentDashboard({
   const [applicationStatus, setApplicationStatus] = useState(null);
 
   const navigate = useNavigate();
-  // ✅ Fix — try all possible formats for both regular and Google login
+
   const userId =
     authData?.id ||
     authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
@@ -41,123 +41,125 @@ export default function StudentDashboard({
     authData?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
     null;
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      let submittedApps = [];
+      let currentPersonalInfoId = null;
+      let fetchedApplicationStatus = null;
+
+      // Personal Info
       try {
-        setLoading(true);
+        const personalRes = await apiInstance.get(
+          `StudentPersonalInfo/user/${userId}`
+        );
+        const personalInfo = personalRes?.data?.result;
+        currentPersonalInfoId = personalInfo?.id;
+        setPersonalInfoId(currentPersonalInfoId);
 
-        let submittedApps = [];
-        let currentPersonalInfoId = null;
-        let fetchedApplicationStatus = null;
+        if (personalInfo?.firstName && personalInfo?.lastName) {
+          setDisplayName(`${personalInfo.firstName} ${personalInfo.lastName}`);
+        }
 
-        // Personal Info
-        try {
-          const personalRes = await apiInstance.get(
-            `StudentPersonalInfo/user/${userId}`,
-          );
-          const personalInfo = personalRes?.data?.result;
-          currentPersonalInfoId = personalInfo?.id;
-          setPersonalInfoId(currentPersonalInfoId);
-
-          if (personalInfo?.firstName && personalInfo?.lastName) {
-            setDisplayName(
-              `${personalInfo.firstName} ${personalInfo.lastName}`,
+        // Application Status
+        if (currentPersonalInfoId) {
+          try {
+            const appResponse = await apiInstance.get(
+              `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`
             );
+            if (appResponse?.data?.result) {
+              const status = appResponse.data.result.applicationStatus;
+              setApplicationStatus(status);
+              fetchedApplicationStatus = status;
+            }
+          } catch {
+            setApplicationStatus(2);
+            fetchedApplicationStatus = 2;
           }
 
-          // Application Status
-          if (currentPersonalInfoId) {
-            try {
-              const appResponse = await apiInstance.get(
-                `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`,
-              );
-              if (appResponse?.data?.result) {
-                const status = appResponse.data.result.applicationStatus;
-                setApplicationStatus(status);
-                fetchedApplicationStatus = status;
-              }
-            } catch {
-              setApplicationStatus(2);
-              fetchedApplicationStatus = 2;
-            }
+          // Submitted Applications
+          try {
+            const submittedAppRes = await apiInstance.get(
+              `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`
+            );
+            submittedApps = submittedAppRes?.data?.result || [];
+            setApplications(
+              Array.isArray(submittedApps) ? submittedApps : [submittedApps]
+            );
+          } catch {
+            /* ignore */
+          }
 
-            // Submitted Applications (general)
-            try {
-              const submittedAppRes = await apiInstance.get(
-                `StudentApplication/application?StudentPersonalInformationId=${currentPersonalInfoId}`,
-              );
-              submittedApps = submittedAppRes?.data?.result || [];
-              setApplications(
-                Array.isArray(submittedApps) ? submittedApps : [submittedApps],
-              );
-            } catch {
-              /* ignore */
-            }
+          // Academic Applications
+          try {
+            const academicAppRes = await apiInstance.get(
+              `Academic/StudentInformationId?PersonalInformationId=${currentPersonalInfoId}`
+            );
 
-            // Academic Applications
-            try {
-              const academicAppRes = await apiInstance.get(
-                `Academic/StudentInformationId?PersonalInformationId=${currentPersonalInfoId}`,
-              );
-
-              if (
-                academicAppRes?.data?.result &&
-                academicAppRes.data.statusCode === 201
-              ) {
-                const academicData = academicAppRes.data.result;
-                const formattedAcademicApp = {
-                  id: academicData.id,
-                  school: academicData.schoolResponse?.name || "Unknown School",
-                  description:
-                    academicData.program?.description || "Unknown Program",
-                  course:
-                    academicData.courseOfInterest?.name || "Unknown Course",
-                  faculty: academicData.program?.faculty || "Unknown Faculty",
-                  programLevel: academicData.program?.programLevel || 0,
-                  duration: academicData.program?.durationInYears || 0,
-                  type: "academic",
-                  appliedProgramId: academicData.program?.id || null,
-                  applicationStatus: fetchedApplicationStatus || 2,
-                  isSubmitted: (fetchedApplicationStatus || 2) >= 1,
-                  submittedAt: academicData.submittedAt || null,
-                  updatedAt: academicData.updatedAt || null,
-                };
-                setSubmittedAcademicApps([formattedAcademicApp]);
-              } else {
-                setSubmittedAcademicApps([]);
-              }
-            } catch {
+            if (
+              academicAppRes?.data?.result &&
+              academicAppRes.data.statusCode === 201
+            ) {
+              const academicData = academicAppRes.data.result;
+              const formattedAcademicApp = {
+                id: academicData.id,
+                school: academicData.schoolResponse?.name || "Unknown School",
+                description: academicData.program?.description || "Unknown Program",
+                course: academicData.courseOfInterest?.name || "Unknown Course",
+                faculty: academicData.program?.faculty || "Unknown Faculty",
+                programLevel: academicData.program?.programLevel || 0,
+                duration: academicData.program?.durationInYears || 0,
+                type: "academic",
+                appliedProgramId: academicData.program?.id || null,
+                applicationStatus: fetchedApplicationStatus || 2,
+                isSubmitted: (fetchedApplicationStatus || 2) >= 1,
+                submittedAt: academicData.submittedAt || null,
+                updatedAt: academicData.updatedAt || null,
+              };
+              setSubmittedAcademicApps([formattedAcademicApp]);
+            } else {
               setSubmittedAcademicApps([]);
             }
+          } catch {
+            setSubmittedAcademicApps([]);
           }
-        } catch {
-          // proceed gracefully
         }
+      } catch {
+        // proceed gracefully
+      }
 
-        // Available Programs
-        try {
-          const availableRes = await apiInstance.get(`AcademicProgram`);
-          if (availableRes?.data?.result) {
-            setAvailableApplications(availableRes.data.result);
-          } else {
-            setAvailableApplications([]);
-          }
-        } catch {
+      // Available Programs
+      try {
+        const availableRes = await apiInstance.get(`AcademicProgram`);
+        if (availableRes?.data?.result) {
+          setAvailableApplications(availableRes.data.result);
+        } else {
           setAvailableApplications([]);
         }
-      } finally {
-        setLoading(false);
-        setInitialLoadComplete(true);
+      } catch {
+        setAvailableApplications([]);
       }
-    };
-
-    if (userId) {
-      fetchData();
-    } else {
+    } finally {
       setLoading(false);
       setInitialLoadComplete(true);
     }
-  }, [userId]);
+  };
+
+  // ── Main effect — wait for authData to hydrate before fetching ──
+  useEffect(() => {
+    // authData not yet loaded from store — wait
+    if (authData === null || authData === undefined) return;
+
+    if (!userId) {
+      // Auth loaded but no userId
+      setLoading(false);
+      setInitialLoadComplete(true);
+      return;
+    }
+
+    fetchData();
+  }, [userId, authData]);
 
   // Helpers
   const getProgramLevelText = (level) => {
@@ -183,18 +185,12 @@ export default function StudentDashboard({
 
   const getStatusBadge = (applicationStatus) => {
     switch (applicationStatus) {
-      case 1:
-        return <span className="badge bg-primary">Submitted</span>;
-      case 2:
-        return <span className="badge bg-warning">Pending</span>;
-      case 3:
-        return <span className="badge bg-info">Under Review</span>;
-      case 4:
-        return <span className="badge bg-danger">Rejected</span>;
-      case 5:
-        return <span className="badge bg-success">Approved</span>;
-      default:
-        return <span className="badge bg-secondary">Draft</span>;
+      case 1: return <span className="badge bg-primary">Submitted</span>;
+      case 2: return <span className="badge bg-warning">Pending</span>;
+      case 3: return <span className="badge bg-info">Under Review</span>;
+      case 4: return <span className="badge bg-danger">Rejected</span>;
+      case 5: return <span className="badge bg-success">Approved</span>;
+      default: return <span className="badge bg-secondary">Draft</span>;
     }
   };
 
@@ -204,10 +200,7 @@ export default function StudentDashboard({
     submittedAcademicApps.some((app) => app.appliedProgramId === programId);
 
   // Contact Support
-  const handleContactSupport = async (
-    applicationId = null,
-    applicationDetails = null,
-  ) => {
+  const handleContactSupport = async (applicationId = null, applicationDetails = null) => {
     const { value: formValues } = await Swal.fire({
       title: "Contact Support",
       html: `
@@ -225,27 +218,21 @@ export default function StudentDashboard({
               <option value="Other">Other</option>
             </select>
           </div>
-          ${applicationDetails
-          ? `
+          ${applicationDetails ? `
             <div style="margin-bottom:15px;padding:10px;background:#f8fafc;border-radius:6px;border-left:4px solid #3b82f6;">
               <strong>Application Details:</strong><br>
               <small>School: ${applicationDetails.school}</small><br>
               <small>Program: ${applicationDetails.description}</small><br>
-              <small>Status: ${getStatusText(
-            applicationDetails.applicationStatus,
-          )}</small>
+              <small>Status: ${getStatusText(applicationDetails.applicationStatus)}</small>
             </div>
-          `
-          : ""
-        }
+          ` : ""}
           <div style="margin-bottom:15px;">
             <label for="message" style="display:block;margin-bottom:5px;font-weight:600;color:#374151;">Message *</label>
             <textarea id="message" class="swal2-textarea" placeholder="Describe your issue..." style="width:100%;min-height:120px;padding:8px;border:2px solid #e5e7eb;border-radius:6px;resize:vertical;"></textarea>
           </div>
           <div style="margin-bottom:10px;">
             <label for="email" style="display:block;margin-bottom:5px;font-weight:600;color:#374151;">Contact Email</label>
-            <input id="email" class="swal2-input" type="email" value="${userEmail || ""
-        }" placeholder="your.email@example.com" style="width:100%;padding:8px;border:2px solid #e5e7eb;border-radius:6px;margin:0;">
+            <input id="email" class="swal2-input" type="email" value="${userEmail || ""}" placeholder="your.email@example.com" style="width:100%;padding:8px;border:2px solid #e5e7eb;border-radius:6px;margin:0;">
           </div>
           <div style="font-size:12px;color:#6b7280;margin-top:10px;">
             <i class="fas fa-info-circle"></i> We reply within 24-48 business hours.
@@ -266,22 +253,14 @@ export default function StudentDashboard({
           return false;
         }
         if (!message || message.trim().length < 10) {
-          Swal.showValidationMessage(
-            "Please enter at least 10 characters for the message",
-          );
+          Swal.showValidationMessage("Please enter at least 10 characters for the message");
           return false;
         }
-        if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           Swal.showValidationMessage("Enter a valid email address");
           return false;
         }
-        return {
-          subject,
-          message: message.trim(),
-          email,
-          applicationId,
-          applicationDetails,
-        };
+        return { subject, message: message.trim(), email, applicationId, applicationDetails };
       },
     });
 
@@ -303,11 +282,7 @@ export default function StudentDashboard({
         });
         Toast.fire({ icon: "success", title: "Support request sent" });
       } catch {
-        Swal.fire({
-          icon: "error",
-          title: "Failed",
-          text: "Could not send your message.",
-        });
+        Swal.fire({ icon: "error", title: "Failed", text: "Could not send your message." });
         Toast.fire({ icon: "error", title: "Sending failed" });
       }
     }
@@ -315,10 +290,7 @@ export default function StudentDashboard({
 
   const handleEdit = (app) => {
     if (!canEditApplication(app)) {
-      Toast.fire({
-        icon: "warning",
-        title: "Cannot edit this application",
-      });
+      Toast.fire({ icon: "warning", title: "Cannot edit this application" });
       return;
     }
     navigate("/dashboard", {
@@ -328,10 +300,7 @@ export default function StudentDashboard({
 
   const handleDeleteAcademic = async (app) => {
     if (!canEditApplication(app)) {
-      Toast.fire({
-        icon: "warning",
-        title: "Cannot delete this application",
-      });
+      Toast.fire({ icon: "warning", title: "Cannot delete this application" });
       return;
     }
     if (!personalInfoId) {
@@ -358,7 +327,7 @@ export default function StudentDashboard({
           didOpen: () => Swal.showLoading(),
         });
         await apiInstance.delete(
-          `Academic?StudentPersonalInformationId=${personalInfoId}`,
+          `Academic?StudentPersonalInformationId=${personalInfoId}`
         );
         setSubmittedAcademicApps([]);
         setApplicationStatus(null);
@@ -383,9 +352,21 @@ export default function StudentDashboard({
   const hasAnyApplications = totalApplications > 0;
   const hasSubmittedApplications = hasAnyApplications;
   const hasSubmittedNonEditableApp = submittedAcademicApps.some(
-    (app) => !canEditApplication(app),
+    (app) => !canEditApplication(app)
   );
 
+  // ── Auth store not yet hydrated ──
+  if (authData === null || authData === undefined) {
+    return (
+      <VigicaLoader
+        variant="inline"
+        size="lg"
+        text="Authenticating..."
+      />
+    );
+  }
+
+  // ── Data not yet fetched ──
   if (!initialLoadComplete) {
     return (
       <VigicaLoader
@@ -408,13 +389,7 @@ export default function StudentDashboard({
           <>
             <h3>{totalApplications} Application(s) Found</h3>
             {applicationStatus && (
-              <div
-                className={`application-status ${getStatusText(
-                  applicationStatus,
-                )
-                  .toLowerCase()
-                  .replace(" ", "-")}`}
-              >
+              <div className={`application-status ${getStatusText(applicationStatus).toLowerCase().replace(" ", "-")}`}>
                 <p>
                   Current Application Status:{" "}
                   <strong>{getStatusText(applicationStatus)}</strong>
@@ -424,8 +399,7 @@ export default function StudentDashboard({
             {hasSubmittedNonEditableApp ? (
               <div className="alert alert-primary mb-2 mt-0 p-2">
                 <p>
-                  <strong>Notice:</strong> Your application cannot be edited at
-                  this time.
+                  <strong>Notice:</strong> Your application cannot be edited at this time.
                 </p>
               </div>
             ) : (
@@ -451,14 +425,11 @@ export default function StudentDashboard({
                   onClick={() => setCurrentStep("personal-info")}
                   disabled={hasSubmittedApplications}
                 >
-                  {hasSubmittedApplications
-                    ? "✅ Application Submitted"
-                    : "➕ Start New Application"}
+                  {hasSubmittedApplications ? "✅ Application Submitted" : "➕ Start New Application"}
                 </button>
                 {hasSubmittedApplications && (
                   <small className="text-muted d-block mt-1">
-                    You already have an active application. Delete it (if status
-                    allows) to create a new one.
+                    You already have an active application. Delete it (if status allows) to create a new one.
                   </small>
                 )}
               </>
@@ -492,26 +463,16 @@ export default function StudentDashboard({
               </thead>
               <tbody>
                 {submittedAcademicApps.map((app) => {
-                  const rowStateClass = canEditApplication(app)
-                    ? "editable"
-                    : "locked";
+                  const rowStateClass = canEditApplication(app) ? "editable" : "locked";
                   return (
                     <tr key={`academic-${app.id}`} className={rowStateClass}>
                       <td data-label="Select" className="select-cell">
                         <input type="checkbox" />
                       </td>
-                      <td data-label="School" className="school">
-                        {app.school}
-                      </td>
-                      <td data-label="Program" className="program-col">
-                        {app.description}
-                      </td>
-                      <td data-label="Level" className="level">
-                        {getProgramLevelText(app.programLevel)}
-                      </td>
-                      <td data-label="Status" className="status-col">
-                        {getStatusBadge(app.applicationStatus)}
-                      </td>
+                      <td data-label="School" className="school">{app.school}</td>
+                      <td data-label="Program" className="program-col">{app.description}</td>
+                      <td data-label="Level" className="level">{getProgramLevelText(app.programLevel)}</td>
+                      <td data-label="Status" className="status-col">{getStatusBadge(app.applicationStatus)}</td>
                       <td data-label="Action" className="actions action-col">
                         <button
                           className="icon-btn"
@@ -521,32 +482,18 @@ export default function StudentDashboard({
                           <i className="fas fa-envelope"></i>
                         </button>
                         <button
-                          className={`icon-btn ${!canEditApplication(app) ? "disabled" : ""
-                            }`}
+                          className={`icon-btn ${!canEditApplication(app) ? "disabled" : ""}`}
                           onClick={() => handleEdit(app)}
-                          title={
-                            canEditApplication(app)
-                              ? "Edit Academic Application"
-                              : "Locked"
-                          }
+                          title={canEditApplication(app) ? "Edit Academic Application" : "Locked"}
                           disabled={!canEditApplication(app)}
                         >
                           {canEditApplication(app) ? "✏️" : "🔒"}
                         </button>
                         <button
-                          className={`icon-btn ${!canEditApplication(app) ? "disabled" : ""
-                            }`}
+                          className={`icon-btn ${!canEditApplication(app) ? "disabled" : ""}`}
                           onClick={() => handleDeleteAcademic(app)}
-                          title={
-                            canEditApplication(app)
-                              ? "Delete Academic Application"
-                              : "Locked"
-                          }
-                          style={{
-                            color: canEditApplication(app)
-                              ? "#dc3545"
-                              : "#6c757d",
-                          }}
+                          title={canEditApplication(app) ? "Delete Academic Application" : "Locked"}
+                          style={{ color: canEditApplication(app) ? "#dc3545" : "#6c757d" }}
                           disabled={!canEditApplication(app)}
                         >
                           <i className="fas fa-trash-alt"></i>
@@ -584,9 +531,7 @@ export default function StudentDashboard({
               <tbody>
                 {availableApplications.map((app, index) => {
                   const isThisProgramApplied = isProgramApplied(app.id);
-                  const isAnyOtherProgramApplied =
-                    hasSubmittedApplications && !isThisProgramApplied;
-
+                  const isAnyOtherProgramApplied = hasSubmittedApplications && !isThisProgramApplied;
                   const rowStateClass = isThisProgramApplied
                     ? "applied-row"
                     : isAnyOtherProgramApplied
@@ -596,38 +541,20 @@ export default function StudentDashboard({
                   return (
                     <tr key={index} className={rowStateClass}>
                       <td className="program" data-label="Program">
-                        <span className="program-name">
-                          {app.description || "General"}
-                        </span>
+                        <span className="program-name">{app.description || "General"}</span>
                       </td>
-                      <td className="faculty" data-label="Faculty">
-                        {app.faculty || "General"}
-                      </td>
-                      <td className="level" data-label="Level">
-                        {getProgramLevelText(app.programLevel)}
-                      </td>
-                      <td className="duration" data-label="Duration">
-                        {app.durationInYears} years
-                      </td>
+                      <td className="faculty" data-label="Faculty">{app.faculty || "General"}</td>
+                      <td className="level" data-label="Level">{getProgramLevelText(app.programLevel)}</td>
+                      <td className="duration" data-label="Duration">{app.durationInYears} years</td>
                       <td className="action" data-label="Action">
                         <button
-                          className={`apply-btn ${isThisProgramApplied || isAnyOtherProgramApplied
-                            ? "disabled"
-                            : ""
-                            } ${isThisProgramApplied
-                              ? "btn-applied"
-                              : isAnyOtherProgramApplied
-                                ? "btn-locked"
-                                : "btn-open"
-                            }`}
+                          className={`apply-btn ${isThisProgramApplied || isAnyOtherProgramApplied ? "disabled" : ""} ${isThisProgramApplied ? "btn-applied" : isAnyOtherProgramApplied ? "btn-locked" : "btn-open"}`}
                           onClick={() =>
                             !isThisProgramApplied &&
                             !isAnyOtherProgramApplied &&
                             setCurrentStep("personal-info")
                           }
-                          disabled={
-                            isThisProgramApplied || isAnyOtherProgramApplied
-                          }
+                          disabled={isThisProgramApplied || isAnyOtherProgramApplied}
                           title={
                             isThisProgramApplied
                               ? "You have already applied for this program"
