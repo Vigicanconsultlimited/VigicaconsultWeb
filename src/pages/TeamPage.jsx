@@ -36,16 +36,20 @@ const styles = `
     font-family: 'DM Sans', sans-serif;
   }
 
-  /* ── Hero ── */
   .tp-hero {
-    position: relative;
-    min-height: 52vh;
-    display: flex;
-    align-items: flex-end;
-    background: linear-gradient(135deg, #0f2057 0%, #1e3a8a 55%, #2563eb 100%);
-    overflow: hidden;
-    padding: 0 2rem 4rem;
-  }
+  position: relative;
+  min-height: 52vh;
+  display: flex;
+  align-items: flex-end;
+  background: 
+    linear-gradient(135deg, rgba(15,32,87,0.85) 0%, rgba(30,58,138,0.80) 55%, rgba(37,99,235,0.75) 100%),
+    url('https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777496620/ChatGPT_Image_Apr_29_2026_10_03_14_PM_cnlzye.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  padding: 0 2rem 4rem;
+}
   .tp-hero::before {
     content: '';
     position: absolute;
@@ -589,7 +593,7 @@ function TeamPage() {
   return (
     <>
       <style>{styles}</style>
-      <div className="tp-root" style={{ paddingTop: "70px" }}>
+      <div className="tp-root" style={{ paddingTop: "80px" }}>
         <Header />
 
         {/* ── Hero ── */}
