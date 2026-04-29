@@ -593,7 +593,7 @@ function TeamPage() {
   return (
     <>
       <style>{styles}</style>
-      <div className="tp-root" style={{ paddingTop: "80px" }}>
+      <div className="tp-root" style={{ paddingTop: "100px" }}>
         <Header />
 
         {/* ── Hero ── */}
@@ -602,9 +602,6 @@ function TeamPage() {
 
           <div className="tp-hero-inner">
             <div style={{ maxWidth: "720px" }}>
-              <div className="tp-hero-eyebrow">
-                <span>👥</span> The People Behind Vigica
-              </div>
 
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
