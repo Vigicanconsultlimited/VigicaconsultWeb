@@ -28,7 +28,7 @@ const getImageUrl = (url) => {
 
 // ─── Styles ───────────────────────────────────────────
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
 
   .tp-root {
     min-height: 100vh;
@@ -224,11 +224,12 @@ const styles = `
     flex-shrink: 0;
   }
   .tp-cat-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    font-weight: 600;
-    color: #0f2057;
-    margin: 0 0 2px;
+  font-family: 'Segoe UI', system-ui, sans-serif;  /* ← was Playfair Display */
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f2057;
+  margin: 0 0 2px;
+}
   }
   .tp-cat-desc {
     font-size: 13px;
@@ -354,11 +355,12 @@ const styles = `
     margin: 0 0 6px;
   }
   .tp-card-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #0f2057;
-    margin: 0 0 4px;
+  font-family: 'Segoe UI', system-ui, sans-serif;  /* ← was Playfair Display */
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f2057;
+  margin: 0 0 4px;
+}
   }
   .tp-card-position {
     font-size: 13px;
@@ -537,9 +539,12 @@ function TeamPage() {
         }
       });
       setCollapsedCategories(initialCollapsed);
-    } catch (err) {
-      console.error("Error fetching team members:", err);
-      setError("Failed to load team members. Please try again.");
+    } catch {
+      !loading && allMembers.length === 0 && (
+        <div className="tp-empty">
+          No team members available at the moment.
+        </div>
+      )
     } finally {
       setLoading(false);
     }
@@ -560,63 +565,59 @@ function TeamPage() {
         {/* ── Hero ── */}
         <section className="tp-hero">
           <div className="tp-hero-dots" />
+
+          {/* THIS container fixes alignment */}
           <div className="tp-hero-inner">
+            <div style={{ maxWidth: "720px" }}>
 
-            {/* ✅ No outer motion wrapper — children animate on their own */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="tp-hero-eyebrow"
-            >
-              <span>👥</span> The People Behind Vigica
-            </motion.div>
+              {/* Your content (unchanged) */}
+              <div className="tp-hero-eyebrow">
+                <span>👥</span> The People Behind Vigica
+              </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              style={{
-                fontFamily: "'Segoe UI', system-ui, sans-serif",
-                fontSize: "clamp(40px, 5vw, 64px)",
-                fontWeight: 700,
-                lineHeight: 1.12,
-                color: "#fff",
-                maxWidth: 720,
-                marginBottom: 24,
-                letterSpacing: "-0.5px",
-              }}
-            >
-              Meet Our <em style={{ fontStyle: "italic", color: "#fed016" }}>Expert</em><br />
-              Team
-            </motion.h1>
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                style={{
+                  fontFamily: "'Segoe UI', system-ui, sans-serif",
+                  fontSize: "clamp(40px, 5vw, 64px)",
+                  fontWeight: 700,
+                  lineHeight: 1.12,
+                  color: "#fff",
+                  maxWidth: 720,
+                  marginBottom: 24,
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                Meet Our{" "}
+                <em style={{ fontStyle: "italic", color: "#fed016" }}>
+                  Expert
+                </em>
+                <br />
+                Team
+              </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              style={{
-                fontSize: 18,
-                fontWeight: 300,
-                lineHeight: 1.7,
-                color: "rgba(255,255,255,.72)",
-                maxWidth: 520,
-                marginBottom: 36,
-              }}
-            >
-              Dedicated professionals committed to opening doors to global opportunities.
-            </motion.p>
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                style={{
+                  fontSize: 18,
+                  fontWeight: 300,
+                  lineHeight: 1.7,
+                  color: "rgba(255,255,255,.72)",
+                  maxWidth: 520,
+                  marginBottom: 36,
+                }}
+              >
+                Dedicated professionals committed to opening doors to global opportunities.
+              </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.45 }}
-            >
-              <Link to="/book" className="tp-book-btn">
-                <FaCalendarAlt /> Book Appointment
-              </Link>
-            </motion.div>
-
+            </div>
+            <Link to="/book" className="tp-book-btn">
+              <FaCalendarAlt /> Book Appointment
+            </Link>
           </div>
         </section>
 
@@ -641,99 +642,150 @@ function TeamPage() {
           </div>
         </div>
 
-        {/* ── Main Content ── */}
-        <main className="tp-main">
+        {/* Main Content */}
+        <section className="team-content">
+          <div className="container mx-auto px-4 py-12">
 
-          {/* Loading */}
-          {loading && (
-            <VigicaLoader variant="inline" size="lg" text="Loading team members..." />
-          )}
 
-          {/* Error */}
-          {!loading && error && (
-            <div className="tp-error">
-              <p>{error}</p>
-              <button onClick={fetchTeamByCategory} className="tp-retry-btn">
-                Try Again
-              </button>
-            </div>
-          )}
+            {/* Loading State */}
+            {loading && (
+              <VigicaLoader
+                variant="inline"
+                size="lg"
+                text="Loading team members..."
+              />
+            )}
 
-          {/* Empty */}
-          {!loading && !error && allMembers.length === 0 && (
-            <div className="tp-empty">No team members found.</div>
-          )}
+            {/* Error State */}
+            {error && (
+              <div className="error-container">
+                <p>{error}</p>
+                <button onClick={fetchTeamByCategory} className="retry-btn">
+                  Try Again
+                </button>
+              </div>
+            )}
 
-          {/* Categories View */}
-          {!loading && !error && viewMode === "categories" && categorizedTeam.length > 0 && (
-            <div>
-              {categorizedTeam.map((item) => {
-                const category = item.category;
-                const categoryId = category?.id || "uncategorized";
-                const isCollapsed = collapsedCategories[categoryId];
+            {/* Empty State */}
+            {!loading && !error && allMembers.length === 0 && (
+              <div className="empty-container">
+                <p>No team members found.</p>
+              </div>
+            )}
 
-                return (
-                  <div key={categoryId} className="tp-cat-section">
-                    <div className="tp-cat-header" onClick={() => toggleCategory(categoryId)}>
-                      <div className="tp-cat-header-left">
-                        <div className="tp-cat-icon">
-                          {category?.icon || "👥"}
-                        </div>
-                        <div>
-                          <p className="tp-cat-name" style={{ color: category?.color || "#0f2057" }}>
-                            {category?.name || "Team Members"}
-                          </p>
-                          {category?.description && (
-                            <p className="tp-cat-desc">{category.description}</p>
-                          )}
-                        </div>
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        {item.members?.length > 0 && (
-                          <span className="tp-cat-pill">{item.members.length} members</span>
-                        )}
-                        <button className="tp-collapse-btn">
-                          {isCollapsed ? <FaChevronDown size={12} /> : <FaChevronUp size={12} />}
-                        </button>
-                      </div>
-                    </div>
+            {/* Categories View */}
+            {!loading &&
+              !error &&
+              viewMode === "categories" &&
+              categorizedTeam.length > 0 && (
+                <div className="categories-container">
+                  {categorizedTeam.map((item) => {
+                    const category = item.category;
+                    const categoryId = category?.id || "uncategorized";
 
-                    <AnimatePresence>
-                      {!isCollapsed && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          style={{ overflow: "hidden" }}
+                    return (
+                      <div key={categoryId} className="category-section mb-10">
+                        {/* Category Header */}
+                        <div
+                          className="category-header flex items-center justify-between cursor-pointer p-4 bg-gray-100 rounded-lg mb-4 hover:bg-gray-200 transition-colors"
+                          onClick={() => toggleCategory(categoryId)}
                         >
-                          {item.members?.length > 0 ? (
-                            <div className="tp-grid">
-                              {item.members.map((member, i) => (
-                                <TeamMemberCard key={member.id} member={member} index={i} />
-                              ))}
+                          <div className="flex items-center gap-3">
+                            {category?.icon && (
+                              <span className="category-icon text-2xl">
+                                {category.icon}
+                              </span>
+                            )}
+                            <div>
+                              <h2
+                                className="text-xl font-bold"
+                                style={{ color: category?.color || "#1a1a2e" }}
+                              >
+                                {category?.name || "Other"}
+                              </h2>
+                              {category?.description && (
+                                <p className="text-gray-600 text-sm">
+                                  {category.description}
+                                </p>
+                              )}
                             </div>
-                          ) : (
-                            <div className="tp-cat-empty">No members in this category yet.</div>
-                          )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+                          </div>
+                          <button className="collapse-btn p-2">
+                            {collapsedCategories[categoryId] ? (
+                              <FaChevronDown className="text-gray-500" />
+                            ) : (
+                              <FaChevronUp className="text-gray-500" />
+                            )}
+                          </button>
+                        </div>
 
-          {/* All Members View */}
-          {!loading && !error && viewMode === "all" && allMembers.length > 0 && (
-            <div className="tp-grid">
-              {allMembers.map((member, i) => (
-                <TeamMemberCard key={member.id} member={member} index={i} />
-              ))}
-            </div>
-          )}
-        </main>
+                        {/* Category Members */}
+                        <AnimatePresence>
+                          {!collapsedCategories[categoryId] &&
+                            item.members?.length > 0 && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                <motion.div
+                                  className="team-grid"
+                                  variants={containerVariants}
+                                  initial="hidden"
+                                  animate="visible"
+                                >
+                                  {item.members.map((member) => (
+                                    <TeamMemberCard
+                                      key={member.id}
+                                      member={member}
+                                      cardVariants={cardVariants}
+                                      getImageUrl={getImageUrl}
+                                      defaultProfile={defaultProfile}
+                                    />
+                                  ))}
+                                </motion.div>
+                              </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {/* Empty category message */}
+                        {!collapsedCategories[categoryId] &&
+                          (!item.members || item.members.length === 0) && (
+                            <p className="text-gray-500 text-center py-4">
+                              No team members in this category yet.
+                            </p>
+                          )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+            {/* All Members View */}
+            {!loading &&
+              !error &&
+              viewMode === "all" &&
+              allMembers.length > 0 && (
+                <motion.div
+                  className="team-grid"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {allMembers.map((member) => (
+                    <TeamMemberCard
+                      key={member.id}
+                      member={member}
+                      cardVariants={cardVariants}
+                      getImageUrl={getImageUrl}
+                      defaultProfile={defaultProfile}
+                    />
+                  ))}
+                </motion.div>
+              )}
+          </div>
+        </section>
 
         {/* Back to Home */}
         <Link to="/" className="tp-back">
