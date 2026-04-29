@@ -2,133 +2,520 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FaLinkedin,
-  FaTwitter,
-  FaFacebook,
-  FaInstagram,
-  FaArrowLeft,
-  FaCalendarAlt,
-  FaChevronDown,
-  FaChevronUp,
+  FaLinkedin, FaTwitter, FaFacebook, FaInstagram,
+  FaArrowLeft, FaCalendarAlt, FaChevronDown, FaChevronUp,
 } from "react-icons/fa";
 import { teamApi } from "../utils/teamApi";
 import Header from "../components/landing/Header";
 import VigicaLoader from "../components/shared/VigicaLoader";
-import "../styles/TeamPage.css";
 
-// Default profile image
 const defaultProfile = "/default-profile.jpg";
 
-// Vigica company social links — used as fallback when a member hasn't set their own
 const VIGICA_SOCIALS = {
-  linkedin:
-    "https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true",
+  linkedin: "https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true",
   twitter: "https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09",
   facebook: "https://www.facebook.com/profile.php?id=61587336548001",
   instagram: "https://www.instagram.com/vigica_consult?igsh=MXYzNmR3ZjZ3c3V2Zw==",
 };
 
-// Base URL for media files (Django server)
-const MEDIA_BASE_URL = import.meta.env.PROD
-  ? "" // Production: Cloudinary returns full URLs
-  : "http://127.0.0.1:8000"; // Development: Django local server
+const MEDIA_BASE_URL = import.meta.env.PROD ? "" : "http://127.0.0.1:8000";
 
-// Helper to get full image URL
 const getImageUrl = (url) => {
   if (!url) return defaultProfile;
-  // If it's already a full URL (Cloudinary), return as-is
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
-  // Otherwise, prepend the Django server URL
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
   return `${MEDIA_BASE_URL}${url}`;
 };
 
-// Team Member Card Component
-const TeamMemberCard = ({
-  member,
-  cardVariants,
-  getImageUrl,
-  defaultProfile,
-}) => (
-  <motion.div
-    className="team-card"
-    variants={cardVariants}
-    whileHover={{ y: -5, transition: { duration: 0.2 } }}
-  >
-    {member.is_featured && <div className="featured-badge">Featured</div>}
+// ─── Styles ───────────────────────────────────────────
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');
 
-    <Link to={`/team/${member.id}`} className="card-image">
-      <img
-        src={getImageUrl(member.profile_picture_url)}
-        alt={member.full_name}
-        onError={(e) => {
-          e.target.src = defaultProfile;
-        }}
-      />
-    </Link>
+  .tp-root {
+    min-height: 100vh;
+    background: #f8f9fc;
+    font-family: 'DM Sans', sans-serif;
+  }
 
-    <div className="card-content">
-      <h3 className="member-name">{member.full_name}</h3>
-      <p className="member-position">{member.position}</p>
-      {member.department && (
-        <p className="member-department">{member.department}</p>
-      )}
-      {member.category_name && (
-        <p className="member-category text-sm text-blue-600">
-          {member.category_name}
-        </p>
-      )}
-      <p className="member-bio">{member.short_bio}</p>
+  /* ── Hero ── */
+  .tp-hero {
+    position: relative;
+    min-height: 52vh;
+    display: flex;
+    align-items: flex-end;
+    background: linear-gradient(135deg, #0f2057 0%, #1e3a8a 55%, #2563eb 100%);
+    overflow: hidden;
+    padding: 0 2rem 4rem;
+  }
+  .tp-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(254,208,22,0.12) 0%, transparent 50%);
+  }
+  .tp-hero-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .tp-hero-inner {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .tp-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(254,208,22,0.15);
+    border: 1px solid rgba(254,208,22,0.3);
+    color: #fed016;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+  .tp-hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.08;
+    margin: 0 0 16px;
+    max-width: 640px;
+  }
+  .tp-hero-title em {
+    font-style: italic;
+    color: #fed016;
+  }
+  .tp-hero-sub {
+    color: rgba(255,255,255,0.65);
+    font-size: 17px;
+    font-weight: 300;
+    max-width: 420px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .tp-hero-actions {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    gap: 12px;
+  }
+  .tp-book-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fed016;
+    color: #0f2057;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tp-book-btn:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
 
-      {/* Social Links */}
-      <div className="social-links">
-        <a
-          href={member.linkedin_url || VIGICA_SOCIALS.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-link linkedin"
-        >
-          <FaLinkedin />
-        </a>
-        <a
-          href={member.twitter_url || VIGICA_SOCIALS.twitter}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-link twitter"
-        >
-          <FaTwitter />
-        </a>
-        <a
-          href={member.facebook_url || VIGICA_SOCIALS.facebook}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-link facebook"
-        >
-          <FaFacebook />
-        </a>
-        <a
-          href={member.instagram_url || VIGICA_SOCIALS.instagram}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="social-link instagram"
-        >
-          <FaInstagram />
-        </a>
-      </div>
+  /* ── Toolbar ── */
+  .tp-toolbar {
+    background: #fff;
+    border-bottom: 1px solid #e8eaf0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 0 2rem;
+  }
+  .tp-toolbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 56px;
+  }
+  .tp-tab {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    border: none;
+    background: none;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+  .tp-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #2563eb;
+    transform: scaleX(0);
+    transition: transform 0.2s;
+    border-radius: 2px 2px 0 0;
+  }
+  .tp-tab.active { color: #2563eb; }
+  .tp-tab.active::after { transform: scaleX(1); }
+  .tp-tab:hover { color: #2563eb; }
+  .tp-count-badge {
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-left: 8px;
+  }
 
-      <Link to={`/team/${member.id}`} className="view-profile-btn">
-        View Profile
+  /* ── Main ── */
+  .tp-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 2rem 80px;
+  }
+
+  /* ── Category Section ── */
+  .tp-cat-section { margin-bottom: 56px; }
+  .tp-cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    background: #fff;
+    border: 1px solid #e8eaf0;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tp-cat-header:hover {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.06);
+  }
+  .tp-cat-header-left { display: flex; align-items: center; gap: 16px; }
+  .tp-cat-icon {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .tp-cat-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #0f2057;
+    margin: 0 0 2px;
+  }
+  .tp-cat-desc {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
+  }
+  .tp-cat-pill {
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 100px;
+  }
+  .tp-collapse-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .tp-collapse-btn:hover { background: #e5e7eb; }
+
+  /* ── Team Grid ── */
+  .tp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  /* ── Member Card ── */
+  .tp-card {
+    background: #fff;
+    border: 1px solid #e8eaf0;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .tp-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 20px 48px rgba(37,99,235,0.12);
+    transform: translateY(-4px);
+  }
+  .tp-card-img-wrap {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #e0e7ff, #dbeafe);
+  }
+  .tp-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .tp-card:hover .tp-card-img-wrap img { transform: scale(1.05); }
+  .tp-featured-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #fed016;
+    color: #0f2057;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    z-index: 2;
+  }
+  .tp-card-socials {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: linear-gradient(to top, rgba(15,32,87,0.85), transparent);
+    transform: translateY(100%);
+    transition: transform 0.3s;
+  }
+  .tp-card:hover .tp-card-socials { transform: translateY(0); }
+  .tp-social-a {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .tp-social-a:hover { background: rgba(255,255,255,0.3); }
+  .tp-card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .tp-card-cat {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #2563eb;
+    margin: 0 0 6px;
+  }
+  .tp-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f2057;
+    margin: 0 0 4px;
+  }
+  .tp-card-position {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0 0 12px;
+    font-weight: 400;
+  }
+  .tp-card-bio {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 0 0 20px;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tp-view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-top: auto;
+  }
+  .tp-view-btn:hover {
+    background: #2563eb;
+    color: #fff;
+  }
+
+  /* ── States ── */
+  .tp-error {
+    text-align: center;
+    padding: 64px 24px;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #fee2e2;
+  }
+  .tp-error p { color: #dc2626; margin-bottom: 16px; font-size: 15px; }
+  .tp-retry-btn {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .tp-retry-btn:hover { background: #1d4ed8; }
+  .tp-empty {
+    text-align: center;
+    padding: 64px 24px;
+    color: #6b7280;
+    font-size: 15px;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px dashed #d1d5db;
+  }
+  .tp-cat-empty {
+    text-align: center;
+    padding: 32px;
+    color: #9ca3af;
+    font-size: 14px;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px dashed #e5e7eb;
+  }
+
+  /* ── Back ── */
+  .tp-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #2563eb;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: #eff6ff;
+    transition: all 0.2s;
+    margin: 0 2rem 40px;
+  }
+  .tp-back:hover { background: #2563eb; color: #fff; }
+
+  @media (max-width: 640px) {
+    .tp-hero { padding: 0 1rem 3rem; min-height: 44vh; }
+    .tp-hero-actions { position: static; margin-top: 24px; }
+    .tp-main { padding: 32px 1rem 60px; }
+    .tp-grid { grid-template-columns: 1fr; }
+    .tp-back { margin: 0 1rem 32px; }
+  }
+`;
+
+// ─── Member Card ──────────────────────────────────────
+const TeamMemberCard = ({ member, index }) => {
+  const cardVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45, delay: index * 0.07 } },
+  };
+
+  return (
+    <motion.div className="tp-card" variants={cardVariants} initial="hidden" animate="visible">
+      {/* Image */}
+      <Link to={`/team/${member.id}`} className="tp-card-img-wrap" style={{ display: "block" }}>
+        {member.is_featured && <div className="tp-featured-badge">⭐ Featured</div>}
+        <img
+          src={getImageUrl(member.profile_picture_url)}
+          alt={member.full_name}
+          onError={(e) => { e.target.src = defaultProfile; }}
+        />
+        {/* Social overlay */}
+        <div className="tp-card-socials" onClick={(e) => e.preventDefault()}>
+          {[
+            { href: member.linkedin_url || VIGICA_SOCIALS.linkedin, icon: <FaLinkedin /> },
+            { href: member.twitter_url || VIGICA_SOCIALS.twitter, icon: <FaTwitter /> },
+            { href: member.facebook_url || VIGICA_SOCIALS.facebook, icon: <FaFacebook /> },
+            { href: member.instagram_url || VIGICA_SOCIALS.instagram, icon: <FaInstagram /> },
+          ].map((s, i) => (
+            <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" className="tp-social-a">
+              {s.icon}
+            </a>
+          ))}
+        </div>
       </Link>
-    </div>
-  </motion.div>
-);
 
+      {/* Body */}
+      <div className="tp-card-body">
+        {member.category_name && (
+          <p className="tp-card-cat">{member.category_name}</p>
+        )}
+        <h3 className="tp-card-name">{member.full_name}</h3>
+        <p className="tp-card-position">{member.position}{member.department ? ` · ${member.department}` : ""}</p>
+        {member.short_bio && <p className="tp-card-bio">{member.short_bio}</p>}
+        <Link to={`/team/${member.id}`} className="tp-view-btn">
+          View Profile →
+        </Link>
+      </div>
+    </motion.div>
+  );
+};
+
+// ─── Main Page ────────────────────────────────────────
 function TeamPage() {
   const [categorizedTeam, setCategorizedTeam] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState("categories"); // "categories" or "all"
+  const [viewMode, setViewMode] = useState("categories");
   const [collapsedCategories, setCollapsedCategories] = useState({});
 
   useEffect(() => {
@@ -138,10 +525,10 @@ function TeamPage() {
   const fetchTeamByCategory = async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await teamApi.getTeamMembersByCategory();
       setCategorizedTeam(data);
 
-      // Initialize collapsed state based on category settings
       const initialCollapsed = {};
       data.forEach((item) => {
         if (item.category) {
@@ -152,244 +539,208 @@ function TeamPage() {
       setCollapsedCategories(initialCollapsed);
     } catch (err) {
       console.error("Error fetching team members:", err);
-      setError("Failed to load team members. Please try again later.");
+      setError("Failed to load team members. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const toggleCategory = (categoryId) => {
-    setCollapsedCategories((prev) => ({
-      ...prev,
-      [categoryId]: !prev[categoryId],
-    }));
+    setCollapsedCategories((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }));
   };
 
-  // Get all team members from all categories
   const allMembers = categorizedTeam.flatMap((item) => item.members || []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-      },
-    },
-  };
-
   return (
-    <div className="team-page">
-      <Header />
+    <>
+      <style>{styles}</style>
+      <div className="tp-root" style={{ paddingTop: "70px" }}>
+        <Header />
 
-      {/* Hero Section */}
-      <section className="team-hero">
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            Meet Our Team
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            Dedicated professionals committed to your success
-          </motion.p>
-        </div>
-      </section>
+        {/* ── Hero ── */}
+        <section className="tp-hero">
+          <div className="tp-hero-dots" />
+          <div className="tp-hero-inner">
 
-      {/* Main Content */}
-      <section className="team-content">
-        <div className="container mx-auto px-4 py-12">
-          {/* View Mode Toggle & Actions Bar */}
-          <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
-            <div className="view-toggle flex gap-2">
-              <button
-                className={`filter-btn ${viewMode === "categories" ? "active" : ""}`}
-                onClick={() => setViewMode("categories")}
-              >
-                By Category
-              </button>
-              <button
-                className={`filter-btn ${viewMode === "all" ? "active" : ""}`}
-                onClick={() => setViewMode("all")}
-              >
-                All Members
-              </button>
-            </div>
+            {/* ✅ No outer motion wrapper — children animate on their own */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="tp-hero-eyebrow"
+            >
+              <span>👥</span> The People Behind Vigica
+            </motion.div>
 
-            <div className="action-buttons">
-              <Link to="/book" className="book-btn">
-                <FaCalendarAlt className="mr-2" />
-                Book Appointment
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              style={{
+                fontFamily: "'Segoe UI', system-ui, sans-serif",
+                fontSize: "clamp(40px, 5vw, 64px)",
+                fontWeight: 700,
+                lineHeight: 1.12,
+                color: "#fff",
+                maxWidth: 720,
+                marginBottom: 24,
+                letterSpacing: "-0.5px",
+              }}
+            >
+              Meet Our <em style={{ fontStyle: "italic", color: "#fed016" }}>Expert</em><br />
+              Team
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              style={{
+                fontSize: 18,
+                fontWeight: 300,
+                lineHeight: 1.7,
+                color: "rgba(255,255,255,.72)",
+                maxWidth: 520,
+                marginBottom: 36,
+              }}
+            >
+              Dedicated professionals committed to opening doors to global opportunities.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.45 }}
+            >
+              <Link to="/book" className="tp-book-btn">
+                <FaCalendarAlt /> Book Appointment
               </Link>
-            </div>
-          </div>
+            </motion.div>
 
-          {/* Loading State */}
+          </div>
+        </section>
+
+        {/* ── Sticky Toolbar ── */}
+        <div className="tp-toolbar">
+          <div className="tp-toolbar-inner">
+            <button
+              className={`tp-tab ${viewMode === "categories" ? "active" : ""}`}
+              onClick={() => setViewMode("categories")}
+            >
+              By Category
+            </button>
+            <button
+              className={`tp-tab ${viewMode === "all" ? "active" : ""}`}
+              onClick={() => setViewMode("all")}
+            >
+              All Members
+              {allMembers.length > 0 && (
+                <span className="tp-count-badge">{allMembers.length}</span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* ── Main Content ── */}
+        <main className="tp-main">
+
+          {/* Loading */}
           {loading && (
-            <VigicaLoader
-              variant="inline"
-              size="lg"
-              text="Loading team members..."
-            />
+            <VigicaLoader variant="inline" size="lg" text="Loading team members..." />
           )}
 
-          {/* Error State */}
-          {error && (
-            <div className="error-container">
+          {/* Error */}
+          {!loading && error && (
+            <div className="tp-error">
               <p>{error}</p>
-              <button onClick={fetchTeamByCategory} className="retry-btn">
+              <button onClick={fetchTeamByCategory} className="tp-retry-btn">
                 Try Again
               </button>
             </div>
           )}
 
-          {/* Empty State */}
+          {/* Empty */}
           {!loading && !error && allMembers.length === 0 && (
-            <div className="empty-container">
-              <p>No team members found.</p>
-            </div>
+            <div className="tp-empty">No team members found.</div>
           )}
 
           {/* Categories View */}
-          {!loading &&
-            !error &&
-            viewMode === "categories" &&
-            categorizedTeam.length > 0 && (
-              <div className="categories-container">
-                {categorizedTeam.map((item) => {
-                  const category = item.category;
-                  const categoryId = category?.id || "uncategorized";
+          {!loading && !error && viewMode === "categories" && categorizedTeam.length > 0 && (
+            <div>
+              {categorizedTeam.map((item) => {
+                const category = item.category;
+                const categoryId = category?.id || "uncategorized";
+                const isCollapsed = collapsedCategories[categoryId];
 
-                  return (
-                    <div key={categoryId} className="category-section mb-10">
-                      {/* Category Header */}
-                      <div
-                        className="category-header flex items-center justify-between cursor-pointer p-4 bg-gray-100 rounded-lg mb-4 hover:bg-gray-200 transition-colors"
-                        onClick={() => toggleCategory(categoryId)}
-                      >
-                        <div className="flex items-center gap-3">
-                          {category?.icon && (
-                            <span className="category-icon text-2xl">
-                              {category.icon}
-                            </span>
-                          )}
-                          <div>
-                            <h2
-                              className="text-xl font-bold"
-                              style={{ color: category?.color || "#1a1a2e" }}
-                            >
-                              {category?.name || "Other"}
-                            </h2>
-                            {category?.description && (
-                              <p className="text-gray-600 text-sm">
-                                {category.description}
-                              </p>
-                            )}
-                          </div>
+                return (
+                  <div key={categoryId} className="tp-cat-section">
+                    <div className="tp-cat-header" onClick={() => toggleCategory(categoryId)}>
+                      <div className="tp-cat-header-left">
+                        <div className="tp-cat-icon">
+                          {category?.icon || "👥"}
                         </div>
-                        <button className="collapse-btn p-2">
-                          {collapsedCategories[categoryId] ? (
-                            <FaChevronDown className="text-gray-500" />
-                          ) : (
-                            <FaChevronUp className="text-gray-500" />
+                        <div>
+                          <p className="tp-cat-name" style={{ color: category?.color || "#0f2057" }}>
+                            {category?.name || "Team Members"}
+                          </p>
+                          {category?.description && (
+                            <p className="tp-cat-desc">{category.description}</p>
                           )}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        {item.members?.length > 0 && (
+                          <span className="tp-cat-pill">{item.members.length} members</span>
+                        )}
+                        <button className="tp-collapse-btn">
+                          {isCollapsed ? <FaChevronDown size={12} /> : <FaChevronUp size={12} />}
                         </button>
                       </div>
-
-                      {/* Category Members */}
-                      <AnimatePresence>
-                        {!collapsedCategories[categoryId] &&
-                          item.members?.length > 0 && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: "auto" }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              <motion.div
-                                className="team-grid"
-                                variants={containerVariants}
-                                initial="hidden"
-                                animate="visible"
-                              >
-                                {item.members.map((member) => (
-                                  <TeamMemberCard
-                                    key={member.id}
-                                    member={member}
-                                    cardVariants={cardVariants}
-                                    getImageUrl={getImageUrl}
-                                    defaultProfile={defaultProfile}
-                                  />
-                                ))}
-                              </motion.div>
-                            </motion.div>
-                          )}
-                      </AnimatePresence>
-
-                      {/* Empty category message */}
-                      {!collapsedCategories[categoryId] &&
-                        (!item.members || item.members.length === 0) && (
-                          <p className="text-gray-500 text-center py-4">
-                            No team members in this category yet.
-                          </p>
-                        )}
                     </div>
-                  );
-                })}
-              </div>
-            )}
+
+                    <AnimatePresence>
+                      {!isCollapsed && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          style={{ overflow: "hidden" }}
+                        >
+                          {item.members?.length > 0 ? (
+                            <div className="tp-grid">
+                              {item.members.map((member, i) => (
+                                <TeamMemberCard key={member.id} member={member} index={i} />
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="tp-cat-empty">No members in this category yet.</div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* All Members View */}
-          {!loading &&
-            !error &&
-            viewMode === "all" &&
-            allMembers.length > 0 && (
-              <motion.div
-                className="team-grid"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                {allMembers.map((member) => (
-                  <TeamMemberCard
-                    key={member.id}
-                    member={member}
-                    cardVariants={cardVariants}
-                    getImageUrl={getImageUrl}
-                    defaultProfile={defaultProfile}
-                  />
-                ))}
-              </motion.div>
-            )}
-        </div>
-      </section>
+          {!loading && !error && viewMode === "all" && allMembers.length > 0 && (
+            <div className="tp-grid">
+              {allMembers.map((member, i) => (
+                <TeamMemberCard key={member.id} member={member} index={i} />
+              ))}
+            </div>
+          )}
+        </main>
 
-      {/* Back to Home */}
-      <div className="back-home-container">
-        <Link to="/" className="back-home-btn">
-          <FaArrowLeft className="mr-2" />
-          Back to Home
+        {/* Back to Home */}
+        <Link to="/" className="tp-back">
+          <FaArrowLeft /> Back to Home
         </Link>
       </div>
-    </div>
+    </>
   );
 }
 
