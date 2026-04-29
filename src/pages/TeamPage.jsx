@@ -264,6 +264,7 @@ const styles = `
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
+    justify-content: center; 
   }
 
   /* ── Member Card ── */
@@ -503,7 +504,7 @@ const TeamMemberCard = ({ member, index }) => {
       custom={index}
     >
       {/* Image */}
-      <Link to={`/team/${member.id}`} className="tp-card-img-wrap" style={{ display: "block" }}>
+      <Link to={`/team/${member.id}`} className="tp-card-img-wrap">
         {member.is_featured && <div className="tp-featured-badge">⭐ Featured</div>}
         <img
           src={getImageUrl(member.profile_picture_url)}
