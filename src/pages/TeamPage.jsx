@@ -86,13 +86,16 @@ const styles = `
     margin-bottom: 20px;
   }
   .tp-hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(40px, 6vw, 72px);
-    font-weight: 700;
-    color: #fff;
-    line-height: 1.08;
-    margin: 0 0 16px;
-    max-width: 640px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: clamp(28px, 5vw, 64px); /* ← smaller min for mobile */
+  font-weight: 700;
+  line-height: 1.12;
+  color: #fff;
+  max-width: 720px;
+  width: 100%;        /* ← full width on mobile */
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+}
   }
   .tp-hero-title em {
     font-style: italic;
@@ -483,6 +486,16 @@ const styles = `
     .tp-grid { grid-template-columns: 1fr; }
     .tp-back { margin: 0 1rem 32px; }
   }
+    @media (max-width: 640px) {
+  .tp-hero-title {
+    font-size: 28px;
+    letter-spacing: -0.3px;
+    margin-bottom: 16px;
+  }
+  .tp-hero-inner > div {
+    max-width: 100% !important;
+  }
+}
 `;
 
 // FIX: Defined containerVariants and cardVariants at module level
@@ -604,24 +617,13 @@ function TeamPage() {
             <div style={{ maxWidth: "720px" }}>
 
               <motion.h1
+                className="tp-hero-title"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                style={{
-                  fontFamily: "'Segoe UI', system-ui, sans-serif",
-                  fontSize: "clamp(40px, 5vw, 64px)",
-                  fontWeight: 700,
-                  lineHeight: 1.12,
-                  color: "#fff",
-                  maxWidth: 720,
-                  marginBottom: 24,
-                  letterSpacing: "-0.5px",
-                }}
               >
                 Meet Our{" "}
-                <em style={{ fontStyle: "italic", color: "#fed016" }}>
-                  Expert
-                </em>
+                <em style={{ fontStyle: "italic", color: "#fed016" }}>Expert</em>
                 <br />
                 Team
               </motion.h1>

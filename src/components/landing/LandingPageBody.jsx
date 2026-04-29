@@ -381,11 +381,11 @@ export default function Home() {
             <div className="absolute inset-0 hero-bg">
               <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(18, 37, 60, 0.92) 45%, rgba(18, 37, 60, 0.2) 100%)" }} />
             </div>
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-32 pb-16">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20 pb-16 md:pt-32">
               <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-2xl">
                 <div className="flex items-start justify-between gap-8">
                   <motion.h1
-                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", fontSize: "clamp(40px,5vw,64px)", fontWeight: 700, lineHeight: 1.12, color: "#fff", maxWidth: 720, marginBottom: 24, letterSpacing: "-0.5px" }}
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", fontSize: "clamp(28px,5vw,64px)", fontWeight: 700, lineHeight: 1.12, color: "#fff", maxWidth: 720, marginBottom: 24, letterSpacing: "-0.5px" }}
                     initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
                     Your trusted pathway to{" "}
                     <em style={{ fontStyle: "italic", color: "#fed016" }}>GLOBAL OPPORTUNITIES</em>
@@ -398,7 +398,7 @@ export default function Home() {
                     </Link>
                   </motion.div>
                 </div>
-                <motion.p className="text-xl md:text-2xl text-blue-100 mb-10 leading-relaxed" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
+                <motion.p className="text-lg md:text-2xl text-blue-100 mb-10 leading-relaxed" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}>
                   A multidimensional consultancy firm offering specialized services in international education recruitment, advisory, programme coordination, travel logistics, and accommodation solutions.
                 </motion.p>
                 <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }} className="md:hidden">
