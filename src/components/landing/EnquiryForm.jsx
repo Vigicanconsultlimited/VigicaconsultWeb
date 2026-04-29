@@ -119,11 +119,8 @@ const COUNTRY_OPTIONS = [
   { value: "Turkmenistan", label: "Turkmenistan" },
   { value: "Ukraine", label: "Ukraine" },
   { value: "UnitedArabEmirates", label: "United Arab Emirates" },
-
-  // Always last
   { value: "AnyOther", label: "Any Other" },
 ];
-
 
 // ─── Toast ───────────────────────────────────────────
 
@@ -141,7 +138,7 @@ const EMPTY_FORM = {
   EmailAddress: "",
   MobileNumber: "",
   IeltsStatus: "",
-  EnglishQualificationType: "",
+  QualificationType: "",
   CountryCode: "",
   StudyDestination: "",
   CurrentCountryOfResidence: "",
@@ -168,7 +165,7 @@ export default function EnquiryForm() {
     }
 
     if (!formData.AgreeToPrivacyPolicy) {
-      Toast.fire({ icon: "error", title: "You must agree to privacy policy" });
+      Toast.fire({ icon: "error", title: "You must agree to the privacy policy" });
       return;
     }
 
@@ -181,7 +178,7 @@ export default function EnquiryForm() {
       fd.append("EmailAddress", formData.EmailAddress);
       fd.append("MobileNumber", formData.MobileNumber);
       fd.append("IeltsStatus", formData.IeltsStatus);
-      fd.append("EnglishQualificationType", formData.EnglishQualificationType);
+      fd.append("QualificationType", formData.QualificationType); // ← fixed field name
       fd.append("CountryCode", formData.CountryCode);
       fd.append("StudyDestination", formData.StudyDestination);
       fd.append("CurrentCountryOfResidence", formData.CurrentCountryOfResidence);
@@ -197,25 +194,30 @@ export default function EnquiryForm() {
       fd.append("QualificationTypeDisplay", "");
 
       await axios.post(
-        "https://vigica-001-site1.qtempurl.com/api/Enquiry",
+        "https://vigica-001-site1.qtempurl.com/api/Enquiry/student",
         fd
       );
 
-      Toast.fire({ icon: "success", title: "Enquiry submitted!" });
+      Toast.fire({ icon: "success", title: "Enquiry submitted successfully!" });
       setFormData(EMPTY_FORM);
 
     } catch (error) {
+      // ── ADD THESE LOGS ──────────────────────────────
+      console.log("❌ Full error object:", error);
+      console.log("❌ Response status:", error.response?.status);
+      console.log("❌ Response data:", error.response?.data);
+      console.log("❌ Response headers:", error.response?.headers);
+      console.log("❌ Request that was sent:", error.config);
+      // ────────────────────────────────────────────────
+
       const errors = error.response?.data?.errors;
 
       if (errors) {
         Object.entries(errors).forEach(([key, value]) => {
-          Toast.fire({
-            icon: "error",
-            title: `${key}: ${value.join(", ")}`,
-          });
+          Toast.fire({ icon: "error", title: `${key}: ${value.join(", ")}` });
         });
       } else {
-        Toast.fire({ icon: "error", title: "Submission failed" });
+        Toast.fire({ icon: "error", title: "Submission failed. Please try again." });
       }
     } finally {
       setIsSubmitting(false);
@@ -225,16 +227,15 @@ export default function EnquiryForm() {
   return (
     <Card className="max-w-lg mx-auto backdrop-blur-xl bg-white/70 border border-white/30 shadow-2xl rounded-2xl">
       <CardContent className="p-8">
-
         <form onSubmit={handleSubmit} className="space-y-6">
 
           {/* Title */}
           <div>
             <h2 className="text-2xl font-semibold">Make an Enquiry</h2>
-            <p className="text-sm text-gray-500">We’ll get back to you shortly</p>
+            <p className="text-sm text-gray-500">We'll get back to you shortly</p>
           </div>
 
-          {/* Inputs */}
+          {/* Name */}
           <Input
             placeholder="Full Name"
             className="rounded-lg"
@@ -242,6 +243,7 @@ export default function EnquiryForm() {
             onChange={(e) => set("FullName", e.target.value)}
           />
 
+          {/* Email */}
           <Input
             type="email"
             placeholder="Email Address"
@@ -250,6 +252,7 @@ export default function EnquiryForm() {
             onChange={(e) => set("EmailAddress", e.target.value)}
           />
 
+          {/* Mobile */}
           <Input
             placeholder="Mobile Number"
             className="rounded-lg"
@@ -257,7 +260,7 @@ export default function EnquiryForm() {
             onChange={(e) => set("MobileNumber", e.target.value)}
           />
 
-          {/* 🔥 UNIFORM DROPDOWNS (FIXED HERE) */}
+          {/* Dropdowns */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             <select
@@ -273,8 +276,8 @@ export default function EnquiryForm() {
 
             <select
               className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white/60 focus:outline-none focus:border-black"
-              value={formData.EnglishQualificationType}
-              onChange={(e) => set("EnglishQualificationType", e.target.value)}
+              value={formData.QualificationType}
+              onChange={(e) => set("QualificationType", e.target.value)}
             >
               <option value="">Qualification</option>
               {QUALIFICATION_TYPE_OPTIONS.map((o) => (
@@ -304,7 +307,7 @@ export default function EnquiryForm() {
               ))}
             </select>
 
-            {/* Full width row */}
+            {/* Full width */}
             <select
               className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white/60 focus:outline-none focus:border-black md:col-span-2"
               value={formData.CurrentCountryOfResidence}
@@ -318,6 +321,7 @@ export default function EnquiryForm() {
 
           </div>
 
+          {/* Message */}
           <Textarea
             placeholder="Message"
             className="rounded-lg"
@@ -325,6 +329,7 @@ export default function EnquiryForm() {
             onChange={(e) => set("Message", e.target.value)}
           />
 
+          {/* Privacy Policy */}
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -334,6 +339,7 @@ export default function EnquiryForm() {
             I agree to privacy policy
           </label>
 
+          {/* Submit */}
           <Button
             type="submit"
             disabled={isSubmitting}
