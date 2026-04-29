@@ -38,7 +38,7 @@ const styles = `
 
   .tp-hero {
   position: relative;
-  min-height: 52vh;
+  min-height: 80vh;
   display: flex;
   align-items: flex-end;
   background: 

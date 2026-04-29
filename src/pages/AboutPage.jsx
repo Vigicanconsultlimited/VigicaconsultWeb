@@ -69,7 +69,7 @@ const CLIENT_TESTIMONIALS = [
 
 const EXPERTS = [
   { id: 1, name: "Dr. Ikporo Stephen", title: "Secretary, Ebonyi State Scholarship Board", institution: "Ebonyi State Government", photo: DrSteve, remark: "VIGICA CONSULT LIMITED stands out in the Nigerian consulting space for its holistic approach. They don't just place students they prepare them for global success." },
-  { id: 2, name: "Puspa Mistry", title: "Regional Manager (Middle East, Africa & Europe) International Recruitment and Partnerships", institution: "Leeds Beckett University", photo: Puspa, remark: "We have a strong partnership with VIGICA CONSULT LIMITED that has produced a long lasting results and we are currently working on new projects" },
+  { id: 2, name: "Puspa Mistry", title: "Regional Manager (Middle East, Africa & Europe) International Recruitment and Partnerships", institution: "Leeds Beckett University", photo: Puspa, remark: "We have a strong partnership with VIGICA CONSULT LIMITED that has produced a long lasting results and we are currently working on new projects." },
 ];
 
 
@@ -344,7 +344,7 @@ export default function AboutPage() {
                       { num: "128", label: "Ebonyi scholars placed at the University of Greater Manchester", accent: false },
                       { num: "80%", label: "Graduated with Distinction", accent: true },
                       { num: "20%", label: "Graduated with Merit", accent: false },
-                      { num: "1", label: "Corporate partnership coordinating all scholar placements", accent: false },
+                      { num: "5", label: "Corporate partnership coordinating all scholar placements", accent: false },
                     ].map((s, i) => (
                       <motion.div key={i} variants={fadeUp} className={`ap-stat${s.accent ? " ap-stat--accent" : ""}`}>
                         <div className="ap-stat-num">{s.num}</div>
