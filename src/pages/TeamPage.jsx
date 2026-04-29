@@ -262,7 +262,7 @@ const styles = `
   /* ── Team Grid ── */
   .tp-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+     grid-template-columns: repeat(auto-fill, minmax(280px, 320px));
     gap: 24px;
     justify-content: center; 
   }
