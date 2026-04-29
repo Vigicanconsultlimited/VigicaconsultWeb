@@ -283,16 +283,24 @@ const styles = `
     transform: translateY(-4px);
   }
   .tp-card-img-wrap {
-    position: relative;
-    height: 220px;
-    overflow: hidden;
-    background: linear-gradient(135deg, #e0e7ff, #dbeafe);
+  position: relative;
+  height: 160px;        /* reduced from 220px */
+  overflow: hidden;
+  background: linear-gradient(135deg, #e0e7ff, #dbeafe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
   }
   .tp-card-img-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s;
+  width: 120px;         /* fixed width instead of 100% */
+  height: 120px;        /* fixed height */
+  object-fit: cover;
+  object-position: top; /* keeps face in frame */
+  border-radius: 50%;   /* circle avatar */
+  transition: transform 0.5s;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   }
   .tp-card:hover .tp-card-img-wrap img { transform: scale(1.05); }
   .tp-featured-badge {
