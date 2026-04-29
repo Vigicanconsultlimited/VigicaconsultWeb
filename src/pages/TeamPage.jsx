@@ -265,11 +265,11 @@ const styles = `
 
   /* ── Team Grid ── */
   .tp-grid {
-    display: grid;
-     grid-template-columns: repeat(auto-fill, minmax(280px, 320px));
-    gap: 24px;
-    justify-content: center; 
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+  gap: 24px;
+  justify-content: center;
+}
 
   /* ── Member Card ── */
   .tp-card {
