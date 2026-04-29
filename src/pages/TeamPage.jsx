@@ -511,20 +511,21 @@ const TeamMemberCard = ({ member, index }) => {
           alt={member.full_name}
           onError={(e) => { e.target.src = defaultProfile; }}
         />
-        {/* Social overlay */}
-        <div className="tp-card-socials" onClick={(e) => e.preventDefault()}>
-          {[
-            { href: member.linkedin_url || VIGICA_SOCIALS.linkedin, icon: <FaLinkedin /> },
-            { href: member.twitter_url || VIGICA_SOCIALS.twitter, icon: <FaTwitter /> },
-            { href: member.facebook_url || VIGICA_SOCIALS.facebook, icon: <FaFacebook /> },
-            { href: member.instagram_url || VIGICA_SOCIALS.instagram, icon: <FaInstagram /> },
-          ].map((s, i) => (
-            <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" className="tp-social-a">
-              {s.icon}
-            </a>
-          ))}
-        </div>
       </Link>
+
+      {/* Social Icons */}
+      <div className="tp-card-socials">
+        {[
+          { href: member.linkedin_url || VIGICA_SOCIALS.linkedin, icon: <FaLinkedin /> },
+          { href: member.twitter_url || VIGICA_SOCIALS.twitter, icon: <FaTwitter /> },
+          { href: member.facebook_url || VIGICA_SOCIALS.facebook, icon: <FaFacebook /> },
+          { href: member.instagram_url || VIGICA_SOCIALS.instagram, icon: <FaInstagram /> },
+        ].map((s, i) => (
+          <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" className="tp-social-a">
+            {s.icon}
+          </a>
+        ))}
+      </div>
 
       {/* Body */}
       <div className="tp-card-body">
