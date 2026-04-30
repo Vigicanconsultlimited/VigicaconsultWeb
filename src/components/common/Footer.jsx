@@ -13,7 +13,7 @@ const Footer = () => (
             <i className="fa-brands fa-telegram"></i>
           </a>
           <a
-            href="https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true"
+            href="https://www.linkedin.com/company/vigica-consult-limited/about/?https://www.linkedin.com/company/vigica-consult-limited-ng/posts/?feedView=all=true"
             className="footer-social-btn"
           >
             <i className="fa-brands fa-linkedin-in"></i>

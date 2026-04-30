@@ -202,11 +202,10 @@ function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 w-full">
       {/* Contact Bar */}
       <div
-        className={`bg-blue-600 text-white transition-all duration-300 ${
-          scrolled
+        className={`bg-blue-600 text-white transition-all duration-300 ${scrolled
             ? "opacity-0 h-0 py-0 overflow-hidden"
             : "opacity-100 py-1 md:py-2"
-        }`}
+          }`}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           {/* Mobile: two lines, compact, no scrolling */}
@@ -245,7 +244,7 @@ function Header() {
                   <FaLinkedin />
                 </a>
                 <a
-                  href="https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09"
+                  href="https://x.com/vigicaconsult?t=https://www.linkedin.com/company/vigica-consult-limited-ng/posts/?feedView=all-mPotS-MhX4Mw&s=09"
                   className="mc-social"
                   aria-label="Twitter/X"
                   title="Twitter/X"
@@ -370,9 +369,8 @@ function Header() {
 
       {/* Navigation Bar */}
       <nav
-        className={`bg-white backdrop-blur-xl border-b border-gray-100 transition-all duration-300 ${
-          scrolled ? "shadow-lg py-2" : "shadow-sm py-0"
-        }`}
+        className={`bg-white backdrop-blur-xl border-b border-gray-100 transition-all duration-300 ${scrolled ? "shadow-lg py-2" : "shadow-sm py-0"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16">
@@ -399,11 +397,10 @@ function Header() {
                     <Link
                       key={item.id}
                       to={item.to}
-                      className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 no-underline ${
-                        location.pathname === item.to
+                      className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 no-underline ${location.pathname === item.to
                           ? "text-blue-600 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600"
                           : "text-gray-600"
-                      }`}
+                        }`}
                     >
                       {item.label}
                     </Link>
@@ -411,11 +408,10 @@ function Header() {
                     <button
                       key={item.id}
                       onClick={() => scrollToSection(item.id)}
-                      className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 group ${
-                        currentSection === item.id
+                      className={`relative text-sm font-medium px-1 py-2 mx-2 transition-all duration-300 hover:text-blue-600 group ${currentSection === item.id
                           ? "text-blue-600 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600"
                           : "text-gray-600"
-                      }`}
+                        }`}
                     >
                       {item.label}
                       <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
@@ -461,11 +457,10 @@ function Header() {
                     <Link
                       key={item.id}
                       to={item.to}
-                      className={`block w-full text-left px-4 py-2 rounded-lg transition-colors no-underline ${
-                        location.pathname === item.to
+                      className={`block w-full text-left px-4 py-2 rounded-lg transition-colors no-underline ${location.pathname === item.to
                           ? "text-blue-600 bg-blue-50 font-semibold"
                           : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                      }`}
+                        }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item.label}
@@ -474,11 +469,10 @@ function Header() {
                     <button
                       key={item.id}
                       onClick={() => scrollToSection(item.id)}
-                      className={`block w-full text-left px-4 py-2 rounded-lg transition-colors ${
-                        currentSection === item.id
+                      className={`block w-full text-left px-4 py-2 rounded-lg transition-colors ${currentSection === item.id
                           ? "text-blue-600 bg-blue-50 font-semibold"
                           : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                      }`}
+                        }`}
                     >
                       {item.label}
                     </button>
