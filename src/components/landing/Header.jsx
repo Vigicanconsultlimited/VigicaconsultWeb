@@ -244,7 +244,7 @@ function Header() {
                   <FaLinkedin />
                 </a>
                 <a
-                  href="https://x.com/vigicaconsult?t=https://www.linkedin.com/company/vigica-consult-limited-ng/posts/?feedView=all-mPotS-MhX4Mw&s=09"
+                  href="https://www.linkedin.com/company/vigica-consult-limited-ng/posts/?feedView=all"
                   className="mc-social"
                   aria-label="Twitter/X"
                   title="Twitter/X"
