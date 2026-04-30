@@ -85,18 +85,7 @@ const styles = `
     border-radius: 100px;
     margin-bottom: 20px;
   }
-  .tp-hero-title {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  font-size: clamp(28px, 5vw, 64px); /* ← smaller min for mobile */
-  font-weight: 700;
-  line-height: 1.12;
-  color: #fff;
-  max-width: 720px;
-  width: 100%;        /* ← full width on mobile */
-  margin-bottom: 24px;
-  letter-spacing: -0.5px;
-}
-  }
+  
   .tp-hero-title em {
     font-style: italic;
     color: #fed016;
@@ -642,19 +631,11 @@ function TeamPage() {
                 <br />
                 Team
               </motion.h1>
-
               <motion.p
+                className="tp-hero-sub"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                style={{
-                  fontSize: 18,
-                  fontWeight: 300,
-                  lineHeight: 1.7,
-                  color: "rgba(255,255,255,.72)",
-                  maxWidth: 520,
-                  marginBottom: 36,
-                }}
               >
                 Dedicated professionals committed to opening doors to global opportunities.
               </motion.p>
