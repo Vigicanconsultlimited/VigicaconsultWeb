@@ -449,7 +449,7 @@ export default function Home() {
                 <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
                   <Badge className="bg-blue-100 text-blue-700 mb-4 px-3 py-1">About Us</Badge>
                   <h2 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">A Multi-dimensional Consultancy Firm</h2>
-                  <p className="text-gray-600 mb-8 text-lg leading-relaxed">Specialized services in international education recruitment, advisory, programme coordination, travel logistics, and accommodation solutions. We also facilitate transnational partnership and collaboration between institutions. Strategically headquartered in Abuja, Nigeria, we pride ourselves on delivering tailored, high-impact services that meet the dynamic needs of students, institutions, travelers, and corporate partners.</p>
+                  <p className="text-gray-600 mb-8 text-lg leading-relaxed">VIGICA CONSULT LTD, headquartered in Abuja, Nigeria, delivers tailored solutions for students, institutions, travellers, and corporate partners. The company specialises in international student recruitment, guiding applicants from application to arrival, alongside travel logistics and accommodation support. It fosters transnational partnerships to drive innovation and growth, while maintaining a commitment to integrity, efficiency, excellence, and client-focused service across global markets.</p>
                   <Link to="/register" className="text-decoration-none">
                     <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                       Start Your Journey <ArrowRight className="ml-2 w-5 h-5" />
@@ -587,9 +587,9 @@ export default function Home() {
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                 {[
-                  { title: "Student Hostels", image: OrlandoExternal, desc: "Affordable accommodation options specially designed for students near universities." },
-                  { title: "Serviced Apartments", image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=250&fit=crop", desc: "Fully furnished apartments with amenities for short or long-term stays." },
-                  { title: "Student Apartments", image: OrlandoSilver, desc: "Luxury accommodations with premium services for business travelers." },
+                  { title: "Student Hostels", image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777581731/HUB_072200.jpg_tavz8t.jpg", desc: "Affordable accommodation options specially designed for students near universities." },
+                  { title: "Serviced Apartments", image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777581924/APARTMENTS_072242.jpg_tj64to.jpg", desc: "Fully furnished apartments with amenities for short or long-term stays." },
+                  { title: "Student Apartments", image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777582064/STUDENTSS_072223.jpg_omhxnf.jpg", desc: "Luxury accommodations with premium services for business travelers." },
                 ].map((item, index) => (
                   <motion.div key={index} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: index * 0.1 + 0.1 }} className="bg-white rounded-xl overflow-hidden shadow-lg group hover:-translate-y-2 transition-all duration-300">
                     <div className="relative h-48 overflow-hidden">

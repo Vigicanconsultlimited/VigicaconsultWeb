@@ -486,14 +486,29 @@ const styles = `
     .tp-grid { grid-template-columns: 1fr; }
     .tp-back { margin: 0 1rem 32px; }
   }
-    @media (max-width: 640px) {
-  .tp-hero-title {
-    font-size: 28px;
-    letter-spacing: -0.3px;
-    margin-bottom: 16px;
-  }
-  .tp-hero-inner > div {
-    max-width: 100% !important;
+    .tp-hero-sub {
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.72);
+  max-width: 520px;
+  margin-bottom: 36px;
+}
+.tp-hero-title {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: clamp(28px, 5vw, 64px);
+  font-weight: 700;
+  line-height: 1.12;
+  color: #fff;
+  width: 100%;
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+}
+@media (max-width: 640px) {
+  .tp-hero-sub {
+    font-size: 15px;
+    max-width: 100%;
+    margin-bottom: 24px;
   }
 }
 `;
