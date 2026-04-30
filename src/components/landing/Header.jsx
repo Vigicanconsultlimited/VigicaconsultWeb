@@ -236,7 +236,7 @@ function Header() {
                   <FaTelegramPlane />
                 </a>
                 <a
-                  href="https://www.linkedin.com/company/vigica-consult-limited/about/?viewAsMember=true"
+                  href="https://www.linkedin.com/company/vigica-consult-limited-ng/posts/?feedView=all"
                   className="mc-social"
                   aria-label="LinkedIn"
                   title="LinkedIn"
@@ -244,7 +244,7 @@ function Header() {
                   <FaLinkedin />
                 </a>
                 <a
-                  href="https://www.linkedin.com/company/vigica-consult-limited-ng/posts/?feedView=all"
+                  href="https://x.com/vigicaconsult?t=_E90eYcUQ-mPotS-MhX4Mw&s=09"
                   className="mc-social"
                   aria-label="Twitter/X"
                   title="Twitter/X"
