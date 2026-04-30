@@ -587,9 +587,9 @@ export default function Home() {
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                 {[
-                  { title: "Student Hostels", image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777581731/HUB_072200.jpg_tavz8t.jpg", desc: "Affordable accommodation options specially designed for students near universities." },
-                  { title: "Serviced Apartments", image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777581924/APARTMENTS_072242.jpg_tj64to.jpg", desc: "Fully furnished apartments with amenities for short or long-term stays." },
-                  { title: "Student Apartments", image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777582064/STUDENTSS_072223.jpg_omhxnf.jpg", desc: "Luxury accommodations with premium services for business travelers." },
+                  { image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777581731/HUB_072200.jpg_tavz8t.jpg", desc: "Affordable accommodation options specially designed for students near universities." },
+                  { image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777581924/APARTMENTS_072242.jpg_tj64to.jpg", desc: "Fully furnished apartments with amenities for short or long-term stays." },
+                  { image: "https://res.cloudinary.com/dd4bl9gwo/image/upload/v1777582064/STUDENTSS_072223.jpg_omhxnf.jpg", desc: "Luxury accommodations with premium services for business travelers." },
                 ].map((item, index) => (
                   <motion.div key={index} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: index * 0.1 + 0.1 }} className="bg-white rounded-xl overflow-hidden shadow-lg group hover:-translate-y-2 transition-all duration-300">
                     <div className="relative h-48 overflow-hidden">
