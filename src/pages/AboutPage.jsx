@@ -484,6 +484,7 @@ export default function AboutPage() {
                 ))}
               </div>
             </div>
+<<<<<<< Updated upstream
             <div className="ap-test-scroll" ref={testimonialsRef}>
               {CLIENT_TESTIMONIALS.map(t => (
                 <div key={t.id} className="ap-test-card">
@@ -491,6 +492,74 @@ export default function AboutPage() {
                     <img src={getThumb(t.videoId)} alt="Testimonial video" onError={e => e.target.src = "/default-profile.jpg"} />
                     <div className="ap-test-play">
                       <div className="ap-test-play-btn"><FaPlay style={{ marginLeft: 2 }} /></div>
+=======
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Client Testimonials ─────────────────────────────────────── */}
+      <section className="about-section testimonials-section">
+        <div className="about-container">
+          <motion.div
+            className="about-section-header"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <span className="about-section-label">Testimonials</span>
+            <h2 className="about-section-title">
+              What Our Partners & Clients Say
+            </h2>
+            <p className="about-section-sub">
+              Real stories from students whose lives we have helped transform.
+            </p>
+          </motion.div>
+
+          <div className="sub-section-header">
+            <h3 className="sub-section-title">Video Testimonials</h3>
+            <div className="scroll-controls">
+              <button
+                className="scroll-btn"
+                onClick={() => scrollTestimonials(-1)}
+                aria-label="Scroll left"
+              >
+                <FaChevronLeft />
+              </button>
+              <button
+                className="scroll-btn"
+                onClick={() => scrollTestimonials(1)}
+                aria-label="Scroll right"
+              >
+                <FaChevronRight />
+              </button>
+            </div>
+          </div>
+
+          <div className="testimonials-scroll" ref={testimonialsScrollRef}>
+            {CLIENT_TESTIMONIALS.map((t) => (
+              <div key={t.id} className="testimonial-card">
+                {/* Video thumbnail */}
+                {t.type === "video" && t.videoId && (
+                  <a
+                    href={getYoutubeUrl(t.videoId, t.isShort)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="testimonial-video-thumb"
+                    aria-label="Watch video testimony"
+                  >
+                    <img
+                      src={getYoutubeThumbnail(t.videoId)}
+                      alt="Video remark thumbnail"
+                      onError={(e) => {
+                        e.target.src = "/default-profile.jpg";
+                      }}
+                    />
+                    <div className="testimonial-play-overlay">
+                      <span className="testimonial-play-btn">
+                        <FaPlay />
+                      </span>
+>>>>>>> Stashed changes
                     </div>
                   </a>
                   <div className="ap-test-body">
