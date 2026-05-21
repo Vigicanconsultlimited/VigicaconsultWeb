@@ -1,9 +1,20 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  FaQuoteLeft, FaPlay, FaTrophy, FaMedal, FaAward, FaStar,
-  FaChevronLeft, FaChevronRight, FaCheckCircle, FaGraduationCap,
-  FaHandshake, FaUsers, FaGlobe, FaPlane,
+  FaQuoteLeft,
+  FaPlay,
+  FaTrophy,
+  FaMedal,
+  FaAward,
+  FaStar,
+  FaChevronLeft,
+  FaChevronRight,
+  FaCheckCircle,
+  FaGraduationCap,
+  FaHandshake,
+  FaUsers,
+  FaGlobe,
+  FaPlane,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Header from "../components/landing/Header";
@@ -22,8 +33,10 @@ const CONSULTANT = {
   title: "Ebonyi State Scholarship Liaison Officer / Chief Consultant",
   photo: drGideon,
   awardPhoto: UoGMAwardDrGideon,
-  awardCaption: "Best Mentor of the Year – FON Scholars, University of Greater Manchester",
-  topic: "Reflecting on the Mentorship Award and the Ebonyi State Scholarship Journey",
+  awardCaption:
+    "Best Mentor of the Year – FON Scholars, University of Greater Manchester",
+  topic:
+    "Reflecting on the Mentorship Award and the Ebonyi State Scholarship Journey",
   speech: `While pursuing my MBA in Global Healthcare Management at the University of Greater Manchester, serving as both Class Representative and Student Ambassador strengthened my resolve to become a person of value rather than merely someone who is successful.
 
 My six years' experience at the National Agency for the Control of AIDS (NACA), largely focused on coordination, proved instrumental in shaping the role that ultimately led to this award. During my time there, I worked within teams coordinating activities related to the Millennium Development Goals, the Sustainable Development Goals and Global Fund initiatives.
@@ -46,7 +59,8 @@ const MANAGER = {
   title: "CEO, VIGICA Consult Limited",
   photo: emmanuel,
   awardPhoto: UoGMAward,
-  awardCaption: "Outstanding Scholar Support – FON Scholars, University of Greater Manchester",
+  awardCaption:
+    "Outstanding Scholar Support – FON Scholars, University of Greater Manchester",
   topic: "Message from the CEO",
   speech: `At VIGICA Consult Limited, we believe that strategic investment in education and human capital remains one of the most powerful drivers of sustainable national development. Our mission extends beyond facilitating international study opportunities; we are committed to designing and managing structured education programmes that deliver measurable, long-term value.
 
@@ -61,35 +75,135 @@ As we look ahead, our focus remains clear: to deepen international partnerships 
 
 const CLIENT_TESTIMONIALS = [
   //{ id: 1, videoId: "cPDbFdOF248", isShort: true, quote: "Expert testimony from Partner organisation speaks on the collaboration with VIGICA Consult Ltd.", name: "Mistry Puspa", caption: "Leeds Beckett University, UK" },
-  { id: 2, videoId: "IXrWCvYuAes", isShort: false, quote: "The support and mentorship I received through VIGICA CONSULT LIMITED was immeasurable. Their guidance was exceptional from start to finishmst especially the timely disbursment of scholarship stipend", name: "Ezekiel Gabriel Nwibo", caption: "MSc Artificial Intelligence, University of Greater Manchester" },
-  { id: 3, videoId: "ZwTFTwiqiF8", isShort: true, quote: "VIGICA CONSULT LIMITED made my study abroad dream a reality. Their guidance was exceptional from start to finish.", name: "Nwankwo Evaristus", caption: "MSc Data Analytics, University of Greater Manchester" },
-  { id: 4, videoId: "oZ16_O34sFc", isShort: true, quote: "The support and mentorship I received through VIGICA CONSULT LIMITED was truly life-changing.", name: "Ugwoke Edward", caption: "MSc Software Engineering, University of Greater Manchester" },
-  { id: 5, videoId: "7nzqUUFqH4M", isShort: true, quote: "VIGICA CONSULT LIMITED opened doors I never thought possible. I am proud to be studying AI at a top UK university.", name: "Cynthia Uduma", caption: "MSc Artificial Intelligence, University of Greater Manchester" },
+  {
+    id: 2,
+    videoId: "IXrWCvYuAes",
+    isShort: false,
+    quote:
+      "The support and mentorship I received through VIGICA CONSULT LIMITED was immeasurable. Their guidance was exceptional from start to finishmst especially the timely disbursment of scholarship stipend",
+    name: "Ezekiel Gabriel Nwibo",
+    caption: "MSc Artificial Intelligence, University of Greater Manchester",
+  },
+  {
+    id: 3,
+    videoId: "ZwTFTwiqiF8",
+    isShort: true,
+    quote:
+      "VIGICA CONSULT LIMITED made my study abroad dream a reality. Their guidance was exceptional from start to finish.",
+    name: "Nwankwo Evaristus",
+    caption: "MSc Data Analytics, University of Greater Manchester",
+  },
+  {
+    id: 4,
+    videoId: "oZ16_O34sFc",
+    isShort: true,
+    quote:
+      "The support and mentorship I received through VIGICA CONSULT LIMITED was truly life-changing.",
+    name: "Ugwoke Edward",
+    caption: "MSc Software Engineering, University of Greater Manchester",
+  },
+  {
+    id: 5,
+    videoId: "7nzqUUFqH4M",
+    isShort: true,
+    quote:
+      "VIGICA CONSULT LIMITED opened doors I never thought possible. I am proud to be studying AI at a top UK university.",
+    name: "Cynthia Uduma",
+    caption: "MSc Artificial Intelligence, University of Greater Manchester",
+  },
 ];
 
 const EXPERTS = [
-  { id: 1, name: "Dr. Ikporo Stephen", title: "Secretary, Ebonyi State Scholarship Board", institution: "Ebonyi State Government", photo: DrSteve, remark: "VIGICA CONSULT LIMITED stands out in the Nigerian consulting space for its holistic approach. They don't just place students they prepare them for global success." },
-  { id: 2, name: "Puspa Mistry", title: "Regional Manager (Middle East, Africa & Europe) International Recruitment and Partnerships", institution: "Leeds Beckett University", photo: Puspa, remark: "We have a strong partnership with VIGICA CONSULT LIMITED that has produced a long lasting results and we are currently working on new projects." },
+  {
+    id: 1,
+    name: "Dr. Ikporo Stephen",
+    title: "Secretary, Ebonyi State Scholarship Board",
+    institution: "Ebonyi State Government",
+    photo: DrSteve,
+    remark:
+      "VIGICA CONSULT LIMITED stands out in the Nigerian consulting space for its holistic approach. They don't just place students they prepare them for global success.",
+  },
+  {
+    id: 2,
+    name: "Puspa Mistry",
+    title:
+      "Regional Manager (Middle East, Africa & Europe) International Recruitment and Partnerships",
+    institution: "Leeds Beckett University",
+    photo: Puspa,
+    remark:
+      "We have a strong partnership with VIGICA CONSULT LIMITED that has produced a long lasting results and we are currently working on new projects.",
+  },
 ];
 
-
 const AWARDS = [
-  { id: 1, title: "Outstanding Scholar Support", organization: "FON Scholars, University of Greater Manchester", year: "2025", description: "Recognised for excellence in student placement and support services.", icon: "trophy" },
-  { id: 2, title: "Best Mentor Award", organization: "FON Scholars, University of Greater Manchester", year: "2025", description: "Recognised for exceptional mentorship and guidance provided to students.", icon: "medal" },
+  {
+    id: 1,
+    title: "Outstanding Scholar Support",
+    organization: "FON Scholars, University of Greater Manchester",
+    year: "2025",
+    description:
+      "Recognised for excellence in student placement and support services.",
+    icon: "trophy",
+  },
+  {
+    id: 2,
+    title: "Best Mentor Award",
+    organization: "FON Scholars, University of Greater Manchester",
+    year: "2025",
+    description:
+      "Recognised for exceptional mentorship and guidance provided to students.",
+    icon: "medal",
+  },
 ];
 
 const SERVICES = [
-  { num: "01", icon: <FaGlobe />, title: "International Student Recruitment", desc: "We connect students to reputable institutions across the globe, guiding them through every stage from application to enrolment with personalised support and strategic institutional relationships." },
-  { num: "02", icon: <FaPlane />, title: "Travel & Accommodation Support", desc: "We provide seamless travel logistics and secure accommodation solutions, ensuring a smooth transition abroad from airport transfers to pre-arranged housing near universities." },
-  { num: "03", icon: <FaUsers />, title: "Student Support Services", desc: "Our commitment extends beyond placement. We offer CV coaching, integration workshops, cultural guidance, and personal welfare assistance helping students adapt and succeed." },
-  { num: "04", icon: <FaHandshake />, title: "Institutional Partnerships", desc: "We facilitate transnational collaborations between educational and corporate institutions, fostering innovation, knowledge exchange, and long-term partnerships." },
+  {
+    num: "01",
+    icon: <FaGlobe />,
+    title: "International Student Recruitment",
+    desc: "We connect students to reputable institutions across the globe, guiding them through every stage from application to enrolment with personalised support and strategic institutional relationships.",
+  },
+  {
+    num: "02",
+    icon: <FaPlane />,
+    title: "Travel & Accommodation Support",
+    desc: "We provide seamless travel logistics and secure accommodation solutions, ensuring a smooth transition abroad from airport transfers to pre-arranged housing near universities.",
+  },
+  {
+    num: "03",
+    icon: <FaUsers />,
+    title: "Student Support Services",
+    desc: "Our commitment extends beyond placement. We offer CV coaching, integration workshops, cultural guidance, and personal welfare assistance helping students adapt and succeed.",
+  },
+  {
+    num: "04",
+    icon: <FaHandshake />,
+    title: "Institutional Partnerships",
+    desc: "We facilitate transnational collaborations between educational and corporate institutions, fostering innovation, knowledge exchange, and long-term partnerships.",
+  },
 ];
 
 const WHY_US = [
-  { num: "01", title: "Integrity", desc: "We uphold transparency and trust in all our engagements, ensuring every client receives honest, unbiased guidance." },
-  { num: "02", title: "Efficiency", desc: "We deliver timely and reliable solutions every process is streamlined so students and partners experience no unnecessary delays." },
-  { num: "03", title: "Excellence", desc: "We are committed to high standards in every dimension of service delivery from administrative precision to academic outcomes." },
-  { num: "04", title: "Client-Focused", desc: "Every solution is tailored to meet specific needs. We listen, we adapt, and we measure our success by yours." },
+  {
+    num: "01",
+    title: "Integrity",
+    desc: "We uphold transparency and trust in all our engagements, ensuring every client receives honest, unbiased guidance.",
+  },
+  {
+    num: "02",
+    title: "Efficiency",
+    desc: "We deliver timely and reliable solutions every process is streamlined so students and partners experience no unnecessary delays.",
+  },
+  {
+    num: "03",
+    title: "Excellence",
+    desc: "We are committed to high standards in every dimension of service delivery from administrative precision to academic outcomes.",
+  },
+  {
+    num: "04",
+    title: "Client-Focused",
+    desc: "Every solution is tailored to meet specific needs. We listen, we adapt, and we measure our success by yours.",
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -100,7 +214,18 @@ function ReadMoreText({ text, limit = 200 }) {
   return (
     <span>
       {expanded ? text : text.slice(0, limit).trimEnd() + "…"}
-      <button onClick={() => setExpanded(v => !v)} style={{ color: "#2135b0", background: "none", border: "none", cursor: "pointer", fontWeight: 600, marginLeft: 4, fontSize: 14 }}>
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        style={{
+          color: "#2135b0",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          fontWeight: 600,
+          marginLeft: 4,
+          fontSize: 14,
+        }}
+      >
         {expanded ? " Read less" : " Read more"}
       </button>
     </span>
@@ -109,16 +234,43 @@ function ReadMoreText({ text, limit = 200 }) {
 
 function ReadMoreParagraphs({ text, visibleCount = 2, dark = false }) {
   const [expanded, setExpanded] = useState(false);
-  const paras = text.split("\n\n").map(p => p.trim()).filter(Boolean);
+  const paras = text
+    .split("\n\n")
+    .map((p) => p.trim())
+    .filter(Boolean);
   const shown = expanded ? paras : paras.slice(0, visibleCount);
   const hasMore = paras.length > visibleCount;
   return (
     <>
       {shown.map((para, i) => (
-        <p key={i} style={{ marginBottom: 18, lineHeight: 1.85, color: dark ? "rgba(255,255,255,0.72)" : "#4A4440", fontWeight: 300, fontSize: 16 }}>{para}</p>
+        <p
+          key={i}
+          style={{
+            marginBottom: 18,
+            lineHeight: 1.85,
+            color: dark ? "rgba(255,255,255,0.72)" : "#4A4440",
+            fontWeight: 300,
+            fontSize: 16,
+          }}
+        >
+          {para}
+        </p>
       ))}
       {hasMore && (
-        <button onClick={() => setExpanded(v => !v)} style={{ color: dark ? "#fff" : "#2135b0", background: "none", border: `1.5px solid ${dark ? "rgba(255,255,255,0.3)" : "#2135b0"}`, borderRadius: 6, padding: "8px 20px", cursor: "pointer", fontWeight: 500, fontSize: 14, marginTop: 8 }}>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          style={{
+            color: dark ? "#fff" : "#2135b0",
+            background: "none",
+            border: `1.5px solid ${dark ? "rgba(255,255,255,0.3)" : "#2135b0"}`,
+            borderRadius: 6,
+            padding: "8px 20px",
+            cursor: "pointer",
+            fontWeight: 500,
+            fontSize: 14,
+            marginTop: 8,
+          }}
+        >
           {expanded ? "Read less ▲" : "Read more ▼"}
         </button>
       )}
@@ -126,17 +278,28 @@ function ReadMoreParagraphs({ text, visibleCount = 2, dark = false }) {
   );
 }
 
-const getThumb = id => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-const getUrl = (id, isShort) => isShort ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
+const getThumb = (id) => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+const getUrl = (id, isShort) =>
+  isShort
+    ? `https://www.youtube.com/shorts/${id}`
+    : `https://www.youtube.com/watch?v=${id}`;
 
 const AwardIcon = ({ type }) => {
-  if (type === "trophy") return <FaTrophy style={{ fontSize: 24, color: "#2135b0" }} />;
-  if (type === "medal") return <FaMedal style={{ fontSize: 24, color: "#2135b0" }} />;
+  if (type === "trophy")
+    return <FaTrophy style={{ fontSize: 24, color: "#2135b0" }} />;
+  if (type === "medal")
+    return <FaMedal style={{ fontSize: 24, color: "#2135b0" }} />;
   return <FaAward style={{ fontSize: 24, color: "#2135b0" }} />;
 };
 
-const fadeUp = { hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65 } } };
-const stagger = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.65 } },
+};
+const stagger = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
 
 // ─── Styles (CSS-in-JS via style tags) ────────────────────────────────────────
 
@@ -291,7 +454,7 @@ const css = `
 export default function AboutPage() {
   const testimonialsRef = useRef(null);
 
-  const scrollTestimonials = dir => {
+  const scrollTestimonials = (dir) => {
     testimonialsRef.current?.scrollBy({ left: dir * 340, behavior: "smooth" });
   };
 
@@ -307,17 +470,65 @@ export default function AboutPage() {
           <div className="ap-hero-ring" />
           <div className="ap-hero-ring2" />
           <div className="ap-hero-inner">
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+            >
               <div className="ap-eyebrow-line">About VIGICA Consult</div>
-              <h1 style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", fontSize: "clamp(40px,5vw,64px)", fontWeight: 700, lineHeight: 1.12, color: "#fff", maxWidth: 720, marginBottom: 24, letterSpacing: "-0.5px" }}>
-                Bridging <em style={{ fontStyle: "italic", color: "#fed016" }}>People,</em><br />Institutions &amp; Opportunity
+              <h1
+                style={{
+                  fontFamily: "'Segoe UI', system-ui, sans-serif",
+                  fontSize: "clamp(40px,5vw,64px)",
+                  fontWeight: 700,
+                  lineHeight: 1.12,
+                  color: "#fff",
+                  maxWidth: 720,
+                  marginBottom: 24,
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                Bridging{" "}
+                <em style={{ fontStyle: "italic", color: "#fed016" }}>
+                  People,
+                </em>
+                <br />
+                Institutions &amp; Opportunity
               </h1>
-              <p style={{ fontSize: 18, fontWeight: 300, lineHeight: 1.7, color: "rgba(255,255,255,.72)", maxWidth: 520, marginBottom: 36 }}>
-                Headquartered in Abuja, Nigeria delivering tailored, high-impact solutions to students, institutions, travellers, and corporate partners across the globe.
+              <p
+                style={{
+                  fontSize: 18,
+                  fontWeight: 300,
+                  lineHeight: 1.7,
+                  color: "rgba(255,255,255,.72)",
+                  maxWidth: 520,
+                  marginBottom: 36,
+                }}
+              >
+                Headquartered in Abuja, Nigeria delivering tailored, high-impact
+                solutions to students, institutions, travellers, and corporate
+                partners across the globe.
               </p>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,.9)" }} >
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#051ceb", display: "inline-block" }} />
-                Abuja, Nigeria &nbsp;·&nbsp; Partnering with leading UK universities
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: 13,
+                  color: "rgba(255,255,255,.9)",
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: "#051ceb",
+                    display: "inline-block",
+                  }}
+                />
+                Abuja, Nigeria &nbsp;·&nbsp; Partnering with leading UK
+                universities
               </div>
             </motion.div>
           </div>
@@ -327,26 +538,82 @@ export default function AboutPage() {
         <section className="ap-section" style={{ background: "#fff" }}>
           <div className="ap-inner">
             <div className="ap-about-layout">
-              <motion.div className="ap-about-text" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              <motion.div
+                className="ap-about-text"
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
                 <span className="ap-eyebrow">Who We Are</span>
                 <h2 className="ap-title" style={{ marginBottom: 24 }}>
-                  A forward-thinking<br /><em>education partner</em>
+                  A forward-thinking
+                  <br />
+                  <em>education partner</em>
                 </h2>
-                <p>We are a forward-thinking organisation dedicated to delivering tailored, high-impact solutions to students, institutions, travellers, and corporate partners. Our approach is rooted in understanding unique needs and providing services that create real, measurable value.</p>
-                <p>Through strong partnerships with public institutions, universities, and international stakeholders, we have built a model grounded in strategic placement, rigorous academic monitoring, and disciplined financial oversight.</p>
-                <p>From guiding individuals through applications to managing large-scale government scholarship programmes, VIGICA CONSULT LIMITED delivers at every scale with integrity, efficiency, and excellence as our constant standards.</p>
+                <p>
+                  We are a forward-thinking organisation dedicated to delivering
+                  tailored, high-impact solutions to students, institutions,
+                  travellers, and corporate partners. Our approach is rooted in
+                  understanding unique needs and providing services that create
+                  real, measurable value.
+                </p>
+                <p>
+                  Through strong partnerships with public institutions,
+                  universities, and international stakeholders, we have built a
+                  model grounded in strategic placement, rigorous academic
+                  monitoring, and disciplined financial oversight.
+                </p>
+                <p>
+                  From guiding individuals through applications to managing
+                  large-scale government scholarship programmes, VIGICA CONSULT
+                  LIMITED delivers at every scale with integrity, efficiency,
+                  and excellence as our constant standards.
+                </p>
               </motion.div>
 
-              <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-                <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              <motion.div
+                variants={stagger}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <motion.div
+                  variants={stagger}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                >
                   <div className="ap-stats">
                     {[
-                      { num: "128", label: "Ebonyi scholars placed at the University of Greater Manchester", accent: false },
-                      { num: "80%", label: "Graduated with Distinction", accent: true },
-                      { num: "20%", label: "Graduated with Merit", accent: false },
-                      { num: "5", label: "Corporate partnership coordinating all scholar placements", accent: false },
+                      {
+                        num: "128",
+                        label:
+                          "Ebonyi scholars placed at the University of Greater Manchester",
+                        accent: false,
+                      },
+                      {
+                        num: "80%",
+                        label: "Graduated with Distinction",
+                        accent: true,
+                      },
+                      {
+                        num: "20%",
+                        label: "Graduated with Merit",
+                        accent: false,
+                      },
+                      {
+                        num: "5",
+                        label:
+                          "Corporate partnership coordinating all scholar placements",
+                        accent: false,
+                      },
                     ].map((s, i) => (
-                      <motion.div key={i} variants={fadeUp} className={`ap-stat${s.accent ? " ap-stat--accent" : ""}`}>
+                      <motion.div
+                        key={i}
+                        variants={fadeUp}
+                        className={`ap-stat${s.accent ? " ap-stat--accent" : ""}`}
+                      >
                         <div className="ap-stat-num">{s.num}</div>
                         <div className="ap-stat-label">{s.label}</div>
                       </motion.div>
@@ -366,11 +633,25 @@ export default function AboutPage() {
                 <span className="ap-eyebrow">Our Services</span>
                 <h2 className="ap-title">What we do</h2>
               </div>
-              <p className="ap-sub" style={{ marginTop: 0 }}>End-to-end solutions at every stage of the international education journey.</p>
+              <p className="ap-sub" style={{ marginTop: 0 }}>
+                End-to-end solutions at every stage of the international
+                education journey.
+              </p>
             </div>
-            <motion.div className="ap-services-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <motion.div
+              className="ap-services-grid"
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
               {SERVICES.map((s, i) => (
-                <motion.div key={i} variants={fadeUp} className="ap-service" data-num={s.num}>
+                <motion.div
+                  key={i}
+                  variants={fadeUp}
+                  className="ap-service"
+                  data-num={s.num}
+                >
                   <div className="ap-service-icon">{s.icon}</div>
                   <h3>{s.title}</h3>
                   <p>{s.desc}</p>
@@ -384,8 +665,18 @@ export default function AboutPage() {
         <section className="ap-section ap-why">
           <div className="ap-inner">
             <span className="ap-eyebrow">Why Choose Us</span>
-            <h2 className="ap-title">Built on principles that<br />last</h2>
-            <motion.div className="ap-why-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <h2 className="ap-title">
+              Built on principles that
+              <br />
+              last
+            </h2>
+            <motion.div
+              className="ap-why-grid"
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
               {WHY_US.map((w, i) => (
                 <motion.div key={i} variants={fadeUp} className="ap-why-card">
                   <span className="ap-why-num">— {w.num}</span>
@@ -402,16 +693,31 @@ export default function AboutPage() {
         <section className="ap-section" style={{ background: "#fff" }}>
           <div className="ap-inner">
             <span className="ap-eyebrow">Our Direction</span>
-            <h2 className="ap-title">Vision &amp; <em>Mission</em></h2>
-            <motion.div className="ap-vm-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <h2 className="ap-title">
+              Vision &amp; <em>Mission</em>
+            </h2>
+            <motion.div
+              className="ap-vm-grid"
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
               <motion.div variants={fadeUp} className="ap-vm ap-vm--vision">
                 <span className="ap-vm-label">Our Vision</span>
-                <h3>To be a leading global bridge connecting people, institutions, and opportunities across borders.</h3>
+                <h3>
+                  To be a leading global bridge connecting people, institutions,
+                  and opportunities across borders.
+                </h3>
                 <div className="ap-vm-quote">"</div>
               </motion.div>
               <motion.div variants={fadeUp} className="ap-vm ap-vm--mission">
                 <span className="ap-vm-label">Our Mission</span>
-                <h3>To provide efficient, reliable, and innovative services that empower students and organisations to thrive in a global environment.</h3>
+                <h3>
+                  To provide efficient, reliable, and innovative services that
+                  empower students and organisations to thrive in a global
+                  environment.
+                </h3>
                 <div className="ap-vm-quote">"</div>
               </motion.div>
             </motion.div>
@@ -474,30 +780,76 @@ export default function AboutPage() {
               <div>
                 <span className="ap-eyebrow">Testimonials</span>
                 <h2 className="ap-title">What Our Students Say</h2>
-                <p className="ap-sub">Real stories from students whose lives we have helped transform.</p>
+                <p className="ap-sub">
+                  Real stories from students whose lives we have helped
+                  transform.
+                </p>
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 {[-1, 1].map((dir, i) => (
-                  <button key={i} className="ap-scroll-btn" onClick={() => scrollTestimonials(dir)}>
+                  <button
+                    key={i}
+                    className="ap-scroll-btn"
+                    onClick={() => scrollTestimonials(dir)}
+                  >
                     {dir === -1 ? <FaChevronLeft /> : <FaChevronRight />}
                   </button>
                 ))}
               </div>
             </div>
             <div className="ap-test-scroll" ref={testimonialsRef}>
-              {CLIENT_TESTIMONIALS.map(t => (
+              {CLIENT_TESTIMONIALS.map((t) => (
                 <div key={t.id} className="ap-test-card">
-                  <a href={getUrl(t.videoId, t.isShort)} target="_blank" rel="noopener noreferrer" className="ap-test-thumb">
-                    <img src={getThumb(t.videoId)} alt="Testimonial video" onError={e => e.target.src = "/default-profile.jpg"} />
+                  <a
+                    href={getUrl(t.videoId, t.isShort)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ap-test-thumb"
+                  >
+                    <img
+                      src={getThumb(t.videoId)}
+                      alt="Testimonial video"
+                      onError={(e) => (e.target.src = "/default-profile.jpg")}
+                    />
                     <div className="ap-test-play">
-                      <div className="ap-test-play-btn"><FaPlay style={{ marginLeft: 2 }} /></div>
+                      <div className="ap-test-play-btn">
+                        <FaPlay style={{ marginLeft: 2 }} />
+                      </div>
                     </div>
                   </a>
                   <div className="ap-test-body">
-                    <FaQuoteLeft style={{ color: "#7B9CFF", marginBottom: 10 }} />
-                    <p style={{ color: "rgba(255,255,255,.8)", fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>{t.quote}</p>
-                    <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>{t.name}</p>
-                    <p style={{ color: "rgba(255,255,255,.45)", fontSize: 12, margin: "4px 0 0" }}>{t.caption}</p>
+                    <FaQuoteLeft
+                      style={{ color: "#7B9CFF", marginBottom: 10 }}
+                    />
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,.8)",
+                        fontSize: 14,
+                        lineHeight: 1.6,
+                        marginBottom: 16,
+                      }}
+                    >
+                      {t.quote}
+                    </p>
+                    <p
+                      style={{
+                        color: "#fff",
+                        fontWeight: 700,
+                        fontSize: 14,
+                        margin: 0,
+                      }}
+                    >
+                      {t.name}
+                    </p>
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,.45)",
+                        fontSize: 12,
+                        margin: "4px 0 0",
+                      }}
+                    >
+                      {t.caption}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -508,24 +860,101 @@ export default function AboutPage() {
         {/* ── Expert Voices ─────────────────────────────────────── */}
         <section className="ap-section" style={{ background: "#F9F7F4" }}>
           <div className="ap-inner">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} style={{ textAlign: "center", marginBottom: 0 }}>
-              <span className="ap-eyebrow" style={{ display: "block", textAlign: "center" }}>Expert Voices</span>
-              <h2 className="ap-title" style={{ textAlign: "center" }}>What Experts Say</h2>
-              <p className="ap-sub" style={{ margin: "14px auto 0", textAlign: "center" }}>Leading professionals share their perspective on VIGICA CONSULT LIMITED.</p>
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              style={{ textAlign: "center", marginBottom: 0 }}
+            >
+              <span
+                className="ap-eyebrow"
+                style={{ display: "block", textAlign: "center" }}
+              >
+                Expert Voices
+              </span>
+              <h2 className="ap-title" style={{ textAlign: "center" }}>
+                What Experts Say
+              </h2>
+              <p
+                className="ap-sub"
+                style={{ margin: "14px auto 0", textAlign: "center" }}
+              >
+                Leading professionals share their perspective on VIGICA CONSULT
+                LIMITED.
+              </p>
             </motion.div>
-            <motion.div className="ap-experts-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              {EXPERTS.map(e => (
-                <motion.div key={e.id} variants={fadeUp} className="ap-expert-card">
-                  <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
-                    <img src={e.photo} alt={e.name} onError={ev => ev.target.src = "/default-profile.jpg"} style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", border: "3px solid #2135b0" }} />
+            <motion.div
+              className="ap-experts-grid"
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {EXPERTS.map((e) => (
+                <motion.div
+                  key={e.id}
+                  variants={fadeUp}
+                  className="ap-expert-card"
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 16,
+                      marginBottom: 20,
+                    }}
+                  >
+                    <img
+                      src={e.photo}
+                      alt={e.name}
+                      onError={(ev) => (ev.target.src = "/default-profile.jpg")}
+                      style={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        border: "3px solid #2135b0",
+                      }}
+                    />
                     <div>
-                      <p style={{ fontWeight: 700, color: "#12253C", margin: 0, fontSize: 16 }}>{e.name}</p>
-                      <p style={{ color: "#807873", fontSize: 13, margin: "2px 0 0" }}>{e.title}</p>
-                      <p style={{ color: "#2135b0", fontSize: 12, margin: "2px 0 0", fontWeight: 600 }}>{e.institution}</p>
+                      <p
+                        style={{
+                          fontWeight: 700,
+                          color: "#12253C",
+                          margin: 0,
+                          fontSize: 16,
+                        }}
+                      >
+                        {e.name}
+                      </p>
+                      <p
+                        style={{
+                          color: "#807873",
+                          fontSize: 13,
+                          margin: "2px 0 0",
+                        }}
+                      >
+                        {e.title}
+                      </p>
+                      <p
+                        style={{
+                          color: "#2135b0",
+                          fontSize: 12,
+                          margin: "2px 0 0",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {e.institution}
+                      </p>
                     </div>
                   </div>
                   <FaQuoteLeft style={{ color: "#2135b0", marginBottom: 10 }} />
-                  <p style={{ color: "#4A4440", lineHeight: 1.7, fontSize: 15 }}><ReadMoreText text={e.remark} limit={200} /></p>
+                  <p
+                    style={{ color: "#4A4440", lineHeight: 1.7, fontSize: 15 }}
+                  >
+                    <ReadMoreText text={e.remark} limit={200} />
+                  </p>
                 </motion.div>
               ))}
             </motion.div>
@@ -535,20 +964,78 @@ export default function AboutPage() {
         {/* ── Awards ────────────────────────────────────────────── */}
         <section className="ap-section" style={{ background: "#fff" }}>
           <div className="ap-inner">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} style={{ textAlign: "center" }}>
-              <span className="ap-eyebrow" style={{ display: "block", textAlign: "center" }}>Recognition</span>
-              <h2 className="ap-title" style={{ textAlign: "center" }}>Awards &amp; Achievements</h2>
-              <p className="ap-sub" style={{ margin: "14px auto 0", textAlign: "center" }}>Our commitment to excellence has been recognised by leading institutions.</p>
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              style={{ textAlign: "center" }}
+            >
+              <span
+                className="ap-eyebrow"
+                style={{ display: "block", textAlign: "center" }}
+              >
+                Recognition
+              </span>
+              <h2 className="ap-title" style={{ textAlign: "center" }}>
+                Awards &amp; Achievements
+              </h2>
+              <p
+                className="ap-sub"
+                style={{ margin: "14px auto 0", textAlign: "center" }}
+              >
+                Our commitment to excellence has been recognised by leading
+                institutions.
+              </p>
             </motion.div>
-            <motion.div className="ap-awards-grid" variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              {AWARDS.map(a => (
-                <motion.div key={a.id} variants={fadeUp} className="ap-award-card">
-                  <div className="ap-award-icon"><AwardIcon type={a.icon} /></div>
+            <motion.div
+              className="ap-awards-grid"
+              variants={stagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              {AWARDS.map((a) => (
+                <motion.div
+                  key={a.id}
+                  variants={fadeUp}
+                  className="ap-award-card"
+                >
+                  <div className="ap-award-icon">
+                    <AwardIcon type={a.icon} />
+                  </div>
                   <div>
                     <span className="ap-award-year">{a.year}</span>
-                    <h4 style={{ color: "#12253C", fontWeight: 700, fontSize: 17, margin: "0 0 4px" }}>{a.title}</h4>
-                    <p style={{ color: "#2135b0", fontSize: 13, fontWeight: 600, margin: "0 0 8px" }}>{a.organization}</p>
-                    <p style={{ color: "#807873", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{a.description}</p>
+                    <h4
+                      style={{
+                        color: "#12253C",
+                        fontWeight: 700,
+                        fontSize: 17,
+                        margin: "0 0 4px",
+                      }}
+                    >
+                      {a.title}
+                    </h4>
+                    <p
+                      style={{
+                        color: "#2135b0",
+                        fontSize: 13,
+                        fontWeight: 600,
+                        margin: "0 0 8px",
+                      }}
+                    >
+                      {a.organization}
+                    </p>
+                    <p
+                      style={{
+                        color: "#807873",
+                        fontSize: 14,
+                        lineHeight: 1.6,
+                        margin: 0,
+                      }}
+                    >
+                      {a.description}
+                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -558,20 +1045,49 @@ export default function AboutPage() {
 
         {/* ── CTA ───────────────────────────────────────────────── */}
         <section className="ap-cta">
-          <motion.div className="ap-cta-inner" variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <span className="ap-eyebrow" style={{ display: "block", textAlign: "center" }}>Get In Touch</span>
-            <h2>Ready to unlock <em>global opportunities?</em></h2>
-            <p>Partner with us to open doors to world-class education and international collaboration. We are ready to support your journey every step of the way.</p>
+          <motion.div
+            className="ap-cta-inner"
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <span
+              className="ap-eyebrow"
+              style={{ display: "block", textAlign: "center" }}
+            >
+              Get In Touch
+            </span>
+            <h2>
+              Ready to unlock <em>global opportunities?</em>
+            </h2>
+            <p>
+              Partner with us to open doors to world-class education and
+              international collaboration. We are ready to support your journey
+              every step of the way.
+            </p>
             <div className="ap-cta-btns">
               <Link to="/register" className="ap-btn-primary">
                 Start Your Application
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </Link>
-              <Link to="/#contact" className="ap-btn-secondary">Book Free Consultation</Link>
+              <Link to="/#contact" className="ap-btn-secondary">
+                Book Free Consultation
+              </Link>
             </div>
           </motion.div>
         </section>
-
       </div>
     </>
   );
