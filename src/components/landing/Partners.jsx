@@ -3,21 +3,21 @@ import { motion } from "framer-motion";
 import { Badge } from "../ui/badge";
 import { Handshake } from "lucide-react";
 import DMU from "../../assets/images/1499083809_Capture.avif";
-import Leed_Bekett from "../../assets/images/2018_LBU01_PURPLE_jpg-1024x430.jpg";
+// import Leed_Bekett from "../../assets/images/2018_LBU01_PURPLE_jpg-1024x430.jpg";
 import EBSG from "../../assets/images/ebonyiia.png";
 import Sweftly from "../../assets/images/sweftly.png";
-import Robert_Gordon from "../../assets/images/RobertGordon.jpg";
+// import Robert_Gordon from "../../assets/images/RobertGordon.jpg";
 import British_Council from "../../assets/images/british-council2.avif";
 //"C:\Users\User\Desktop\proj\VigicaconsultWeb\vigicanwebapp\src\assets\images\ebonyiia.png"
 // Partners data - easily extendable
 const partnersData = [
-  {
-    id: 1,
-    name: "Leeds Beckett University",
-    logo: Leed_Bekett,
-    url: "https://www.leedsbeckett.ac.uk/",
-    //description: "UK University Partner",
-  },
+  // {
+  //   id: 1,
+  //   name: "Leeds Beckett University",
+  //   logo: Leed_Bekett,
+  //   url: "https://www.leedsbeckett.ac.uk/",
+  //   //description: "UK University Partner",
+  // },
   {
     id: 2,
     name: "Sweftly Payment Agent",
@@ -32,13 +32,13 @@ const partnersData = [
     url: "https://www.ebonyistate.gov.ng/",
     //description: "Government Partner",
   },
-  {
-    id: 4,
-    name: "Robert Gordon University, Aberdeen",
-    logo: Robert_Gordon,
-    url: "https://www.rgu.ac.uk/",
-    //description: "Scholarship Partner",
-  },
+  // {
+  //   id: 4,
+  //   name: "Robert Gordon University, Aberdeen",
+  //   logo: Robert_Gordon,
+  //   url: "https://www.rgu.ac.uk/",
+  //   //description: "Scholarship Partner",
+  // },
   {
     id: 5,
     name: "British Council",
