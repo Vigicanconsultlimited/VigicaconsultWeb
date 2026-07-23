@@ -78,14 +78,14 @@ const Partners = () => {
         </motion.div>
 
         {/* Partners Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8">
+        <div className="flex flex-wrap justify-center gap-6 lg:gap-8 max-w-3xl mx-auto">
           {partnersData.map((partner, index) => (
             <motion.a
               key={partner.id}
               href={partner.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group no-underline"
+              className="group no-underline w-40 lg:w-48"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
